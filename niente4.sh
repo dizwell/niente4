@@ -140,7 +140,7 @@ fi
 # ===========================================================================================================
 clear
 if ! [[ -f "$CONFDIR/bin/ablibgiotput.sh" ]]; then 
-  wget -q "https://bbritten.com/software/niente/bin/nentput.sh" -O "$CONFDIR/bin/nentput.sh";
+  wget -q "https://raw.githubusercontent.com/dizwell/niente4/beta/bin/nentput.sh" -O "$CONFDIR/bin/nentput.sh";
 else
   source "$CONFDIR/bin/ablibgiotput.sh" 
 fi
