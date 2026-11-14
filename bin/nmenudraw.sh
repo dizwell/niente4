@@ -11,7 +11,7 @@ function wordlogo {
 tput setaf $LOGO 
 tput cup  8 60; echo "  _   _ _            _        "
 tput cup  9 60; echo " | \ | (_) ___ _ __ | |_ ___  "
-tput cup 10 60; echo " |  \| | |/ _ \ '_ \| __/ _ \ "
+tput cup 10 60; echo " |  \| | |/ _ \ '_ \| __/ 4̲ \ "
 tput cup 11 60; echo " | |\  | |  __/ | | | ||  __/ "
 tput cup 12 60; echo " |_| \_|_|\___|_| |_|\__\___| "
 }
