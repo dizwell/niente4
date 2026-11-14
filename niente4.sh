@@ -149,21 +149,21 @@ fi
 for i in "$@"; do
   case $i in
     --scan-full)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --scan-new)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --check-full)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" full; clear; exit_program;;
     --check-differential)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" diff; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" diff; clear; exit_program;;
     --check-fast)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" logic; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" logic; clear; exit_program;;
     --check-art)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenartscannd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenartscannd.sh"; clear; exit_program;;
     --check-volume)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenvolchknd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenvolchknd.sh" full; clear; exit_program;;
     --aggstats)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenaggstatnd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenaggstatnd.sh" full; clear; exit_program;;
   esac
 done
 
@@ -171,7 +171,7 @@ export DIALOGRC="$CONFDIR/txt/abnendialog.conf"		# Sets the colour scheme for di
 tput civis; printf '\e[8;28;103t'			# Setting terminal virtual size to 103x28, regardless of what it's actually set to
 parse_config
 
-source "$CONFDIR/bin/aboscheck.sh"
+source "$CONFDIR/bin/nenoscheck.sh"
 source "$CONFDIR/txt/programvariables.txt"																# Apply particular program variables that are needed, and which are OS-dependent
 
 # If at this point we discover database name is null, we need to prompt for one to

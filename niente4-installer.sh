@@ -5,7 +5,7 @@
 #
 #  1. Get user consent to adjust system
 #  2. Configure default Dialog colour scheme
-#  3. Use aboscheck to install Niente's software dependencies
+#  3. Use nenoscheck to install Niente's software dependencies
 #  4. Install new Niente 4 files
 #  5. Verify installation
 #  6. Install new fonts
@@ -130,17 +130,17 @@ mkdir -p "$NEWCONF/db"
 mkdir -p "$NEWCONF/txt"
 mkdir -p "$NEWCONF/tmp"
 
-# 3. Call aboscheck.sh and get packages installed
+# 3. Call nenoscheck.sh and get packages installed
 YPOS=$((YPOS+1)); tput cup $YPOS 1;
-wget -q "$REMOTESOURCE/bin/aboscheck.sh" -O "$NEWCONF/bin/aboscheck.sh"
-source "$NEWCONF/bin/aboscheck.sh" install        # Triggers a check of software dependencies and *fixes* them
+wget -q "$REMOTESOURCE/bin/nenoscheck.sh" -O "$NEWCONF/bin/nenoscheck.sh"
+source "$NEWCONF/bin/nenoscheck.sh" install        # Triggers a check of software dependencies and *fixes* them
 
 function downloads {
 # 4. Fetch Niente components
-components=(abcheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
+components=(nencheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
 nenintegrity.sh nenintegritynd.sh nenlogdel.sh nenlokdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh
 nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh
-nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh aboscheck.sh aboutput.sh nmenudraw.sh
+nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh nenoscheck.sh nenoutput.sh nmenudraw.sh
 nmenuoptions.sh nsubmenuoptions.sh)
 total=${#components[@]}
 count=0

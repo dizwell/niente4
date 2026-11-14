@@ -2,7 +2,7 @@
 #
 ####################################################################
 #
-# abcheckver: A function to check if software updates are available
+# nencheckver: A function to check if software updates are available
 # and to apply them if so and the user requests it.
 #
 ####################################################################
@@ -25,10 +25,10 @@ fi
 
 function perform_upgrade {
 # Fetch Niente components: Bin files first
-components=(abcheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
+components=(nencheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
 nenintegrity.sh nenintegritynd.sh nenlogdel.sh nenlokdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh
 nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh
-nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh aboscheck.sh aboutput.sh nmenudraw.sh
+nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh nenoscheck.sh nenoutput.sh nmenudraw.sh
 nmenuoptions.sh nsubmenuoptions.sh)
 total=${#components[@]}
 count=0

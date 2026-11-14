@@ -12,12 +12,12 @@
 #
 ####################################################################
 function output_report {
-if ! [[ -f $CONFDIR/bin/aboutput.sh ]]; then
+if ! [[ -f $CONFDIR/bin/nenoutput.sh ]]; then
   REMOTESOURCE="https://software.bbritten.com/giocoso/bin"
-  wget -q "$REMOTESOURCE/aboutput.sh" -O "$CONFDIR/bin/aboutput.sh"
-  source "$CONFDIR/bin/aboutput.sh" "$REPORT_FILE"
+  wget -q "$REMOTESOURCE/nenoutput.sh" -O "$CONFDIR/bin/nenoutput.sh"
+  source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 else
-  source "$CONFDIR/bin/aboutput.sh" "$REPORT_FILE"
+  source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 fi
 }
 

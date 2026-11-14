@@ -244,7 +244,7 @@ elif [ "$1" == "administration" ]; then
         nmenuoptions administration ;;
     3 ) clear; source "$CONFDIR/bin/nenlokdel.sh"; nmenuoptions administration ;;
     4 ) clear; source "$CONFDIR/bin/nenlogdel.sh"; nmenuoptions administration ;;
-    5 ) clear; source "$CONFDIR/bin/abcheckver.sh"; nmenuoptions administration ;;
+    5 ) clear; source "$CONFDIR/bin/nencheckver.sh"; nmenuoptions administration ;;
     6 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
 
     D|d ) clear; nmenuoptions database;;
