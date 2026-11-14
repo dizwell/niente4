@@ -137,10 +137,10 @@ source "$NEWCONF/bin/aboscheck.sh" install        # Triggers a check of software
 
 function downloads {
 # 4. Fetch Niente components
-components=(abcheckver.sh ablibnenaggstatnd.sh ablibnenartscan.sh ablibnenartscannd.sh ablibnencolour.sh ablibnenconf.sh ablibnencreatedb.sh
-ablibnenintegrity.sh ablibnenintegritynd.sh ablibnenlogdel.sh ablibnenlokdel.sh ablibnennodb.sh ablibnennukedb.sh ablibnennukedbnd.sh
-ablibnenparse.sh ablibnenrefreshdb.sh ablibnenrefreshdbnd.sh ablibnenreports.sh ablibnenrptgen.sh ablibnenrptlog.sh
-ablibnenrptother.sh ablibnentput.sh ablibnenvolchk.sh ablibnenvolchknd.sh aboscheck.sh aboutput.sh nmenudraw.sh
+components=(abcheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
+nenintegrity.sh nenintegritynd.sh nenlogdel.sh nenlokdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh
+nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh
+nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh aboscheck.sh aboutput.sh nmenudraw.sh
 nmenuoptions.sh nsubmenuoptions.sh)
 total=${#components[@]}
 count=0

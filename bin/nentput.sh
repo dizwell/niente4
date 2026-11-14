@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnentput: routine for making tput work as a bash internal
+# nentput: routine for making tput work as a bash internal
 # call rather than as an invocation of an external utility
 #
 ####################################################################

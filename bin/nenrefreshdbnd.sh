@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenrefreshdb: routine for re-scanning music files and
+# nenrefreshdb: routine for re-scanning music files and
 # re-populating the database with their metadata details. Same as
 # the main refresh module, but with no output to screen.
 #

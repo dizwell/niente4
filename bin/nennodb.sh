@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnennodb: routine to set a working database if a default database
+# nennodb: routine to set a working database if a default database
 # and/or music folder has not been configured. These set per-session
 # working values if not.
 #

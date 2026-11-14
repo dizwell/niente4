@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnencolour: routine for allowing program display elements to 
+# nencolour: routine for allowing program display elements to 
 # be coloured in a user-configurable manner
 #
 ####################################################################

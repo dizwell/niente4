@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenrptother: routine for producing all the "Other Reports", namely:
+# nenrptother: routine for producing all the "Other Reports", namely:
 #
 # 1. Album Art issues
 # 2. Volume Boosts

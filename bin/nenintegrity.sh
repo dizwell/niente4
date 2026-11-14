@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenintegrity: routine for checking the state of embedded
+# nenintegrity: routine for checking the state of embedded
 # album art within known FLACs
 #
 # A FULL check = visit every row in the tracks table and recheck everything

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenvolchknd: routine for checking the peak volumes of music
+# nenvolchknd: routine for checking the peak volumes of music
 # within a FLAC mentioned in the Niente music database. Same as then
 # main module for doing this, but with no output to screen.
 #
@@ -12,7 +12,7 @@ POSSIBLE_BOOSTS=0
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
 
 function ctrl_c() {
-  source "$CONFDIR/bin/ablibnenlokdel.sh" quiet
+  source "$CONFDIR/bin/nenlokdel.sh" quiet
   exit_program
 }
 

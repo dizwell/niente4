@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnencreatedb: routine for creating a music database for
+# nencreatedb: routine for creating a music database for
 # Niente to work with
 #
 ####################################################################

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenlokdel: routine for removing the file scan log
+# nenlokdel: routine for removing the file scan log
 #
 ####################################################################
 

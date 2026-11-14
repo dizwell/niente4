@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenrefreshdb: routine for re-scanning music files and
+# nenrefreshdb: routine for re-scanning music files and
 # re-populating the database with their metadata details
 #
 ####################################################################
@@ -125,6 +125,6 @@ else
 fi
 }
 
-if [ -z "$MUSICDIR" ]; then source "$CONFDIR/bin/ablibnennodb.sh" folder; fi
+if [ -z "$MUSICDIR" ]; then source "$CONFDIR/bin/nennodb.sh" folder; fi
 check_existing_recordcount
 

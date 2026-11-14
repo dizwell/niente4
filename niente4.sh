@@ -44,7 +44,7 @@ mkdir -p "$CONFDIR" "$CONFDIR/txt" "$CONFDIR/bin" "$CONFDIR/tmp" "$CONFDIR/art" 
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
 
 function parse_config {
-source "$CONFDIR/bin/ablibnenparse.sh"
+source "$CONFDIR/bin/nenparse.sh"
 }
 
 function exit_program {
@@ -140,7 +140,7 @@ fi
 # ===========================================================================================================
 clear
 if ! [[ -f "$CONFDIR/bin/ablibgiotput.sh" ]]; then 
-  wget -q "https://bbritten.com/software/niente/bin/ablibnentput.sh" -O "$CONFDIR/bin/ablibnentput.sh";
+  wget -q "https://bbritten.com/software/niente/bin/nentput.sh" -O "$CONFDIR/bin/nentput.sh";
 else
   source "$CONFDIR/bin/ablibgiotput.sh" 
 fi
@@ -149,21 +149,21 @@ fi
 for i in "$@"; do
   case $i in
     --scan-full)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnennukedbnd.sh" quiet; source "$CONFDIR/bin/ablibnenrefreshdbnd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --scan-new)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenrefreshdbnd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --check-full)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenintegritynd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" full; clear; exit_program;;
     --check-differential)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenintegritynd.sh" diff; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" diff; clear; exit_program;;
     --check-fast)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenintegritynd.sh" logic; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" logic; clear; exit_program;;
     --check-art)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenartscannd.sh"; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenartscannd.sh"; clear; exit_program;;
     --check-volume)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenvolchknd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenvolchknd.sh" full; clear; exit_program;;
     --aggstats)
-      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/ablibnenaggstatnd.sh" full; clear; exit_program;;
+      parse_config; check_database; source "$CONFDIR/bin/aboscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenaggstatnd.sh" full; clear; exit_program;;
   esac
 done
 
@@ -176,7 +176,7 @@ source "$CONFDIR/txt/programvariables.txt"																# Apply particular pro
 
 # If at this point we discover database name is null, we need to prompt for one to
 # use as 'the session database'.
-if [ -z "$DBNAME" ]; then source "$CONFDIR/bin/ablibnennodb.sh" database; fi
+if [ -z "$DBNAME" ]; then source "$CONFDIR/bin/nennodb.sh" database; fi
 
 # If a database name is specified, check it's valid
 if [[ ! -z $DBNAME ]]; then

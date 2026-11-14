@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenaggstatnd: routine for running the Aggstats report, but
+# nenaggstatnd: routine for running the Aggstats report, but
 # with no output to screen, just a written report to disk
 #
 ####################################################################

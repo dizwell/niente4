@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenartscan: routine for checking the state of embedded
+# nenartscan: routine for checking the state of embedded
 # album art within known FLACs
 #
 ####################################################################

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnennukedb: routine for wiping a database of all of its
+# nennukedb: routine for wiping a database of all of its
 # contents
 #
 ####################################################################

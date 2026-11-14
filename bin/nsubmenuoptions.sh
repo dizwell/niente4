@@ -4,7 +4,7 @@
 # A function to write various menu options onto the screen
 #
 ####################################################################
-source "$CONFDIR/bin/ablibnentput.sh"
+source "$CONFDIR/bin/nentput.sh"
 SPACER="      "
 escape_char=$(printf "\u1b")
 
@@ -30,11 +30,11 @@ if [ "$1" == "general" ]; then
     read -rsn2 option
   fi
   case $option in
-   "") source "$CONFDIR/bin/ablibnenreports.sh" aggsts ;;
-    1) source "$CONFDIR/bin/ablibnenreports.sh" aggsts ;;
-    2) source "$CONFDIR/bin/ablibnenreports.sh" phys ;;
-    3) source "$CONFDIR/bin/ablibnenreports.sh" nya ;;
-    4) source "$CONFDIR/bin/ablibnenreports.sh" nulltg ;;
+   "") source "$CONFDIR/bin/nenreports.sh" aggsts ;;
+    1) source "$CONFDIR/bin/nenreports.sh" aggsts ;;
+    2) source "$CONFDIR/bin/nenreports.sh" phys ;;
+    3) source "$CONFDIR/bin/nenreports.sh" nya ;;
+    4) source "$CONFDIR/bin/nenreports.sh" nulltg ;;
     '[D') nsubmenuoptions other;;
     '[C') nsubmenuoptions logical;;
     G|g ) clear; nsubmenuoptions general;;
@@ -86,13 +86,13 @@ elif [ "$1" == "logical" ]; then
     read -rsn2 option
   fi
   case $option in
-   "") source "$CONFDIR/bin/ablibnenreports.sh" dates ;;
-    1) source "$CONFDIR/bin/ablibnenreports.sh" dates ;;
-    2) source "$CONFDIR/bin/ablibnenreports.sh" track ;;
-    3) source "$CONFDIR/bin/ablibnenreports.sh" comper ;;
-    4) source "$CONFDIR/bin/ablibnenreports.sh" albper ;;
-    5) source "$CONFDIR/bin/ablibnenreports.sh" artcom ;;
-    6) source "$CONFDIR/bin/ablibnenreports.sh" bits ;;
+   "") source "$CONFDIR/bin/nenreports.sh" dates ;;
+    1) source "$CONFDIR/bin/nenreports.sh" dates ;;
+    2) source "$CONFDIR/bin/nenreports.sh" track ;;
+    3) source "$CONFDIR/bin/nenreports.sh" comper ;;
+    4) source "$CONFDIR/bin/nenreports.sh" albper ;;
+    5) source "$CONFDIR/bin/nenreports.sh" artcom ;;
+    6) source "$CONFDIR/bin/nenreports.sh" bits ;;
     '[D') nsubmenuoptions general;;
     '[C') nsubmenuoptions other;;
     G|g ) clear; nsubmenuoptions general;;
@@ -145,14 +145,14 @@ elif [ "$1" == "other" ]; then
     read -rsn2 option
   fi
   case $option in
-   "") source "$CONFDIR/bin/ablibnenreports.sh" badart ;;
-    1) source "$CONFDIR/bin/ablibnenreports.sh" badart ;;
-    2) source "$CONFDIR/bin/ablibnenreports.sh" maxv ;;
-    3) source "$CONFDIR/bin/ablibnenreports.sh" replay ;;
-    4) source "$CONFDIR/bin/ablibnenreports.sh" namebt ;;
-    5) source "$CONFDIR/bin/ablibnenreports.sh" multtk ;;
-    6) source "$CONFDIR/bin/ablibnenreports.sh" dupes ;;
-    7) source "$CONFDIR/bin/ablibnenreports.sh" ops ;;
+   "") source "$CONFDIR/bin/nenreports.sh" badart ;;
+    1) source "$CONFDIR/bin/nenreports.sh" badart ;;
+    2) source "$CONFDIR/bin/nenreports.sh" maxv ;;
+    3) source "$CONFDIR/bin/nenreports.sh" replay ;;
+    4) source "$CONFDIR/bin/nenreports.sh" namebt ;;
+    5) source "$CONFDIR/bin/nenreports.sh" multtk ;;
+    6) source "$CONFDIR/bin/nenreports.sh" dupes ;;
+    7) source "$CONFDIR/bin/nenreports.sh" ops ;;
     '[D') nsubmenuoptions logical;;
     '[C') nsubmenuoptions general;;
     G|g ) clear; nsubmenuoptions general;;

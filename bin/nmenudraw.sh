@@ -2,8 +2,8 @@
 ####################################################################
 # smenudraw: Clear screen drawing routine
 ####################################################################
-source "$CONFDIR/bin/ablibnenparse.sh"
-source "$CONFDIR/bin/ablibnentput.sh"
+source "$CONFDIR/bin/nenparse.sh"
+source "$CONFDIR/bin/nentput.sh"
 LOGO_PATH="$CONFDIR/art/nienteicosmall.png"
 clear; tput cup 0 0
 

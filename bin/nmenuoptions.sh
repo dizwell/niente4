@@ -4,7 +4,7 @@
 # A function to write various menu options onto the screen
 #
 ####################################################################
-source "$CONFDIR/bin/ablibnentput.sh"
+source "$CONFDIR/bin/nentput.sh"
 SPACER="      "
 escape_char=$(printf "\u1b")
 
@@ -34,19 +34,19 @@ if [ "$1" == "database" ]; then
     read -rsn2 option
   fi
   case $option in
-   "" ) source "$CONFDIR/bin/ablibnencreatedb.sh"; nmenuoptions database ;;
-    1 ) source "$CONFDIR/bin/ablibnencreatedb.sh"; nmenuoptions database ;;
-    2 ) source "$CONFDIR/bin/ablibnennukedb.sh" quiet; source "$CONFDIR/bin/ablibnenrefreshdb.sh"; nmenuoptions database;;
-    3 ) source "$CONFDIR/bin/ablibnenrefreshdb.sh"; nmenuoptions database;;
-    4 ) source "$CONFDIR/bin/ablibnennukedb.sh" verbose; nmenuoptions database;;
+   "" ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
+    1 ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
+    2 ) source "$CONFDIR/bin/nennukedb.sh" quiet; source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;
+    3 ) source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;
+    4 ) source "$CONFDIR/bin/nennukedb.sh" verbose; nmenuoptions database;;
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/ablibnenlokdel.sh" quiet; nmenuoptions database;;
-    C|c ) source "$CONFDIR/bin/ablibnennodb.sh" database; nmenuoptions database;;
-    F|f ) source "$CONFDIR/bin/ablibnennodb.sh" folder; nmenuoptions database;;
+    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions database;;
+    C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions database;;
+    F|f ) source "$CONFDIR/bin/nennodb.sh" folder; nmenuoptions database;;
     X|x ) clear; exit 0 ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
@@ -100,21 +100,21 @@ elif [ "$1" == "integrity" ]; then
     read -rsn2 option
   fi
   case $option in
-   "" ) source "$CONFDIR/bin/ablibnenintegrity.sh" full; nmenuoptions integrity;;
-    1 ) source "$CONFDIR/bin/ablibnenintegrity.sh" full; nmenuoptions integrity;;
-    2 ) source "$CONFDIR/bin/ablibnenintegrity.sh" diff; nmenuoptions integrity;;
-    3 ) source "$CONFDIR/bin/ablibnenintegrity.sh" logic; nmenuoptions integrity;;
-    4 ) source "$CONFDIR/bin/ablibnenartscan.sh" full; nmenuoptions integrity;;
-    5 ) source "$CONFDIR/bin/ablibnenartscan.sh" diff; nmenuoptions integrity;;
-    6 ) source "$CONFDIR/bin/ablibnenvolchk.sh" full; nmenuoptions integrity;;
-    7 ) source "$CONFDIR/bin/ablibnenvolchk.sh" partial; nmenuoptions integrity;;
+   "" ) source "$CONFDIR/bin/nenintegrity.sh" full; nmenuoptions integrity;;
+    1 ) source "$CONFDIR/bin/nenintegrity.sh" full; nmenuoptions integrity;;
+    2 ) source "$CONFDIR/bin/nenintegrity.sh" diff; nmenuoptions integrity;;
+    3 ) source "$CONFDIR/bin/nenintegrity.sh" logic; nmenuoptions integrity;;
+    4 ) source "$CONFDIR/bin/nenartscan.sh" full; nmenuoptions integrity;;
+    5 ) source "$CONFDIR/bin/nenartscan.sh" diff; nmenuoptions integrity;;
+    6 ) source "$CONFDIR/bin/nenvolchk.sh" full; nmenuoptions integrity;;
+    7 ) source "$CONFDIR/bin/nenvolchk.sh" partial; nmenuoptions integrity;;
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/ablibnenlokdel.sh" quiet; nmenuoptions integrity;;
-    C|c ) source "$CONFDIR/bin/ablibnennodb.sh" database; nmenuoptions integrity;;
+    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions integrity;;
+    C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions integrity;;
     X|x ) clear; exit 0 ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
@@ -169,14 +169,14 @@ elif [ "$1" == "reporting" ]; then
     1 ) source "$CONFDIR/bin/nsubmenuoptions.sh" general;;
     2 ) source "$CONFDIR/bin/nsubmenuoptions.sh" logical;;
     3 ) source "$CONFDIR/bin/nsubmenuoptions.sh" other;;
-    4 ) source "$CONFDIR/bin/ablibnenreports.sh" advsql ;;
+    4 ) source "$CONFDIR/bin/nenreports.sh" advsql ;;
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/ablibnenlokdel.sh" quiet; nmenuoptions reporting;;
-    C|c ) source "$CONFDIR/bin/ablibnennodb.sh" database; nmenuoptions reporting;;
+    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions reporting;;
+    C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions reporting;;
     X|x ) clear; exit 0 ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
@@ -229,8 +229,8 @@ elif [ "$1" == "administration" ]; then
     read -rsn2 option
   fi
   case $option in
-   "" ) clear; source "$CONFDIR/bin/ablibnenconf.sh"; nmenuoptions administration ;;
-    1 ) clear; source "$CONFDIR/bin/ablibnenconf.sh"; nmenuoptions administration ;;
+   "" ) clear; source "$CONFDIR/bin/nenconf.sh"; nmenuoptions administration ;;
+    1 ) clear; source "$CONFDIR/bin/nenconf.sh"; nmenuoptions administration ;;
     2 ) if [[ ! -d "$CONFDIR/tmp" ]]; then mkdir -p "$CONFDIR/tmp"; fi
         if [[ ! -f "$CONFDIR/tmp/license.txt" ]]; then
           wget -q https://bbritten.com/software/niente/gpl-v2.0.txt -O "$CONFDIR/tmp/license.txt"
@@ -242,18 +242,18 @@ elif [ "$1" == "administration" ]; then
           dialog --backtitle "Niente GPL v2 Software Licence" --title " Text of the GPLv2 Licence " --ok-label "OK" --extra-button --extra-label "Cancel" --textbox "$CONFDIR/tmp/licensewrapped.txt" 20 95
         fi
         nmenuoptions administration ;;
-    3 ) clear; source "$CONFDIR/bin/ablibnenlokdel.sh"; nmenuoptions administration ;;
-    4 ) clear; source "$CONFDIR/bin/ablibnenlogdel.sh"; nmenuoptions administration ;;
+    3 ) clear; source "$CONFDIR/bin/nenlokdel.sh"; nmenuoptions administration ;;
+    4 ) clear; source "$CONFDIR/bin/nenlogdel.sh"; nmenuoptions administration ;;
     5 ) clear; source "$CONFDIR/bin/abcheckver.sh"; nmenuoptions administration ;;
-    6 ) clear; source "$CONFDIR/bin/ablibnencolour.sh"; nmenuoptions administration;;
+    6 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
 
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/ablibnenlokdel.sh" quiet; nmenuoptions administration;;
-    C|c ) source "$CONFDIR/bin/ablibnennodb.sh" database; nmenuoptions administration;;
+    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions administration;;
+    C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions administration;;
     X|x ) clear; exit 0 ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then

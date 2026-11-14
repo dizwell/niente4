@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenintegritynd: routine for checking the state of embedded
+# nenintegritynd: routine for checking the state of embedded
 # album art within known FLACs. Same as main integrity check but
 # without any graphical output.
 #

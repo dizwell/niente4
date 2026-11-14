@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenparse: routine for parsing the persistent configuration
+# nenparse: routine for parsing the persistent configuration
 # file and deriving sensible values from whatever is supplied there.
 #
 ####################################################################

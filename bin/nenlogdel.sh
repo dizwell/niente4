@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenlogdel: routine for pruning the database operations log
+# nenlogdel: routine for pruning the database operations log
 #
 ####################################################################
 

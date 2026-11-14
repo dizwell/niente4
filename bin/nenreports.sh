@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenreports: This is now the central clearing house for all
+# nenreports: This is now the central clearing house for all
 # reports, together with the special logic needed to allow for 
 # user-defined 'Advanced SQL' queries.
 #
@@ -95,14 +95,14 @@ done
 
 function other_reports {
 REMOTESOURCE="https://software.bbritten.com/niente/bin"
-if ! [[ -f $CONFDIR/bin/ablibnenrptgen.sh ]]; then
-  wget -q "$REMOTESOURCE/ablibnenrptgen.sh" -O "$CONFDIR/bin/ablibnenrptgen.sh"
+if ! [[ -f $CONFDIR/bin/nenrptgen.sh ]]; then
+  wget -q "$REMOTESOURCE/nenrptgen.sh" -O "$CONFDIR/bin/nenrptgen.sh"
 fi
-if ! [[ -f $CONFDIR/bin/ablibnenrptlog.sh ]]; then
-  wget -q "$REMOTESOURCE/ablibnenrptlog.sh" -O "$CONFDIR/bin/ablibnenrptlog.sh"
+if ! [[ -f $CONFDIR/bin/nenrptlog.sh ]]; then
+  wget -q "$REMOTESOURCE/nenrptlog.sh" -O "$CONFDIR/bin/nenrptlog.sh"
 fi
-if ! [[ -f $CONFDIR/bin/ablibnenrptother.sh ]]; then
-  wget -q "$REMOTESOURCE/ablibnenrptother.sh" -O "$CONFDIR/bin/ablibnenrptother.sh"
+if ! [[ -f $CONFDIR/bin/nenrptother.sh ]]; then
+  wget -q "$REMOTESOURCE/nenrptother.sh" -O "$CONFDIR/bin/nenrptother.sh"
 fi
 }
 
@@ -110,25 +110,25 @@ other_reports
 if [ -z "$1" ]; then REPORT_TYPE="aggstats"; else REPORT_TYPE=$1; fi
 
 case $REPORT_TYPE in
-  aggsts) source "$CONFDIR/bin/ablibnenrptgen.sh" aggsts;;
-  phys  ) source "$CONFDIR/bin/ablibnenrptgen.sh" phys;;
-  nya   ) source "$CONFDIR/bin/ablibnenrptgen.sh" nya;;
-  nulltg) source "$CONFDIR/bin/ablibnenrptgen.sh" nulltg;;
+  aggsts) source "$CONFDIR/bin/nenrptgen.sh" aggsts;;
+  phys  ) source "$CONFDIR/bin/nenrptgen.sh" phys;;
+  nya   ) source "$CONFDIR/bin/nenrptgen.sh" nya;;
+  nulltg) source "$CONFDIR/bin/nenrptgen.sh" nulltg;;
 
-  dates ) source "$CONFDIR/bin/ablibnenrptlog.sh" dates;;
-  track ) source "$CONFDIR/bin/ablibnenrptlog.sh" track;;
-  comper) source "$CONFDIR/bin/ablibnenrptlog.sh" percom;;
-  albper) source "$CONFDIR/bin/ablibnenrptlog.sh" peralb;;
-  artcom) source "$CONFDIR/bin/ablibnenrptlog.sh" artcom;;
-  bits  ) source "$CONFDIR/bin/ablibnenrptlog.sh" badbit;;
+  dates ) source "$CONFDIR/bin/nenrptlog.sh" dates;;
+  track ) source "$CONFDIR/bin/nenrptlog.sh" track;;
+  comper) source "$CONFDIR/bin/nenrptlog.sh" percom;;
+  albper) source "$CONFDIR/bin/nenrptlog.sh" peralb;;
+  artcom) source "$CONFDIR/bin/nenrptlog.sh" artcom;;
+  bits  ) source "$CONFDIR/bin/nenrptlog.sh" badbit;;
   
-  badart) source "$CONFDIR/bin/ablibnenrptother.sh" badart;;
-  maxv  ) source "$CONFDIR/bin/ablibnenrptother.sh" maxv;;
-  replay) source "$CONFDIR/bin/ablibnenrptother.sh" replay;;
-  namebt) source "$CONFDIR/bin/ablibnenrptother.sh" namebt;;
-  multtk) source "$CONFDIR/bin/ablibnenrptother.sh" multtk;;
-  dupes ) source "$CONFDIR/bin/ablibnenrptother.sh" dupes;;
-  ops   ) source "$CONFDIR/bin/ablibnenrptother.sh" ops;;
+  badart) source "$CONFDIR/bin/nenrptother.sh" badart;;
+  maxv  ) source "$CONFDIR/bin/nenrptother.sh" maxv;;
+  replay) source "$CONFDIR/bin/nenrptother.sh" replay;;
+  namebt) source "$CONFDIR/bin/nenrptother.sh" namebt;;
+  multtk) source "$CONFDIR/bin/nenrptother.sh" multtk;;
+  dupes ) source "$CONFDIR/bin/nenrptother.sh" dupes;;
+  ops   ) source "$CONFDIR/bin/nenrptother.sh" ops;;
 
   advsql) advsql_reports; nmenuoptions reporting;;
 esac

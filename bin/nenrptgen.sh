@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenrptgen: routine for producing all the "General Reports", namely:
+# nenrptgen: routine for producing all the "General Reports", namely:
 #
 # 1. Aggregate Statistics
 # 2. Physical Corruption

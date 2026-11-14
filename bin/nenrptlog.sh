@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####################################################################
 #
-# ablibnenrptlog: routine for producing all the "Logical Issues Reports", namely:
+# nenrptlog: routine for producing all the "Logical Issues Reports", namely:
 #
 # 1. DATE v. ALBUM tag discrepancies
 # 2. TRACKNUMBER tags not starting at 1 in a folder
