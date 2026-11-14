@@ -13,7 +13,7 @@
 ####################################################################
 function output_report {
 if ! [[ -f $CONFDIR/bin/nenoutput.sh ]]; then
-  REMOTESOURCE="https://software.bbritten.com/giocoso/bin"
+  REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta/bin"
   wget -q "$REMOTESOURCE/nenoutput.sh" -O "$CONFDIR/bin/nenoutput.sh"
   source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 else

@@ -69,7 +69,7 @@ tput() {
 # Attempt to resize the terminal to 29 rows and 105 columns.
 tput civis; printf '\e[8;28;103t'
 
-REMOTESOURCE="https://bbritten.com/software/niente"
+REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta"
 NEWCONF="$HOME/.local/share/niente4"
 CONFDIR="$NEWCONF"
 
@@ -227,7 +227,6 @@ if [[ $OS != "DARWIN" ]]; then
   ln -s "$HOME/.local/share/applications/niente.desktop" "$HOME/Desktop" 2>/dev/null
 fi
   
-wget -q "$REMOTESOURCE/txt/niente.conf" -O "$CONFDIR/txt/niente.conf"
   
 # Confirmation when concluded
 dialog --title "Software Components Completed" --msgbox "\\n\\nAll Niente's components have now been installed successfully.\\n\\nPress OK to quit back to the command line." 12 70

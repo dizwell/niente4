@@ -8,7 +8,7 @@
 ####################################################################
 function output_report {
 if ! [[ -f $CONFDIR/bin/nenoutput.sh ]]; then
-  REMOTESOURCE="https://software.bbritten.com/giocoso/bin"
+  REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta/bin"
   wget -q "$REMOTESOURCE/nenoutput.sh" -O "$CONFDIR/bin/nenoutput.sh"
   source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 else
@@ -94,7 +94,7 @@ done
 }
 
 function other_reports {
-REMOTESOURCE="https://software.bbritten.com/niente/bin"
+REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta/bin"
 if ! [[ -f $CONFDIR/bin/nenrptgen.sh ]]; then
   wget -q "$REMOTESOURCE/nenrptgen.sh" -O "$CONFDIR/bin/nenrptgen.sh"
 fi
