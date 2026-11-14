@@ -1,0 +1,5 @@
+select 1, genrename, count(*) from tracks where composername like '%Britten%'
+group by composername, genrename
+union 
+select 2, 'Total', count(*) from tracks where composername like '%Britten%'
+order by 1
