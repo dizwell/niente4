@@ -7,3 +7,6 @@
 /txt/abnendialog.conf
 /txt/newplay.txt
 /tmp/
+
+# Each user's own music database: never committed
+/db/
