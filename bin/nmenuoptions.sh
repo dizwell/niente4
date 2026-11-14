@@ -216,8 +216,7 @@ elif [ "$1" == "administration" ]; then
   tput cup  9 4; echo -e "2) Display software licence"
   tput cup 10 4; echo -e "3) Remove Program Lock"
   tput cup 11 4; echo -e "4) Wipe the Niente operations log"
-  tput cup 12 4; echo -e "5) Check for software updates"
-  tput cup 13 4; echo -e "6) Change the program colour scheme"    
+  tput cup 12 4; echo -e "5) Change the program colour scheme"
   tput cup 15 4; echo -e "L) Remove the program lock"
   tput cup 16 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program"  
@@ -244,8 +243,7 @@ elif [ "$1" == "administration" ]; then
         nmenuoptions administration ;;
     3 ) clear; source "$CONFDIR/bin/nenlokdel.sh"; nmenuoptions administration ;;
     4 ) clear; source "$CONFDIR/bin/nenlogdel.sh"; nmenuoptions administration ;;
-    5 ) clear; source "$CONFDIR/bin/nencheckver.sh"; nmenuoptions administration ;;
-    6 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
+    5 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
 
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;

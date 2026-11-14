@@ -137,7 +137,7 @@ source "$NEWCONF/bin/nenoscheck.sh" install        # Triggers a check of softwar
 
 function downloads {
 # 4. Fetch Niente components
-components=(nencheckver.sh nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
+components=(nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh
 nenintegrity.sh nenintegritynd.sh nenlogdel.sh nenlokdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh
 nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh
 nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh nenoscheck.sh nenoutput.sh nmenudraw.sh
