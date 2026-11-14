@@ -1,0 +1,9 @@
+# macOS Finder metadata: never committed
+.DS_Store
+
+# Personal settings and working files: each user's own, never committed
+/txt/niente.conf
+/txt/programvariables.txt
+/txt/abnendialog.conf
+/txt/newplay.txt
+/tmp/
