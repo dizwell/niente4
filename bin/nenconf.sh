@@ -130,5 +130,5 @@ NAMEBITS=$CONFNBITS
 REPORTMAXV=$CONFREPMAXV" > "$CONFDIR/txt/niente.conf"
 
 rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
-rm -f "$CONFDIR/art/nienteicosmall.png" 2>/dev/null  # needed because if they change logo size, we need to generate a new display logo of the newsize
+rm -f "$CONFDIR/art/nienteicosmall.png" "$CONFDIR/art/nienteicosmallbeta.png" 2>/dev/null  # needed because if they change logo size, we need to generate a new display logo of the newsize
 source "$CONFDIR/bin/nenparse.sh"

@@ -4,7 +4,7 @@
 ####################################################################
 source "$CONFDIR/bin/nenparse.sh"
 source "$CONFDIR/bin/nentput.sh"
-LOGO_PATH="$CONFDIR/art/nienteicosmall.png"
+if [[ $PROGVERSION == *"beta"* ]]; then LOGO_PATH="$CONFDIR/art/nienteicosmallbeta.png"; else LOGO_PATH="$CONFDIR/art/nienteicosmall.png"; fi
 clear; tput cup 0 0
 
 function wordlogo { 
@@ -111,13 +111,17 @@ else
 fi
 
 if [[ -z $LOGOSIZE ]]; then LOGOSIZE="220x220"; fi
-if ! [[ -f "$CONFDIR/art/nienteicosmall.png" ]]; then
-  if [[ $CONVPROG == convert ]]; then
-    convert "$CONFDIR/art/nienteico.png" -resize "$LOGOSIZE" "$CONFDIR/art/nienteicosmall.png" 2>/dev/null
-  elif [[ $CONVPROG == magick ]]; then
-    magick "$CONFDIR/art/nienteico.png" -resize "$LOGOSIZE" "$CONFDIR/art/nienteicosmall.png" 2>/dev/null
+# The small menu logos (release and beta) are made on each computer from the full-size icons, at the configured size
+for smalllogo in nienteico nienteicobeta; do
+  if ! [[ -f "$CONFDIR/art/${smalllogo/ico/icosmall}.png" ]]; then
+    if [[ $CONVPROG == convert ]]; then
+      convert "$CONFDIR/art/$smalllogo.png" -resize "$LOGOSIZE" "$CONFDIR/art/${smalllogo/ico/icosmall}.png" 2>/dev/null
+    elif [[ $CONVPROG == magick ]]; then
+      magick "$CONFDIR/art/$smalllogo.png" -resize "$LOGOSIZE" "$CONFDIR/art/${smalllogo/ico/icosmall}.png" 2>/dev/null
+    fi
   fi
-fi
+done
+unset smalllogo
 
 if [[ -z $LOGOPOS ]]; then LOGOPOS=0; fi
 LOGO_POSITION=$((69 + $LOGOPOS ))

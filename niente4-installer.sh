@@ -157,7 +157,7 @@ done
 ) | dialog --title "Installing Niente Binary Components" --gauge "\\n\\nDownloading Niente's own software components: this might take some time..." 12 70
 
 # Art files next
-components=(Luxi_License.txt luximr.ttf nienteico.png nienteico.svg nienteico.xpm)
+components=(Luxi_License.txt luximr.ttf nienteico.png nienteicobeta.png nienteico.svg nienteico.xpm)
 total=${#components[@]}
 count=0
 (
