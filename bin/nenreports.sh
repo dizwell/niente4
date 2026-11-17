@@ -7,13 +7,7 @@
 #
 ####################################################################
 function output_report {
-if ! [[ -f $CONFDIR/bin/nenoutput.sh ]]; then
-  REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta/bin"
-  wget -q "$REMOTESOURCE/nenoutput.sh" -O "$CONFDIR/bin/nenoutput.sh"
-  source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
-else
-  source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
-fi
+source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 }
 
 function advsql_reports {
@@ -93,20 +87,6 @@ EOF
 done
 }
 
-function other_reports {
-REMOTESOURCE="https://raw.githubusercontent.com/dizwell/niente4/beta/bin"
-if ! [[ -f $CONFDIR/bin/nenrptgen.sh ]]; then
-  wget -q "$REMOTESOURCE/nenrptgen.sh" -O "$CONFDIR/bin/nenrptgen.sh"
-fi
-if ! [[ -f $CONFDIR/bin/nenrptlog.sh ]]; then
-  wget -q "$REMOTESOURCE/nenrptlog.sh" -O "$CONFDIR/bin/nenrptlog.sh"
-fi
-if ! [[ -f $CONFDIR/bin/nenrptother.sh ]]; then
-  wget -q "$REMOTESOURCE/nenrptother.sh" -O "$CONFDIR/bin/nenrptother.sh"
-fi
-}
-
-other_reports
 if [ -z "$1" ]; then REPORT_TYPE="aggstats"; else REPORT_TYPE=$1; fi
 
 case $REPORT_TYPE in

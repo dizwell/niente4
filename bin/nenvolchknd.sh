@@ -61,13 +61,13 @@ COUNTER=0
 for f in "${volcheck[@]}"; do
   fileid=$(echo "$f" | awk -F'|' '{print $1}')
   filename=$(echo "$f" | awk -F'|' '{print $2}')
-  COMPOSERNAME=$(metaflac $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-  ALBUMNAME=$(metaflac $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+  COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
+  ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
   COUNTER=$((COUNTER+1))
   if [ -z "$filename" ]; then filename='QxQxQx'; fi
   if [ -f "$filename" ]; then
     dirname=$(dirname "$filename")
-    MAXV=$(ffmpeg -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | $GREPPROG -m 1 max_volume | $GREPPROG -oP '\-\K.+')
+    MAXV=$("$FFMPEG" -nostdin -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | $GREPPROG -m 1 max_volume | $GREPPROG -oP '\-\K.+')
     if [ -z "$MAXV" ]; then
       MAXV=0.0              # Special case: if max_volume is 0.0, then ffmpeg displays no '+' against it, so the return from the above is null. This sets it back to being 0.0
     else

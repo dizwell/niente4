@@ -140,11 +140,7 @@ fi
 # The actual program control code
 # ===========================================================================================================
 clear
-if ! [[ -f "$CONFDIR/bin/ablibgiotput.sh" ]]; then 
-  wget -q "https://raw.githubusercontent.com/dizwell/niente4/beta/bin/nentput.sh" -O "$CONFDIR/bin/nentput.sh";
-else
-  source "$CONFDIR/bin/ablibgiotput.sh" 
-fi
+source "$CONFDIR/bin/nentput.sh"                     # The fast tput wrapper (installed with Niente, like every other script)
 
 # Check if parameters have been passed. If so, run non-interactively. Otherwise launch program normally
 for i in "$@"; do

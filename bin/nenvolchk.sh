@@ -88,10 +88,10 @@ for f in "${volcheck[@]}"; do
   
   if [[ -z "$filename" ]]; then filename='QxQxQx'; fi
   if [[ -f "$filename" ]]; then
-    COMPOSERNAME=$(metaflac $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-    ALBUMNAME=$(metaflac $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+    COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
+    ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
     DISP_ALBUMNAME="${ALBUMNAME:0:75}"
-    LINE=$(ffmpeg -threads 0 -nostats -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | grep "max_volume")
+    LINE=$("$FFMPEG" -nostdin -threads 0 -nostats -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | grep "max_volume")
     MAXV=$(echo "$LINE" | awk '{print $5}' | tr -d '-')
     
     if [[ -z "$MAXV" ]]; then

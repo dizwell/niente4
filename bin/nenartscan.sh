@@ -68,11 +68,11 @@ for f in "${artcheck[@]}"; do
   
   if [ -z "$filename" ]; then filename='QxQxQx'; fi
   if [ -f "$filename" ]; then
-    COMPOSERNAME=$(metaflac $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-    ALBUMNAME=$(metaflac $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+    COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
+    ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
     DISP_ALBUMNAME="${ALBUMNAME:0:75}"
-    ARTWIDTH=$(metaflac --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
-    ARTHEIGHT=$(metaflac --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
+    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
+    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
     if [[ $ARTWIDTH -eq 9999 ]]; then 
       ARTSTRING="Embedded artwork not present"
     else 
@@ -186,11 +186,11 @@ for f in "${artcheck[@]}"; do
   
   if [ -z "$filename" ]; then filename='QxQxQx'; fi
   if [ -f "$filename" ]; then
-    COMPOSERNAME=$(metaflac $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-    ALBUMNAME=$(metaflac $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+    COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
+    ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
     DISP_ALBUMNAME="${ALBUMNAME:0:75}"
-    ARTWIDTH=$(metaflac --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
-    ARTHEIGHT=$(metaflac --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
+    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
+    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
     if [[ $ARTWIDTH -eq 9999 ]]; then 
       ARTSTRING="Embedded artwork not present"
     else 
