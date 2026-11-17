@@ -77,7 +77,7 @@ CONFREPMAXV="${confparams[8]}"; if [ -z "$CONFREPMAXV" ]; then CONFREPMAXV=yes; 
 CONFNBITS="${confparams[9]}"; if [ -z "$CONFNBITS" ]; then CONFNBITS=yes; fi
 CONFBROWZ="${confparams[10]}"
 CONFLOGOSIZE="${confparams[11]}"
-  if [[ $CONFLOGOSIZE =~ ^[0-9]+$ ]] && (( 10#$CONFLOGOSIZE >= 100 )); then CONFLOGOSIZE=$((10#$CONFLOGOSIZE)); else CONFLOGOSIZE=110; fi   # At least 100: default 110
+  if [[ $CONFLOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$CONFLOGOSIZE >= 100 && 10#$CONFLOGOSIZE <= 400 )); then CONFLOGOSIZE=$((10#$CONFLOGOSIZE)); else CONFLOGOSIZE=110; fi   # 100 to 400: default 110
   CONFLOGOSIZE=$CONFLOGOSIZE"x"$CONFLOGOSIZE
 CONFLOGOPOS="${confparams[12]}"
   if [[ $((CONFLOGOPOS)) != "$CONFLOGOPOS" ]]; then CONFLOGOPOS=0; fi

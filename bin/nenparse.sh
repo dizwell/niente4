@@ -74,9 +74,9 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
     VOLUMETHRESHOLD=2
   fi
 
-  # The logo size must be a whole number of pixels, at least 100 (written as NxN): anything else gives the default, 110
+  # The logo size must be a whole number of pixels from 100 to 400 (written as NxN): anything else gives the default, 110
   LOGOSIZE="${LOGOSIZE%%x*}"
-  if [[ $LOGOSIZE =~ ^[0-9]+$ ]] && (( 10#$LOGOSIZE >= 100 )); then LOGOSIZE="$((10#$LOGOSIZE))x$((10#$LOGOSIZE))"; else LOGOSIZE="110x110"; fi
+  if [[ $LOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$LOGOSIZE >= 100 && 10#$LOGOSIZE <= 400 )); then LOGOSIZE="$((10#$LOGOSIZE))x$((10#$LOGOSIZE))"; else LOGOSIZE="110x110"; fi
 
   # The small menu logos (release and beta) are made from the full-size icons with the bundled ImageMagick, if
   # they don't exist yet; saving the configuration makes them again at the configured size
