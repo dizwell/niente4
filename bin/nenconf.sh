@@ -26,7 +26,6 @@ $GREPPROG -i -m1 "^$1=" "$CONFFILE" | $SEDPROG -e 's/^[^=]*=//' -e 's/^"//' -e '
 # ====================================================================
 if [ -f "$CONFFILE" ]; then
   confaccents=$(conf_text UTFCHARS); if [ -z $confaccents ]; then confaccents='no'; fi
-  confparallel=$(conf_text PARALLELISM); if [ -z $confparallel ]; then confparallel=2; fi
   confdbname=$(conf_text DBNAME)
   confmusdir=$(conf_text MUSICDIR)
   confsmart=$(conf_text SMALLART); if [ -z $confsmart ]; then confsmart=300; fi
@@ -43,58 +42,64 @@ if [ -f "$CONFFILE" ]; then
   confdiatheme=$(conf_text DIATHEME); if [[ -z $confdiatheme ]]; then confdiatheme="standard"; fi
 fi
 
-# Prompt for all parameters
+# Prompt for the parameters: two pages, so that each fits on screen. OK on the first page moves on to the second;
+# OK on the second saves both. Cancel or Esc on either page changes nothing at all: the configuration file (and
+# ~/.niente.lua and the logos) stay exactly as they were.
 # ====================================================================
-dialog --backtitle "Niente Configuration File Editor" --title " Configuration Parameters " --form "" 22 95 17 \
+dialog --backtitle "Niente Configuration File Editor" --title " Program Settings " --form "" 16 95 9 \
 "Default music folder " 1 1 "$confmusdir" 1 45 40 0 \
 "Default music database name " 2 1 "$confdbname" 2 45 25 0 \
 "Stop accented characters conversion" 3 1 "$confaccents" 3 45 6 0 \
-"Default degree of parallelism " 4 1 "$confparallel" 4 45 6 0 \
-"Threshold (pixels) for small art " 5 1 "$confsmart" 5 45 6 0 \
-"Threshold (pixels) for large art " 6 1 "$conflgart" 6 45 6 0 \
-"Should album art be square? " 7 1 "$confsqart" 7 45 6 0 \
-"Threshold (dB) for volume boosts " 8 1 "$confmaxv" 8 45 6 0 \
-"Report on volume boosts" 9 1 "$confrepmaxv" 9 45 6 0 \
-"Report filenames without bitdepth data" 10 1 "$confnbits" 10 45 6 0 \
-"Preferred browser" 11 1 "$confbrowz" 11 45 30 0 \
-"Size of the Program Logo" 12 1  "$conflogosize"     12 45 9 0 \
-"Program Logo position (- or +)" 13 1  "$conflogopos"     13 45 9 0 \
-"Niente colour theme name" 14 1 "$confweztheme" 14 45 40 0 \
-"Niente font size (in points)" 15 1 "$confwezfntsz" 15 45 6 0 \
-"Dialog colour theme name" 16 1 "$confdiatheme" 16 45 10 0 \
+"Preferred browser" 4 1 "$confbrowz" 4 45 30 0 \
+"Size of the Program Logo" 5 1  "$conflogosize"     5 45 9 0 \
+"Program Logo position (- or +)" 6 1  "$conflogopos"     6 45 9 0 \
+"Niente colour theme name" 7 1 "$confweztheme" 7 45 40 0 \
+"Niente font size (in points)" 8 1 "$confwezfntsz" 8 45 6 0 \
+"Dialog colour theme name" 9 1 "$confdiatheme" 9 45 10 0 \
 2>"$CONFDIR/tmp/confparams"
 exitStatus=$?
-
-# Cancel or Esc: change nothing at all. The configuration file (and ~/.niente.lua and the logos) stay exactly as they were.
 if [[ $exitStatus -eq 1 || $exitStatus -eq 255 ]]; then
   rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
   return
 fi
+readarray -t progparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
-readarray -t confparams < "$CONFDIR/tmp/confparams" 2>/dev/null
+dialog --backtitle "Niente Configuration File Editor" --title " Reporting Settings " --form "" 13 95 6 \
+"Threshold (pixels) for small art " 1 1 "$confsmart" 1 45 6 0 \
+"Threshold (pixels) for large art " 2 1 "$conflgart" 2 45 6 0 \
+"Should album art be square? " 3 1 "$confsqart" 3 45 6 0 \
+"Threshold (dB) for volume boosts " 4 1 "$confmaxv" 4 45 6 0 \
+"Report on volume boosts" 5 1 "$confrepmaxv" 5 45 6 0 \
+"Report filenames without bitdepth data" 6 1 "$confnbits" 6 45 6 0 \
+2>"$CONFDIR/tmp/confparams"
+exitStatus=$?
+if [[ $exitStatus -eq 1 || $exitStatus -eq 255 ]]; then
+  rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
+  return
+fi
+readarray -t reptparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
-CONFMUSDIR="${confparams[0]}"
-CONFDBNAME="${confparams[1]}"
-CONFACCENTS="${confparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no"; fi
-CONFPARALLEL="${confparams[3]}"; if [ -z "$CONFPARALLEL" ]; then CONFPARALLEL=2; fi
-CONFSMART="${confparams[4]}"; if [ -z "$CONFSMART" ]; then CONFSMART=300; fi
-CONFLGART="${confparams[5]}"; if [ -z "$CONFLGART" ]; then CONFLGART=1600; fi
-CONFSQART="${confparams[6]}"; if [ -z "$CONFSQART" ]; then CONFSQART="yes"; fi
-CONFMAXV="${confparams[7]}"; if [ -z "$CONFMAXV" ]; then CONFMAXV=2; fi
-CONFREPMAXV="${confparams[8]}"; if [ -z "$CONFREPMAXV" ]; then CONFREPMAXV=yes; fi
-CONFNBITS="${confparams[9]}"; if [ -z "$CONFNBITS" ]; then CONFNBITS=yes; fi
-CONFBROWZ="${confparams[10]}"
-CONFLOGOSIZE="${confparams[11]}"
+CONFMUSDIR="${progparams[0]}"
+CONFDBNAME="${progparams[1]}"
+CONFACCENTS="${progparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no"; fi
+CONFBROWZ="${progparams[3]}"
+CONFLOGOSIZE="${progparams[4]}"
   if [[ $CONFLOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$CONFLOGOSIZE >= 100 && 10#$CONFLOGOSIZE <= 400 )); then CONFLOGOSIZE=$((10#$CONFLOGOSIZE)); else CONFLOGOSIZE=110; fi   # 100 to 400: default 110
   CONFLOGOSIZE=$CONFLOGOSIZE"x"$CONFLOGOSIZE
-CONFLOGOPOS="${confparams[12]}"
+CONFLOGOPOS="${progparams[5]}"
   if [[ $((CONFLOGOPOS)) != "$CONFLOGOPOS" ]]; then CONFLOGOPOS=0; fi
-CONFWEZTHEME="${confparams[13]}"; CONFWEZTHEME="${CONFWEZTHEME//\"/}"        # WezTerm colour scheme: no double quotes, as it's written in quotes
+CONFSMART="${reptparams[0]}"; if [ -z "$CONFSMART" ]; then CONFSMART=300; fi
+CONFLGART="${reptparams[1]}"; if [ -z "$CONFLGART" ]; then CONFLGART=1600; fi
+CONFSQART="${reptparams[2]}"; if [ -z "$CONFSQART" ]; then CONFSQART="yes"; fi
+CONFMAXV="${reptparams[3]}"; if [ -z "$CONFMAXV" ]; then CONFMAXV=2; fi
+CONFREPMAXV="${reptparams[4]}"; if [ -z "$CONFREPMAXV" ]; then CONFREPMAXV=yes; fi
+CONFNBITS="${reptparams[5]}"; if [ -z "$CONFNBITS" ]; then CONFNBITS=yes; fi
+CONFWEZTHEME="${progparams[6]}"; CONFWEZTHEME="${CONFWEZTHEME//\"/}"        # WezTerm colour scheme: no double quotes, as it's written in quotes
   if [[ -z $CONFWEZTHEME ]]; then CONFWEZTHEME="Wild Cherry (Gogh)"; fi
-CONFWEZFNTSZ="${confparams[14]}"
+CONFWEZFNTSZ="${progparams[7]}"
   if [[ $CONFWEZFNTSZ =~ ^[0-9]+$ ]] && (( 10#$CONFWEZFNTSZ >= 8 && 10#$CONFWEZFNTSZ <= 32 )); then CONFWEZFNTSZ=$((10#$CONFWEZFNTSZ)); else CONFWEZFNTSZ=12; fi   # 8 to 32 points: default 12
 
-CONFDIATHEME="${confparams[15]}"
+CONFDIATHEME="${progparams[8]}"
 # Make sure CONFDIATHEME is one of standard, red, green, yellow or magenta. If not, it's standard
 if [[ ${CONFDIATHEME,,} =~ ^(standard|red|green|yellow|magenta)$ ]]; then CONFDIATHEME=${CONFDIATHEME,,}; else CONFDIATHEME=standard; fi
 
@@ -109,7 +114,6 @@ fi
 # ====================================================================
 # Numeric parameters must, if set at all, be actual numbers
 NUM='^[0-9]+$'
-if ! [[ $CONFPARALLEL =~ $NUM ]] ; then CONFPARALLEL=2; fi
 if ! [[ $CONFSMART =~ $NUM ]] ; then CONFSMART=300; fi
 if ! [[ $CONFLGART =~ $NUM ]] ; then CONFLGART=1600; fi
 if ! [[ $CONFMAXV =~ $NUM ]] ; then CONFMAXV=2; fi
@@ -168,7 +172,6 @@ ALERT=$KEEP_ALERT
 # General Parameters (text values double-quoted, since they may contain spaces)
 # ====================================================================
 UTFCHARS=$CONFACCENTS
-PARALLELISM=$CONFPARALLEL
 BROWSER="$CONFBROWZ"
 LOGOSIZE=$CONFLOGOSIZE
 LOGOPOS=$CONFLOGOPOS

@@ -22,16 +22,6 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
     UTFCHARS=""
   fi
 
-  # If PARALLELISM is set, check it's numeric and set to 2 by default if not
-  # -----------------------------------------------------------------------------
-  if [ ! -z $PARALLELISM ]; then
-    if ! [[ $PARALLELISM =~ $NUM ]] ; then
-      PARALLELISM=2
-    fi
-  else
-    PARALLELISM=2
-  fi
-
   # If SMALLART or LARGEART dimensions have been supplied, make sure they
   # are valid numbers and change them to defaults (300 and 1600) if not.
   # -----------------------------------------------------------------------------
@@ -107,7 +97,6 @@ ALERT=1
 # General Parameters
 # ====================================================================
 UTFCHARS=yes
-PARALLELISM=0
 BROWSER=\"\"
 LOGOSIZE=110
 LOGOPOS=0
