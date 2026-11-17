@@ -5,25 +5,77 @@
 # prerequisites are present.
 #
 ####################################################################
-if [ -z "$1" ]; then set -- "checkonly"; fi
+COPYRIGHT="2021-2026"                             # Copyright years, used by every screen that displays them (set here, as bin/ is always current)
+if [[ -f "$CONFDIR/bin/nentput.sh" ]]; then
+  source "$CONFDIR/bin/nentput.sh"
+fi
+if [[ -z $1 ]]; then set -- "checkonly"; fi
 if [[ $1 == "install" ]]; then
   CHECKONLY=0
 else
   CHECKONLY=1
 fi
 
-# Start by checking what operating system we're dealing with
+function print_header {
+clear
+LOGO=6
+tput setaf $DRAWLINES; echo -e "┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                   │
+│                                                                                                   │
+│                                                                                                   │
+└───────────────────────────────────────────────────────────────────────────────────────────────────┘"
+tput cup  1 4; tput setaf $LOGO; echo -e "♬♪ Niente: The Digital Music Integrity Checker Installer ♬♪"
+tput cup  2 4; echo -e "Copyright © H. Rogers $COPYRIGHT"
+tput cup  3 4; echo -e "Version $PROGVERSION"
+}
+
+function check_updates {
+if [[ $pending -gt 0 ]]; then
+  print_header
+  tput cup 6 4; tput setaf $ALERT; echo "!! You have pending OS software updates !!"
+  tput cup 8 4; tput setaf ${ALERT:-1}; echo "Do you want to quit the current installation and apply them yourself, or do you wish to proceed with installing Niente regardless? [q/p] " | fold -s -w 76 | sed '2,$s/^/    /'
+  read -s -n 1 choice
+  tput setaf ${MAINTEXT:-11}
+  
+  # Default to 'q' if the user just presses Enter, or if they type 'q'/'Q'
+  case "${choice:-q}" in
+    [pP]* ) 
+          echo "    OK, proceeding as requested. Please bear with us for a few moments..."    
+          PROCEED=1
+          ;;
+        * ) 
+          echo "    Exiting script at your request. Please update your system manually before trying again."
+          reset
+          rm -f "$INSTALLERFILE"
+          exit 1
+          ;;
+   esac
+fi    
+}
+
+# Start by checking what operating system we're dealing with, unless we've
+# been told explicitly as part of installer invocation (-d)
 # -----------------------------------------------------------------------------
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS=$NAME
-    THISVER=$VERSION
-else
-  OS=$(uname -s)
-  THISVER=$(uname -r)
+# At install time the distro comes from -d if given, otherwise it is detected. Either way the result is saved
+# in programvariables.txt, and every later start of the program uses that saved value instead of detecting again.
+if [[ $CHECKONLY -eq 1 && -z $NENDISTRO && -f "$CONFDIR/txt/programvariables.txt" ]]; then
+  NENDISTRO=$(sed -n 's/^NENDISTRO="\(.*\)"$/\1/p' "$CONFDIR/txt/programvariables.txt")
 fi
 
-OS=${OS^^}
+if [[ -z $NENDISTRO ]]; then
+  if [[ -f /etc/os-release ]]; then
+    # Read only the name and version: sourcing the whole file would overwrite Niente's own variables (its LOGO=
+    # line, on Ubuntu and Fedora, would replace Niente's logo colour)
+    OS=$(. /etc/os-release; echo "$NAME")
+    THISVER=$(. /etc/os-release; echo "$VERSION")
+  else
+    OS=$(uname -s)
+    THISVER=$(uname -r)
+  fi
+  OS=${OS^^}
+else
+  OS=${NENDISTRO^^}
+fi
 
 if hash nproc 2>/dev/null; then
   THREADS=$(nproc)
@@ -41,44 +93,138 @@ fi
 # Put OS into appropriate family:
 # -----------------------------------------------------------------------------
 if [[ $OS == *"DARWIN"* ]]; then OSFAMILY="MACOS"; fi
+if [[ $OS == *"VOID"* ]]; then OSFAMILY="VOID"; fi
 if [[ $OS == *"ALMA"* || $OS == *"ROCKY"* ]]; then OSFAMILY="RHEL"; fi
-if [[ $OS == *"ARCH"* ]] || [[ $OS == *"MANJARO"* ]] || [[ $OS == *"ENDEAVOUROS"* ]] || [[ $OS == *"GARUDA"* ]]; then OSFAMILY="ARCH"; fi
-if [[ $OS == *"DEBIAN"* ]] || [[ $OS == *"DEVUAN"* ]] || [[ $OS == *"RASPBIAN"* ]] || [[ $OS == *"LMDE"* ]]; then OSFAMILY="DEBIAN"; fi
-if [[ $OS == *"FEDORA"* ]] || [[ $OS == *"NOBARA"* ]] || [[ $OS == *"ULTRAMARINE"* ]]; then OSFAMILY="FEDORA"; fi
-if [[ $OS == *"OPENSUSE"* ]]; then OSFAMILY="SUSE"; fi
-if [[ $OS == *"UBUNTU"* ]] || [[ $OS == *"MINT"* ]] || [[ $OS == *"POP!"* ]] || [[ $OS == *"ZORIN"* ]] || [[ $OS == *"ELEMENTARY"* ]] || [[ $OS == *"TUXEDO"* ]] || [[ $OS == *"NEON"* ]]; then OSFAMILY="UBUNTU"; fi
-if [[ $OS == *"MANJARO ARM"* ]]; then OSFAMILY="MANARM"; fi
-if [ -z $OSFAMILY ]; then OSFAMILY="FEDORA"; fi
+if [[ $OS == *"ARCH"* || $OS == *"CACHY"* || $OS == *"MANJARO"* || $OS == *"ENDEAVOUROS"* || $OS == *"GARUDA"* ]]; then OSFAMILY="ARCH"; fi
+if [[ $OS == *"DEBIAN"* || $OS == *"DEVUAN"* || $OS == *"RASPBIAN"* || $OS == *"LMDE"* ]]; then OSFAMILY="DEBIAN"; fi
+if [[ $OS == *"FEDORA"* || $OS == *"ULTRAMARINE"* ]]; then OSFAMILY="FEDORA"; fi
+if [[ $OS == *"UBUNTU"* || $OS == *"MINT"* || $OS == *"POP!"* || $OS == *"ZORIN"* || $OS == *"ELEMENTARY"* || $OS == *"TUXEDO"* || $OS == *"NEON"* ]]; then OSFAMILY="UBUNTU"; fi
+if [[ -z $OSFAMILY ]]; then OSFAMILY="ELSE"; fi
+
+# Raspberry Pi OS calls itself Debian, so spot it by the file only a Pi has (as Giocoso does)
+if [[ -f /etc/rpi-issue ]]; then OSFAMILY="RASPBIAN"; fi
+
+
+function wezterm_app_install {
+# MacPorts' WezTerm package needs the full Xcode application, not just the command-line tools, so on MacPorts Macs
+# we install WezTerm's own ready-made app instead: a Universal build for Intel and Apple Silicon alike, and the
+# same release Homebrew installs. Skipped if WezTerm is already present.
+local WEZVER="20240203-110809-5046fc22"
+local WEZDIR="/tmp/WezTerm-macos-$WEZVER"
+if [[ -x /opt/local/bin/wezterm || -x /Applications/WezTerm.app/Contents/MacOS/wezterm ]]; then return 0; fi
+curl -fsSL --retry 5 -o "$WEZDIR.zip" "https://github.com/wezterm/wezterm/releases/download/$WEZVER/WezTerm-macos-$WEZVER.zip" || return 1
+rm -rf "$WEZDIR"
+ditto -x -k "$WEZDIR.zip" /tmp || return 1
+rm -rf /Applications/WezTerm.app
+mv "$WEZDIR/WezTerm.app" /Applications/ || return 1
+rm -rf "$WEZDIR" "$WEZDIR.zip"
+}
+
+function dnf_retry {
+# Runs "sudo dnf ARGS", logging to the install log. If Fedora's own background updater (PackageKit, GNOME
+# Software) is busy, dnf fails with an rpm transaction lock error, so wait and try again: 20 tries, 15s apart.
+local LOG="$CONFDIR/txt/install-log.txt" OUT tries=0
+mkdir -p "$CONFDIR/txt" 2>/dev/null
+while true; do
+  OUT=$(sudo dnf "$@" 2>&1); local rc=$?
+  echo "$OUT" >> "$LOG"
+  if [[ $rc -eq 0 ]] || ! grep -q -i -E "transaction lock|another transaction is in progress" <<< "$OUT"; then return $rc; fi
+  tries=$((tries+1)); [[ $tries -ge 20 ]] && return $rc
+  echo "dnf busy (another program is installing software): waiting 15s, attempt $tries of 20" >> "$LOG"
+  sleep 15
+done
+}
+
+# Packages that fail to install are noted in failedpkgs.txt; afterwards report_failed_pkgs lists them in one box
+# (returning 0) or, if there were none, returns 1 so the usual "all installed" box shows instead
+FAILEDPKGS="$CONFDIR/tmp/failedpkgs.txt"
+mkdir -p "$CONFDIR/tmp" 2>/dev/null; rm -f "$FAILEDPKGS" 2>/dev/null
+function install_one_pkg {
+# Install one package the way this system's start-up check does, logging to the install log
+local LOG="$CONFDIR/txt/install-log.txt"
+case "$OSFAMILY" in
+  VOID)                   sudo xbps-install -Sf -y "$1" >> "$LOG" 2>&1 ;;
+  ARCH)                   sudo pacman -S --noconfirm "$1" >> "$LOG" 2>&1 ;;
+  DEBIAN|UBUNTU|RASPBIAN) sudo apt-get -o DPkg::Lock::Timeout=300 -y install "$1" >> "$LOG" 2>&1 ;;
+  FEDORA|RHEL)            dnf_retry -y install "$1" --allowerasing ;;
+  MACOS)
+    if [[ $1 == "wezterm" && $pkgmanager == "macports" ]]; then wezterm_app_install >> "$LOG" 2>&1; else mac_install "$1"; fi ;;
+  *) return 1 ;;
+esac
+}
+
+function report_failed_pkgs {
+# Lists any packages that couldn't be installed and offers to try them again, as often as wanted. Returns 1 if
+# nothing failed (or everything succeeded on a retry), so the usual "all installed" box shows; otherwise 0
+local LIST pkg count total
+[[ -s $FAILEDPKGS ]] || return 1
+while [[ -s $FAILEDPKGS ]]; do
+  LIST=$(sort -u "$FAILEDPKGS" | tr '\n' ' ')
+  if ! dialog --title " Some Software Could Not Be Installed " --yes-label " Try again " --no-label " No, carry on " --yesno "\\n\\nThese packages could not be installed:\\n\\n  $LIST\\n\\nThis is often because another program was installing software at the same time. Would you like me to try installing these packages again?" 16 80; then
+    dialog --title " Some Software Could Not Be Installed " --msgbox "\\n\\nThese packages are still not installed:\\n\\n  $LIST\\n\\nNiente may not work fully until you install them yourself with your package manager. Details are in Niente's txt/install-log.txt.\\n\\nClick OK to proceed." 16 80
+    return 0
+  fi
+  sort -u "$FAILEDPKGS" > "$FAILEDPKGS.retry"; rm -f "$FAILEDPKGS"
+  total=$(wc -l < "$FAILEDPKGS.retry"); count=0
+  while read -r pkg; do
+    count=$((count+1)); echo $((count * 100 / total))
+    install_one_pkg "$pkg" || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+  done < "$FAILEDPKGS.retry" | dialog --title " Trying Those Packages Again " --gauge "\\n\\nEach may wait up to five minutes if another program is installing software..." 12 70
+  rm -f "$FAILEDPKGS.retry"
+done
+return 1
+}
+
+# On a Mac the package lists name some packages twice, as Homebrew and MacPorts know them differently (icu4c/icu,
+# for instance), so "no such package" from one manager is expected and isn't reported as a failure
+function mac_install {
+local OUT rc
+if [[ $pkgmanager == "homebrew" ]]; then OUT=$(brew install --quiet "$1" 2>&1); else OUT=$(sudo port -N install "$1" 2>&1); fi
+rc=$?; echo "$OUT" >> "$CONFDIR/txt/install-log.txt"
+if [[ $rc -ne 0 ]] && grep -q -i -E "no available formula|not found|no such port|unknown port" <<< "$OUT"; then return 0; fi
+return $rc
+}
+
+# Is a package installed already, whatever the package manager said? Used so that a package the package manager
+# couldn't reach (because something else held its lock, say) isn't reported as missing when it's actually present
+function pkg_installed {
+case "$OSFAMILY" in
+  DEBIAN|UBUNTU|RASPBIAN) dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q "install ok installed" ;;
+  FEDORA|RHEL)            rpm -q "$1" >/dev/null 2>&1 || rpm -q --whatprovides "$1" >/dev/null 2>&1 ;;
+  ARCH)                   pacman -Q "$1" >/dev/null 2>&1 ;;
+  VOID)                   xbps-query "$1" >/dev/null 2>&1 ;;
+  MACOS)
+    if [[ $1 == "wezterm" && -x /Applications/WezTerm.app/Contents/MacOS/wezterm ]]; then return 0; fi
+    if [[ $pkgmanager == "homebrew" ]]; then brew list --formula "$1" >/dev/null 2>&1; else port -q installed "$1" 2>/dev/null | grep -q active; fi ;;
+  *) return 1 ;;
+esac
+}
 
 # Now define the software tools etc. required for each family
 # -----------------------------------------------------------------------------
 case $OSFAMILY in
-  ARCH)
+  VOID)
   if [[ $CHECKONLY -eq 0 ]]; then
     if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
     fi
 
     # Keep sudo status for as long as needed
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     sudo timedatectl set-ntp true >/dev/null 2>&1
     echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
-    sudo  --noconfirm pacman -Syy >/dev/null 2>&1
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    sudo xbps-install -Sy >/dev/null 2>&1
 
-    if sudo pacman -Qu | grep -q .; then
-      echo " Your system has pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      exit 1
+    if sudo xbps-install -un | grep -q .; then
+      pending=1
+      check_updates
     fi
+    
+    sudo xbps-install -Sfy dialog > /dev/null 2>&1
 
-    sudo pacman -S --noconfirm dialog > /dev/null 2>&1
-
-    # Define what's required
-    packages=(bc coreutils cuetools curl fd ncurses ffmpeg flac imagemagick kitty libsixel sqlite3 xterm)
+    # Define what's required    
+    packages=(bc coreutils curl dialog fd ncurses sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -89,58 +235,90 @@ case $OSFAMILY in
       percent=$((count * 100 / total))
       echo $percent
 
-      sudo pacman -S --noconfirm "$pkg" > /dev/null 2>&1 || true
+      sudo xbps-install -Sf -y "$pkg" >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
       sleep 0.1
     done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
-
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+	
+	
+	
     # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+  fi
+  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fd
+  ;;
+  
+  ARCH)
+  if [[ $CHECKONLY -eq 0 ]]; then
+    if ! sudo -n true 2>/dev/null; then
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
+    fi
+
+    # Keep sudo status for as long as needed
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    sudo timedatectl set-ntp true >/dev/null 2>&1
+    echo ""
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    sudo pacman -Syy --noconfirm >/dev/null 2>&1
+
+    if sudo pacman -Qu | grep -q .; then
+      pending=1
+      check_updates
+    fi
+
+    sudo pacman -S --noconfirm dialog > /dev/null 2>&1
+
+    # Define what's required
+    packages=(bc coreutils curl dialog fd ncurses sqlite wezterm xdg-utils)
+    total=${#packages[@]}
+    count=0
+
+    # Install what's required
+    (
+    for pkg in "${packages[@]}"; do
+      count=$((count + 1 ))
+      percent=$((count * 100 / total))
+      echo $percent
+
+      sudo pacman -S --noconfirm "$pkg" >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+      sleep 0.1
+    done
+    ) | dialog --backtitle "Niente Software Install" --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    tput cup 24 4
+	
+		
+	
+    # Confirmation when concluded
+    report_failed_pkgs || dialog --backtitle "Niente Software Install" --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
   fi
   GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fd  
   ;;
   
   DEBIAN)
   if [[ $CHECKONLY -eq 0 ]]; then
-    # If sudo doesn't work, grant the user SUDO privileges. Otherwise, just get on with it...
     if ! sudo -n true 2>/dev/null; then
-      tput cup $YPOS 1; echo "Please supply the **root user** password when prompted"; YPOS=$((YPOS+1))
-      tput cup $YPOS 1; echo ""
-      su -c "
-      echo \"$USER ALL=(ALL:ALL) ALL\" >/etc/sudoers.d/$USER
-      chmod 440 /etc/sudoers.d/$USER
-      "
-    fi
-
-    if ! sudo -n true 2>/dev/null; then
-      echo ""
-      echo " Now please supply your own password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
     fi
 
     # Keep sudo status for as long as needed
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     sudo timedatectl set-ntp true >/dev/null 2>&1
     echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
-    sudo apt-get update -qq
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..." 
+    wget -qO- https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list >/dev/null
+    sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    sudo apt-get -o DPkg::Lock::Timeout=300 update -qq
     pending=$(apt-get -s upgrade | awk '/^Inst / {count++} END {print count+0}')
-
-    if [[ $pending -gt 0 ]]; then
-      echo " Your system has $pending pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      exit 1
-    fi
-
-    sudo apt -y install dialog > /dev/null 2>&1
-
-    # Define what's required
-    packages=(bc coreutils cuetools curl fd-find ffmpeg flac imagemagick kitty libsixel-bin sqlite3 xterm)
+    check_updates
+ 
+    sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
+        
+    # Define what's required 
+    packages=(bc coreutils curl dialog fd-find libncurses* sqlite3 wezterm xdg-utils)
     total=${#packages[@]}
     count=0
-
+    
     # Install what's required
     (
     for pkg in "${packages[@]}"; do
@@ -148,148 +326,176 @@ case $OSFAMILY in
       percent=$((count * 100 / total))
       echo $percent
 
-      sudo apt -y install "$pkg" > /dev/null 2>&1 || true
+      sudo apt -o DPkg::Lock::Timeout=300 -y install "$pkg" >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
       sleep 0.1
     done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
-
-    # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
-  fi
-  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fdfind  
-  ;;
-  
-  UBUNTU)
-   if [[ $CHECKONLY -eq 0 ]]; then
-    if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
-    fi
-
-    # Keep sudo status for as long as needed
-    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-    sudo timedatectl set-ntp true >/dev/null 2>&1
-    echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
-    sudo apt-get update -qq
-    pending=$(apt-get -s upgrade | awk '/^Inst / {count++} END {print count+0}')
-
-    if [[ $pending -gt 0 ]]; then
-      echo " Your system has $pending pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      exit 1
-    fi
-
-    sudo apt -y install dialog > /dev/null 2>&1
-
-    # Define what's required
-    packages=(bc coreutils cuetools curl fd-find ffmpeg flac imagemagick kitty libsixel-bin xterm sqlite3)
-    total=${#packages[@]}
-    count=0
-
-    # Install what's required
-    (
-    for pkg in "${packages[@]}"; do
-      count=$((count + 1 ))
-      percent=$((count * 100 / total))
-      echo $percent
-
-      sudo apt -y install "$pkg" > /dev/null 2>&1 || true
-      sleep 0.1
-    done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
-
-    # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
-  fi
-  GREPPROG=grep SEDPROG=sed DATEPROG=date MD5PROG=md5sum FDPROG=fdfind
-  ;;
-  
-  FEDORA)
-    if [[ $CHECKONLY -eq 0 ]]; then
-    if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
-    fi
-
-    # Keep sudo status for as long as needed
-    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-    sudo timedatectl set-ntp true >/dev/null 2>&1
-    echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
-    sudo dnf check-update --refresh -q; rc=$?
-    if [[ $rc -eq 100 ]]; then
-      echo " Your system has pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      exit 1
-    fi
-
-    echo " Adding needed repositories. Please be patient..."
-    sudo dnf -y install dialog > /dev/null 2>&1
-    sudo dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >/dev/null 2>&1
-    sudo dnf -y copr enable lchh/libsixel > /dev/null 2>&1
-
-    # Define what's required
-    packages=(bc cuetools coreutils curl fd-find ffmpeg flac ImageMagick ncurses sqlite3 xterm kitty libsixel libsixel-utils)
-    total=${#packages[@]}
-    count=0
-
-    # Install what's required
-    (
-    for pkg in "${packages[@]}"; do
-      count=$((count + 1 ))
-      percent=$((count * 100 / total))
-      echo $percent
-
-      sudo dnf -y install "$pkg" --allowerasing > /dev/null 2>&1 || true
-      sleep 0.1
-    done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
     
     # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
   fi
-  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum FDPROG=fd
+  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fdfind
+  ;;
+  
+  RASPBIAN)
+  if [[ $CHECKONLY -eq 0 ]]; then
+    if ! sudo -n true 2>/dev/null; then
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
+    fi
+
+    # Keep sudo status for as long as needed
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    sudo timedatectl set-ntp true >/dev/null 2>&1
+    echo ""
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    wget -qO- https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list >/dev/null
+    sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    sudo apt-get -o DPkg::Lock::Timeout=300 update -qq
+    pending=$(apt-get -s upgrade | awk '/^Inst / {count++} END {print count+0}')
+    check_updates
+
+    sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
+
+    # Define what's required
+    packages=(bc coreutils curl dialog fd-find libncurses* sqlite3 wezterm xdg-utils)
+    total=${#packages[@]}
+    count=0
+
+    # Install what's required
+    (
+    for pkg in "${packages[@]}"; do
+      count=$((count + 1 ))
+      percent=$((count * 100 / total))
+      echo $percent
+
+      sudo apt -o DPkg::Lock::Timeout=300 -y install "$pkg" >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+      sleep 0.1
+    done
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    
+    # Confirmation when concluded
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+  fi
+  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fdfind
+  ;;  
+    
+  UBUNTU)
+  if [[ $CHECKONLY -eq 0 ]]; then
+    if ! sudo -n true 2>/dev/null; then
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
+    fi
+
+    # Keep sudo status for as long as needed
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    sudo timedatectl set-ntp true >/dev/null 2>&1
+    echo ""
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    wget -qO- https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list > /dev/null
+    sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg >/dev/null 2>&1
+    sudo apt-get -o DPkg::Lock::Timeout=300 update -qq
+    pending=$(apt-get -s upgrade | awk '/^Inst / {count++} END {print count+0}')
+    check_updates
+    
+    sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
+        
+     # Define what's required 
+    packages=(bc coreutils curl dialog fd-find libncurses6 sqlite3 wezterm xdg-utils)
+    total=${#packages[@]}
+    count=0
+    
+    # Install what's required
+    (
+    for pkg in "${packages[@]}"; do
+      count=$((count + 1 ))
+      percent=$((count * 100 / total))
+      echo $percent
+
+      sudo apt -o DPkg::Lock::Timeout=300 -y install "$pkg" >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+      sleep 0.1
+    done
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    
+    # Confirmation when concluded
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+  fi
+  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fdfind
+  ;; 
+  
+  FEDORA)
+  if [[ $CHECKONLY -eq 0 ]]; then
+    if ! sudo -n true 2>/dev/null; then
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
+    fi
+
+    # Keep sudo status for as long as needed
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    sudo timedatectl set-ntp true >/dev/null 2>&1
+    echo ""
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    sudo dnf copr enable -y -q wezfurlong/wezterm-nightly >/dev/null 2>&1
+    sudo dnf check-update --refresh -q; rc=$?
+    if [[ $rc -eq 100 ]]; then
+      pending=1
+      check_updates
+    fi
+    
+    echo "    Adding needed repositories. Please be patient..."
+    dnf_retry -y install dialog
+    
+     # Define what's required 
+    packages=(bc coreutils curl dialog fd-find ncurses sqlite wezterm xdg-utils)
+    total=${#packages[@]}
+    count=0
+    
+    # Install what's required
+    (
+    for pkg in "${packages[@]}"; do
+      count=$((count + 1 ))
+      percent=$((count * 100 / total))
+      echo $percent
+
+      dnf_retry -y install "$pkg" --allowerasing || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+      sleep 0.1
+    done
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    
+    # Confirmation when concluded
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+  fi
+  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fd
   ;;
   
   RHEL)
   if [[ $CHECKONLY -eq 0 ]]; then
     if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
     fi
 
     # Keep sudo status for as long as needed
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     sudo timedatectl set-ntp true >/dev/null 2>&1
     echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
+    sudo dnf copr enable -y -q wezfurlong/wezterm-nightly rhel-9-x86_64 >/dev/null 2>&1
     sudo dnf check-update --refresh -q; rc=$?
     if [[ $rc -eq 100 ]]; then
-      echo " Your system has pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      exit 1
+      pending=1
+      check_updates
     fi
 
-    echo " Adding needed repositories. Please be patient..."
-    sudo dnf -y install dialog > /dev/null 2>&1
-    FUSIONON=$(sudo dnf repolist | grep epel | wc -l)
-    if [ $FUSIONON -eq 0 ]; then
-      sudo dnf -y install "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm" >/dev/null 2>&1
-      sudo dnf -y install "https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-$(rpm -E %rhel).noarch.rpm" >/dev/null 2>&1
-      sudo dnf -y install "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm" >/dev/null 2>&1
-      sudo dnf -y install "https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm" >/dev/null 2>&1
+    echo "    Adding needed repositories. Please be patient..."
+    dnf_retry -y install dialog
+    EPELON=$(sudo dnf repolist | grep epel | wc -l)
+    if [[ $EPELON -eq 0 ]]; then
+      dnf_retry -y install "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm"
+      dnf_retry -y install "https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-$(rpm -E %rhel).noarch.rpm"
       sudo dnf -y config-manager --set-enabled crb >/dev/null 2>&1
     fi
 
-    # Define what's required
-    packages=(bc cuetools coreutils curl fd-find ffmpeg flac ImageMagick ncurses sqlite xterm kitty libsixel libsixel-utils)
+    # Define what's required 
+    packages=(bc coreutils curl dialog fd-find ncurses sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -300,88 +506,30 @@ case $OSFAMILY in
       percent=$((count * 100 / total))
       echo $percent
 
-      sudo dnf -y install "$pkg" --allowerasing > /dev/null 2>&1 || true
+      dnf_retry -y install "$pkg" --allowerasing || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
       sleep 0.1
     done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
 
     # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
   fi
   GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum FDPROG=fd
-  ;;
-  
-  SUSE)
-  if [[ $CHECKONLY -eq 0 ]]; then
-    if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
-    fi
-
-    # Keep sudo status for as long as needed
-    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-    sudo timedatectl set-ntp true >/dev/null 2>&1
-    echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
-
-    sudo zypper refresh >/dev/null
-    if [[ $(sudo zypper lu | grep "No updates found." | wc -l) -eq 0 ]]; then
-      echo " Your system has pending software updates. Please update your system manually."
-      echo " This script will not proceed until you do."
-      read -p " Press a key to continue."
-      clear
-      reset
-      exit 1
-    fi
-
-    if [[ $OS == *"LEAP"* ]]; then
-      sudo zypper ar -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Leap_'$THISVER/ packman
-      sudo zypper --no-gpg-checks -n update
-    else
-      sudo zypper ar -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
-      sudo zypper --no-gpg-checks -n update
-    fi
-    
-    sudo zypper --no-gpg-checks --non-interactive install -t pattern devel_basis
-    sudo zypper --no-gpg-checks --non-interactive install dialog > /dev/null 2>&1
-
-    # Define what's required
-    packages=(ImageMagick fd libncurses6 coreutils cuetools bc flac ffmpeg xclip curl xterm dialog sqlite3 libsixel1 libsixel-utils kitty)
-    total=${#packages[@]}
-    count=0
-
-    # Install what's required
-    (
-    for pkg in "${packages[@]}"; do
-      count=$((count + 1 ))
-      percent=$((count * 100 / total))
-      echo $percent
-
-      sudo zypper --no-gpg-checks --non-interactive install "$pkg" > /dev/null 2>&1 || true
-      sleep 0.1
-    done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
-
-    # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Nienteo's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
-  fi
-  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum FDPROG=fd
-  ;;
+  ;;  
   
   MACOS)
   if [[ $CHECKONLY -eq 0 ]]; then
     if ! sudo -n true 2>/dev/null; then
-      echo "Please supply the sudo password:"
-      sudo -v || { echo " Failed to acquire sudo privieleges, so quitting..."; exit 1; }
+      tput setaf ${ALERT:-1}; sudo -p $'\r    Please supply the sudo password for %u: ' -v || { echo "    Failed to acquire sudo privileges, so quitting..."; rm -f "$INSTALLERFILE"; exit 1; }; tput setaf ${MAINTEXT:-11}
     fi
 
     # Keep sudo status for as long as needed
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     echo ""
-    echo " Getting the Niente installer ready. Please bear with us for a few moments..."
+    echo "    Getting the Niente installer ready. Please bear with us for a few moments..."
     echo ""
 
-    # Create a destination folder for Giocoso
+    # Create a destination folder for Niente
     if [[ ! -d /usr/local/bin ]]; then
       sudo mkdir -p /usr/local/bin
       sudo chown -R $(whoami) /usr/local/bin
@@ -389,26 +537,26 @@ case $OSFAMILY in
     fi
     
      while true; do
-      echo " Do you want to use Homebrew (h) or Macports (m) as your package installer?"
-      echo " Note that whatever you choose here must have already been installed by you, manually."
-      echo " Do not mix package installers: if you've already used one or the other, stick"
-      echo " to that one now. If you have a free choice, choose Macports for older machines"
-      echo " and for the fact that it's *much* faster to complete!"
+      echo "    Do you want to use Homebrew (h) or Macports (m) as your package installer?"
+      echo "    Note that whatever you choose here must have already been installed by you, manually."
+      echo "    Do not mix package installers: if you've already used one or the other, stick"
+      echo "    to that one now. If you have a free choice, choose Macports for older machines"
+      echo "    and for the fact that it's *much* faster to complete!"
       echo ""
-      read -n 1 -p " Homebrew or Macports, then? (h/m): " input
+      tput setaf ${ALERT:-1}; read -n 1 -p "    Homebrew or Macports, then? (h/m): " input; tput setaf ${MAINTEXT:-11}
       case "$input" in
        [hH])
          if command -v brew >/dev/null 2>&1; then
            pkgmanager=homebrew
            echo ""
-           echo " Using the Homebrew Package Manager. Please hold on..."
+           echo "    Using the Homebrew Package Manager. Please hold on..."
            echo ""
            brew install --quiet dialog >/dev/null 2>&1
            break
          else
            echo ""
-           echo " Unfortunately, it appears that Homebrew has not already been installed on this system."
-           echo " Do that first, manually, before trying to re-run this installer."
+           echo "    Unfortunately, it appears that Homebrew has not already been installed on this system."
+           echo "    Do that first, manually, before trying to re-run this installer."
            echo ""
            exit 1        
          fi  
@@ -417,14 +565,14 @@ case $OSFAMILY in
          if command -v port >/dev/null 2>&1; then
            pkgmanager=macports
            echo ""
-           echo " Using the Macports Package Manager. Please wait..."
+           echo "    Using the Macports Package Manager. Please wait..."
            echo ""
            sudo port -N install dialog > /dev/null 2>&1           
            break
          else
            echo ""
-           echo " Unfortunately, it appears that Macports has not already been installed on this system."
-           echo " Do that first, manually, before trying to re-run this installer."
+           echo "    Unfortunately, it appears that Macports has not already been installed on this system."
+           echo "    Do that first, manually, before trying to re-run this installer."
            echo ""
            exit 1
          fi   
@@ -432,16 +580,14 @@ case $OSFAMILY in
        *)
          clear
          echo ""
-         echo " Invalid input: only h or m are allowed. Please try again."
+         echo "    Invalid input: only h or m are allowed. Please try again."
          echo ""
         ;;
       esac
     done
 
     # Define what's required
-    bc coreutils cuetools curl fd ffmpeg flac ImageMagick imagemagick-full md5sha1sum ncurses sqlite3 util-linux xterm
-    
-    packages=(bc coreutils cuetools curl fd ffmpeg flac ImageMagick imagemagick-full md5sha1sum ncurses sqlite3 util-linux xterm libsixel kitty)
+    packages=(bc coreutils curl dialog fd gawk grep gsed md5sha1sum ncurses sqlite sqlite3 wezterm)
     total=${#packages[@]}
     count=0
 
@@ -453,30 +599,25 @@ case $OSFAMILY in
       echo $percent
 
       if [[ $pkgmanager == "homebrew" ]]; then
-        brew install --quiet "$pkg" >/dev/null 2>&1
+        mac_install "$pkg" || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
       elif [[ $pkgmanager == "macports" ]]; then
-        sudo port -N install "$pkg" > /dev/null 2>&1
+        if [[ $pkg == "wezterm" ]]; then
+          wezterm_app_install >> "$CONFDIR/txt/install-log.txt" 2>&1 || pkg_installed wezterm || echo "wezterm" >> "$FAILEDPKGS"
+        else
+          mac_install "$pkg" || pkg_installed "$pkg" || echo "$pkg" >> "$FAILEDPKGS"
+        fi
       fi
       
       sleep 0.1
     done
-    ) | dialog --backtitle "Niente Software Install" --title "Installing Niente's Software Dependencies" --guage "\\n\\nInstallation may take some time. Please be patient..." 12 70
-
+    ) | dialog --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
+    tput cup 24 4
+    
     # Confirmation when concluded
-    dialog --backtitle "Niente Software Install" --title "Software Dependencies Installation Completed" --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
+    report_failed_pkgs || dialog --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
   fi
   GREPPROG=grep  SEDPROG=gsed  DATEPROG=gdate  MD5PROG=md5sum  FDPROG=fd
-  ;;
-  
-  MANARM)
-  if [ $CHECKONLY -eq 0 ]; then
-    sudo pacman --noconfirm -Syy
-    sudo pacman --noconfirm --needed -S imagemagick fd ncurses cuetools coreutils bc flac ffmpeg xclip curl xterm dialog sqlite3
-    sudo pacman --noconfirm --needed -S yay 2>/dev/null
-    dialog --stdout --backtitle "Niente Software Install" --msgbox "Software dependencies have been installed: \n\nClick OK to proceed." 10 80
-  fi
-  GREPPROG=grep  SEDPROG=sed  DATEPROG=date  MD5PROG=md5sum  FDPROG=fd
-  ;;
+  ;;  
   
   *)
   echo "You are using an unsupported operating system. Quitting!"
@@ -484,17 +625,35 @@ case $OSFAMILY in
   ;;
 esac
 
-# Check which version of ImageMagick they have: if 'magick' works, it's 7
+# Platform and architecture, used to pick the right self-compiled programs in exec/ (named as Giocoso's:
+# <program>-<macos|linux>-<arm64|x86_64>).
 # -----------------------------------------------------------------------------
-if hash magick 2>/dev/null; then
-  CONVERTER=magick
-else
-  CONVERTER=convert
-fi
+case "$(uname -s)" in
+    Darwin) OS_PLATFORM="macos" ;;
+    Linux)  OS_PLATFORM="linux" ;;
+    *)      OS_PLATFORM="unknown" ;;
+esac
+case "$(uname -m)" in
+    arm64|aarch64) OS_ARCHITECTURE="arm64" ;;
+    x86_64)        OS_ARCHITECTURE="x86_64" ;;
+    armv7l|armv6l) OS_ARCHITECTURE="armv7l" ;;
+    *)             OS_ARCHITECTURE="unknown" ;;
+esac
+METAFLAC="$CONFDIR/exec/metaflac-${OS_PLATFORM}-${OS_ARCHITECTURE}"    # Self-contained metaflac, ffmpeg, ImageMagick 7 and img2sixel: the same builds as Giocoso's
+FFMPEG="$CONFDIR/exec/ffmpeg-${OS_PLATFORM}-${OS_ARCHITECTURE}"
+CONVERTER="$CONFDIR/exec/magick-${OS_PLATFORM}-${OS_ARCHITECTURE}"
+SIXEL="$CONFDIR/exec/img2sixel-${OS_PLATFORM}-${OS_ARCHITECTURE}"
+chmod +x "$METAFLAC" "$FFMPEG" "$CONVERTER" "$SIXEL" 2>/dev/null
 
 echo "SEDPROG=$SEDPROG
 GREPPROG=$GREPPROG
 DATEPROG=$DATEPROG
 MD5PROG=$MD5PROG
 FDPROG=$FDPROG
-CONVPROG=$CONVERTER"> "$HOME/.local/share/niente4/txt/programvariables.txt"
+CONVPROG=\"$CONVERTER\"
+METAFLAC=\"$METAFLAC\"
+FFMPEG=\"$FFMPEG\"
+SIXEL=\"$SIXEL\"
+OS_PLATFORM=$OS_PLATFORM
+OS_ARCHITECTURE=$OS_ARCHITECTURE
+NENDISTRO=\"$OS\"" > "$CONFDIR/txt/programvariables.txt"
