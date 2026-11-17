@@ -333,9 +333,8 @@ elif [ "$1" == "quit" ]; then
           ;;
     '[D') nmenuoptions administration;;
     '[C') nmenuoptions database;;
-    * )   if [[ $key = "" ]]; then exit_program; fi;;
+    * ) A=1;;
   esac
   done
 fi
 
-read -p "Wait"
