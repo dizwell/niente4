@@ -55,6 +55,13 @@ dialog --backtitle "Niente Configuration File Editor" --title " Configuration Pa
 "Niente colour theme name" 14 1 "$confweztheme" 14 45 40 0 \
 "Niente font size (in points)" 15 1 "$confwezfntsz" 15 45 6 0 \
 2>"$CONFDIR/tmp/confparams"
+exitStatus=$?
+
+# Cancel or Esc: change nothing at all. The configuration file (and ~/.niente.lua and the logos) stay exactly as they were.
+if [[ $exitStatus -eq 1 || $exitStatus -eq 255 ]]; then
+  rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
+  return
+fi
 
 readarray -t confparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
