@@ -5,7 +5,6 @@
 # be coloured in a user-configurable manner
 #
 ####################################################################
-CONFDIR="$HOME/.local/share/niente4"
 CONFFILE="$CONFDIR/txt/niente.conf"
 
 # Read parameters from an existing config file, if present
@@ -20,6 +19,7 @@ if [[ -f "$CONFFILE" ]]; then
   confalert=$(cat "$CONFFILE" | $GREPPROG -i ALERT= | awk -F= '{print $2}')
 fi
 
+colour_defaults=(11 2 15 6 11 12 1)      # Hotkey, lines, menu text, logo, info text, spinner, alert
 PALETTE_ROW1="\Z0 0 \Z1 1 \Z2  2 \Z3  3 \Z4  4 \Z5  5 \Z6  6 \Z7  7 \Zn"
 PALETTE_ROW2="\Zb\Z0 8 \Zb\Z1 9 \Zb\Z2 10 \Zb\Z3 11 \Zb\Z4 12 \Zb\Z5 13 \Zb\Z6 14 \Zb\Z7 15 \Zn"
 PALETTE="  Normal Colours: $PALETTE_ROW1\n  Bright Colours: $PALETTE_ROW2"
@@ -42,11 +42,15 @@ while true; do
 
     ret=$?
     case $ret in
-        0)  # OK pressed, save values and break
+        0)  # OK pressed: save each value, but anything blank or not a whole number from 0 to 255
+            # is silently replaced by that colour's default, so the form never shows a blank
             mapfile -t colour_array <<< "$RESULT"
-            # fallback defaults if empty
-            for i in "${!colour_array[@]}"; do
-                [[ -z "${colour_array[i]}" ]] && colour_array[i]="${defaults[i]}"
+            for i in 0 1 2 3 4 5 6; do
+                if [[ ${colour_array[i]} =~ ^[0-9]{1,3}$ ]] && (( 10#${colour_array[i]} <= 255 )); then
+                    colour_array[i]=$((10#${colour_array[i]}))
+                else
+                    colour_array[i]=${colour_defaults[i]}
+                fi
             done
             break
             ;;
@@ -60,8 +64,9 @@ while true; do
             confalert=1
             continue
             ;;
-        1|255)  # Cancel pressed or ESC
-            exit 1
+        1|255)  # Cancel or ESC: save all colours as their defaults
+            colour_array=("${colour_defaults[@]}")
+            break
             ;;
     esac
 done
@@ -75,6 +80,7 @@ INFOTEXT_VAL="${colour_array[4]}"
 SPINNER_VAL="${colour_array[5]}"
 ALERT_VAL="${colour_array[6]}"
 
+# In-place edit only the matching assignments in the line
 $SEDPROG -i \
   -e "s/^HOTKEY=.*/HOTKEY=$HOTKEY_VAL/" \
   -e "s/^DRAWLINES=.*/DRAWLINES=$DRAWLINES_VAL/" \
@@ -84,3 +90,6 @@ $SEDPROG -i \
   -e "s/^SPINNER=.*/SPINNER=$SPINNER_VAL/" \
   -e "s/^ALERT=.*/ALERT=$ALERT_VAL/" \
   "$CONFFILE"
+
+# Re-read the configuration so the new colours take effect straight away
+source "$CONFDIR/bin/nenparse.sh"
