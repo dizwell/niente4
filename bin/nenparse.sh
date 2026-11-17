@@ -108,7 +108,7 @@ ALERT=1
 # ====================================================================
 UTFCHARS=yes
 PARALLELISM=0
-BROWSER=
+BROWSER=\"\"
 LOGOSIZE=110
 LOGOPOS=0
 WEZTHEME=\"Wild Cherry (Gogh)\"
@@ -117,8 +117,8 @@ DIATHEME=\"standard\"
 
 # Database Parameters
 # ====================================================================
-DBNAME=niente
-MUSICDIR=$HOME/Music/classical
+DBNAME=\"niente\"
+MUSICDIR=\"$HOME/Music/classical\"
 
 # Reporting threshold/limit parameters
 # ====================================================================

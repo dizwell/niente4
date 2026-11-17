@@ -16,25 +16,31 @@ if [ -z $SCREENH ]; then SCREENH=1080; fi
 if ! [ -d "$CONFDIR/tmp" ]; then mkdir -p "$CONFDIR/tmp" 2>/dev/null; fi
 CONFFILE="$CONFDIR/txt/niente.conf"
 
+function conf_text {
+# Print the value of key $1 from the config file, minus any surrounding double quotes (as Giocoso's editor does);
+# copes with '=' inside a value, and only matches the key at the start of a line
+$GREPPROG -i -m1 "^$1=" "$CONFFILE" | $SEDPROG -e 's/^[^=]*=//' -e 's/^"//' -e 's/"$//'
+}
+
 # Read parameters from an existing config file, if present
 # ====================================================================
 if [ -f "$CONFFILE" ]; then
-  confaccents=$(cat "$CONFFILE" | $GREPPROG -i UTFCHARS= | awk -F= '{print $2}'); if [ -z $confaccents ]; then confaccents='no'; fi
-  confparallel=$(cat "$CONFFILE" | $GREPPROG -i PARALLELISM= | awk -F= '{print $2}'); if [ -z $confparallel ]; then confparallel=2; fi
-  confdbname=$(cat "$CONFFILE" | $GREPPROG -i DBNAME= | awk -F= '{print $2}')
-  confmusdir=$(cat "$CONFFILE" | $GREPPROG -i MUSICDIR= | awk -F= '{print $2}')
-  confsmart=$(cat "$CONFFILE" | $GREPPROG -i SMALLART= | awk -F= '{print $2}'); if [ -z $confsmart ]; then confsmart=300; fi
-  conflgart=$(cat "$CONFFILE" | $GREPPROG -i LARGEART= | awk -F= '{print $2}'); if [ -z $conflgart ]; then conflgart=1600; fi
-  confsqart=$(cat "$CONFFILE" | $GREPPROG -i SQUAREART= | awk -F= '{print $2}'); if [ -z $confsqart ]; then confsqart='yes'; fi
-  confmaxv=$(cat "$CONFFILE" | $GREPPROG -i VOLUMETHRESHOLD= | awk -F= '{print $2}'); if [ -z $confmaxv ]; then confmaxv=2; fi
-  confrepmaxv=$(cat "$CONFFILE" | $GREPPROG -i MAXV= | awk -F= '{print $2}'); if [ -z $confrepmaxv ]; then confrepmaxv='yes'; fi
-  confnbits=$(cat "$CONFFILE" | $GREPPROG -i NAMEBITS= | awk -F= '{print $2}'); if [ -z $confnbits ]; then confnbits='yes'; fi
-  confbrowz=$(cat "$CONFFILE" | $GREPPROG -i BROWSER= | awk -F= '{print $2}')
-  conflogosize=$(cat "$CONFFILE" | $GREPPROG -i LOGOSIZE= | awk -F= '{print $2}'); if [ -z $conflogosize ]; then conflogosize=110; elif [[ $conflogosize == *"x"* ]]; then conflogosize=$(echo "$conflogosize" | awk -Fx '{print $1}'); fi
-  conflogopos=$(cat "$CONFFILE" | $GREPPROG -i LOGOPOS= | awk -F= '{print $2}'); if [ -z $conflogopos ]; then conflogopos=0; fi  
-  confweztheme=$(cat "$CONFFILE" | $GREPPROG -i WEZTHEME= | awk -F= '{print $2}' | tr -d '"'); if [[ -z $confweztheme ]]; then confweztheme="Wild Cherry (Gogh)"; fi
-  confwezfntsz=$(cat "$CONFFILE" | $GREPPROG -i WEZFNTSZ= | awk -F= '{print $2}'); if [[ -z $confwezfntsz ]]; then confwezfntsz=12; fi
-  confdiatheme=$(cat "$CONFFILE" | $GREPPROG -i DIATHEME= | awk -F= '{print $2}' | tr -d '"'); if [[ -z $confdiatheme ]]; then confdiatheme="standard"; fi
+  confaccents=$(conf_text UTFCHARS); if [ -z $confaccents ]; then confaccents='no'; fi
+  confparallel=$(conf_text PARALLELISM); if [ -z $confparallel ]; then confparallel=2; fi
+  confdbname=$(conf_text DBNAME)
+  confmusdir=$(conf_text MUSICDIR)
+  confsmart=$(conf_text SMALLART); if [ -z $confsmart ]; then confsmart=300; fi
+  conflgart=$(conf_text LARGEART); if [ -z $conflgart ]; then conflgart=1600; fi
+  confsqart=$(conf_text SQUAREART); if [ -z $confsqart ]; then confsqart='yes'; fi
+  confmaxv=$(conf_text VOLUMETHRESHOLD); if [ -z $confmaxv ]; then confmaxv=2; fi
+  confrepmaxv=$(conf_text REPORTMAXV); if [ -z $confrepmaxv ]; then confrepmaxv='yes'; fi
+  confnbits=$(conf_text NAMEBITS); if [ -z $confnbits ]; then confnbits='yes'; fi
+  confbrowz=$(conf_text BROWSER)
+  conflogosize=$(conf_text LOGOSIZE); if [ -z $conflogosize ]; then conflogosize=110; elif [[ $conflogosize == *"x"* ]]; then conflogosize=$(echo "$conflogosize" | awk -Fx '{print $1}'); fi
+  conflogopos=$(conf_text LOGOPOS); if [ -z $conflogopos ]; then conflogopos=0; fi  
+  confweztheme=$(conf_text WEZTHEME); if [[ -z $confweztheme ]]; then confweztheme="Wild Cherry (Gogh)"; fi
+  confwezfntsz=$(conf_text WEZFNTSZ); if [[ -z $confwezfntsz ]]; then confwezfntsz=12; fi
+  confdiatheme=$(conf_text DIATHEME); if [[ -z $confdiatheme ]]; then confdiatheme="standard"; fi
 fi
 
 # Prompt for all parameters
@@ -70,7 +76,7 @@ readarray -t confparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 CONFMUSDIR="${confparams[0]}"
 CONFDBNAME="${confparams[1]}"
 CONFACCENTS="${confparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no"; fi
-CONFPARALLEL="${confparams[3]}"; if [ -z "$CONFCONFPARALLEL" ]; then CONFPARALLEL=2; fi
+CONFPARALLEL="${confparams[3]}"; if [ -z "$CONFPARALLEL" ]; then CONFPARALLEL=2; fi
 CONFSMART="${confparams[4]}"; if [ -z "$CONFSMART" ]; then CONFSMART=300; fi
 CONFLGART="${confparams[5]}"; if [ -z "$CONFLGART" ]; then CONFLGART=1600; fi
 CONFSQART="${confparams[6]}"; if [ -z "$CONFSQART" ]; then CONFSQART="yes"; fi
@@ -117,34 +123,63 @@ if [[ ${CONFREPMAXV,,} == "yes" ]] || [[ ${CONFREPMAXV,,} == "no" ]]; then CONFR
 # If large and small art thresholds are the wrong way round, reverse them
 if [ $CONFSMART -gt $CONFLGART ]; then TMPART=$CONFSMART; CONFSMART=$CONFLGART; CONFLGART=$TMPART; fi
 
-echo "# New Niente Configuration File, created $(date)
+# Text values are written inside double quotes and the file is later sourced, so strip anything that would break
+# out of (or be expanded inside) those quotes: " $ ` and backslash (as Giocoso and Semplice do)
+# ====================================================================
+BADCHARS='[\"$`\\]'
+for v in CONFMUSDIR CONFDBNAME CONFBROWZ CONFWEZTHEME; do
+  printf -v "$v" '%s' "${!v//$BADCHARS/}"
+done
+
+# Keep the colours already chosen (via the colour picker): read each from the existing file, falling back
+# to its default if missing or not a whole number from 0 to 255 (as Giocoso and Semplice do)
+# ====================================================================
+for colourpair in HOTKEY:11 DRAWLINES:2 MAINTEXT:15 LOGO:6 INFOTEXT:11 SPINNER:12 ALERT:1; do
+  colname="${colourpair%%:*}"; coldefault="${colourpair##*:}"
+  colvalue=$($GREPPROG -i -m1 "^$colname=" "$CONFFILE" 2>/dev/null | $SEDPROG -e "s/^[^=]*=//" -e "s/[[:space:]]*$//")
+  if ! [[ $colvalue =~ ^[0-9]+$ && $colvalue -le 255 ]]; then colvalue=$coldefault; fi
+  printf -v "KEEP_$colname" "%s" "$colvalue"
+done
+
+# Back up the existing configuration file, keeping only the ten most recent backups (as Giocoso and Semplice do)
+# ====================================================================
+if [[ -f "$CONFDIR/txt/niente.conf" ]]; then
+  cp "$CONFDIR/txt/niente.conf" "$CONFDIR/txt/niente.conf-$(date +%F-%T).bkp"
+  BKPS=("$CONFDIR/txt"/niente.conf-*.bkp)                                 # The names carry the date and time,
+  if [[ ${#BKPS[@]} -gt 10 && -f ${BKPS[0]} ]]; then                         # so name order is age order
+    rm -f "${BKPS[@]:0:${#BKPS[@]}-10}"
+  fi
+fi
+
+cat > "$CONFDIR/txt/niente.conf" <<CONFEOF
+# New Niente Configuration File, created $(date)
 # ====================================================================
 
 # Colour Constants (alter at your peril!)
-# ====================================================================	
-HOTKEY=11
-DRAWLINES=2
-MAINTEXT=15
-LOGO=6
-INFOTEXT=11
-SPINNER=12
-ALERT=1
+# ====================================================================
+HOTKEY=$KEEP_HOTKEY
+DRAWLINES=$KEEP_DRAWLINES
+MAINTEXT=$KEEP_MAINTEXT
+LOGO=$KEEP_LOGO
+INFOTEXT=$KEEP_INFOTEXT
+SPINNER=$KEEP_SPINNER
+ALERT=$KEEP_ALERT
 
-# General Parameters
+# General Parameters (text values double-quoted, since they may contain spaces)
 # ====================================================================
 UTFCHARS=$CONFACCENTS
 PARALLELISM=$CONFPARALLEL
-BROWSER=$CONFBROWZ
+BROWSER="$CONFBROWZ"
 LOGOSIZE=$CONFLOGOSIZE
 LOGOPOS=$CONFLOGOPOS
-WEZTHEME=\"$CONFWEZTHEME\"
+WEZTHEME="$CONFWEZTHEME"
 WEZFNTSZ=$CONFWEZFNTSZ
-DIATHEME=\"$CONFDIATHEME\"
+DIATHEME="$CONFDIATHEME"
 
 # Database Parameters
 # ====================================================================
-DBNAME=$CONFDBNAME
-MUSICDIR=$CONFMUSDIR
+DBNAME="$CONFDBNAME"
+MUSICDIR="$CONFMUSDIR"
 
 # Reporting threshold/limit parameters
 # ====================================================================
@@ -153,7 +188,8 @@ LARGEART=$CONFLGART
 SQUAREART=$CONFSQART
 VOLUMETHRESHOLD=$CONFMAXV
 NAMEBITS=$CONFNBITS
-REPORTMAXV=$CONFREPMAXV" > "$CONFDIR/txt/niente.conf"
+REPORTMAXV=$CONFREPMAXV
+CONFEOF
 
 rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
 "$CONVPROG" "$CONFDIR/art/nienteicobeta.png" -resize "$CONFLOGOSIZE" "$CONFDIR/art/nienteicosmallbeta.png" 2>/dev/null     # The small menu logos, at the (perhaps new) size
