@@ -47,7 +47,7 @@ if [ "$1" == "database" ]; then
     L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions database;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions database;;
     F|f ) source "$CONFDIR/bin/nennodb.sh" folder; nmenuoptions database;;
-    X|x ) clear; exit 0 ;;
+    X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
               pkill -i "DB Browser for SQLite" 2>/dev/null
@@ -115,7 +115,7 @@ elif [ "$1" == "integrity" ]; then
     Q|q ) clear; nmenuoptions quit;;
     L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions integrity;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions integrity;;
-    X|x ) clear; exit 0 ;;
+    X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
               pkill -i "DB Browser for SQLite" 2>/dev/null
@@ -177,7 +177,7 @@ elif [ "$1" == "reporting" ]; then
     Q|q ) clear; nmenuoptions quit;;
     L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions reporting;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions reporting;;
-    X|x ) clear; exit 0 ;;
+    X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
               pkill -i "DB Browser for SQLite" 2>/dev/null
@@ -261,7 +261,7 @@ elif [ "$1" == "administration" ]; then
     Q|q ) clear; nmenuoptions quit;;
     L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions administration;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions administration;;
-    X|x ) clear; exit 0 ;;
+    X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
               pkill -i "DB Browser for SQLite" 2>/dev/null
@@ -312,7 +312,7 @@ elif [ "$1" == "quit" ]; then
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    X|x ) clear; exit 0 ;;
+    X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
               pkill -i "DB Browser for SQLite" 2>/dev/null

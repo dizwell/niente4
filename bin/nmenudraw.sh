@@ -92,6 +92,6 @@ if [[ -z $LOGOPOS ]]; then LOGOPOS=0; fi
 LOGO_POSITION=$((69 + $LOGOPOS ))
 
 tput cup  1 4; tput setaf $LOGO; echo "♬♪ Niente: The Digital Music Integrity Manager ♬♪"
-tput cup  2 4; tput setaf $LOGO; echo "Copyright © Howard Rogers 2021-2025, Version $PROGVERSION"
+tput cup  2 4; tput setaf $LOGO; echo "Copyright © H. Rogers $COPYRIGHT, Version $PROGVERSION"
 
 sixel_logo

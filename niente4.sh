@@ -37,6 +37,8 @@
 # 4.05  Bug fix in Integrity Check regarding ReplayGain, changed
 #       menus and colour-picker capability                             28.03.26
 # ==============================================================================================================
+# If the folder Niente was started from no longer exists (moved or deleted since the Terminal was in it), start in the home folder instead
+if [[ ! -d $PWD ]]; then cd "$HOME" 2>/dev/null || exit 1; fi
 PROGFILE="${BASH_SOURCE[0]}"                      # This script's own path (a symlink such as /usr/local/bin/niente is fine)
 if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.1"; else PROGVERSION="4.1-beta"; fi
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
@@ -49,13 +51,8 @@ source "$CONFDIR/bin/nenparse.sh"
 }
 
 function exit_program {
-rm -f "$CONFDIR/txt/programvariables.txt" >/dev/null 2>&1;
-if [[ -t 1 ]]; then
-  tput cvvis
-  tput sgr0
-  clear
-  reset
-fi
+# As Semplice: restore the cursor and colours and clear the screen (no 'reset', which is slow and wipes the scrollback)
+if [[ -t 1 ]]; then tput cvvis; tput sgr0; clear; fi
 exit 0
 }
 
@@ -146,29 +143,28 @@ source "$CONFDIR/bin/nentput.sh"                     # The fast tput wrapper (in
 for i in "$@"; do
   case $i in
     --scan-full)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --scan-new)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --check-full)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" full; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenintegritynd.sh" full; clear; exit_program;;
     --check-differential)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" diff; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenintegritynd.sh" diff; clear; exit_program;;
     --check-fast)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenintegritynd.sh" logic; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenintegritynd.sh" logic; clear; exit_program;;
     --check-art)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenartscannd.sh"; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenartscannd.sh"; clear; exit_program;;
     --check-volume)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenvolchknd.sh" full; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenvolchknd.sh" full; clear; exit_program;;
     --aggstats)
-      parse_config; check_database; source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; source "$CONFDIR/bin/nenaggstatnd.sh" full; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenaggstatnd.sh" full; clear; exit_program;;
   esac
 done
 
 tput civis; printf '\e[8;28;103t'			# Setting terminal virtual size to 103x28, regardless of what it's actually set to
-parse_config
-
 source "$CONFDIR/bin/nenoscheck.sh"
 source "$CONFDIR/txt/programvariables.txt"																# Apply particular program variables that are needed, and which are OS-dependent
+parse_config                                                          # As Semplice: read the configuration only once the bundled programs are known
 
 # If at this point we discover database name is null, we need to prompt for one to
 # use as 'the session database'.
