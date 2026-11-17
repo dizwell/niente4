@@ -1,10 +1,13 @@
 [Desktop Entry]
 Categories=AudioVideo;Audio;Player
+Comment[en_GB]=Niente FLAC Checker
 Comment=Niente FLAC Checker
-Exec=/usr/bin/xterm -xrm 'xterm*iconHint: /home/xxxxxxxx/.local/share/niente4/art/nienteico.xpm' -bg black -fg green -geometry 103x28 -fa 'Luxi Mono:style=Regular' -fs 11 -ti 340 -tn xterm-256color -e niente4.sh
+Exec=/usr/bin/wezterm --config-file /home/xxxxxxxx/.niente.lua -e niente4.sh
+GenericName[en_GB]=Niente
 GenericName=Niente
 Icon=/home/xxxxxxxx/.local/share/niente4/art/nienteico.png
 MimeType=
+Name[en_GB]=niente4
 Name=niente4
 Path=
 StartupNotify=true
