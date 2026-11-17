@@ -32,11 +32,13 @@ if [ -f "$CONFFILE" ]; then
   confbrowz=$(cat "$CONFFILE" | $GREPPROG -i BROWSER= | awk -F= '{print $2}')
   conflogosize=$(cat "$CONFFILE" | $GREPPROG -i LOGOSIZE= | awk -F= '{print $2}'); if [ -z $conflogosize ]; then conflogosize=110; elif [[ $conflogosize == *"x"* ]]; then conflogosize=$(echo "$conflogosize" | awk -Fx '{print $1}'); fi
   conflogopos=$(cat "$CONFFILE" | $GREPPROG -i LOGOPOS= | awk -F= '{print $2}'); if [ -z $conflogopos ]; then conflogopos=0; fi  
+  confweztheme=$(cat "$CONFFILE" | $GREPPROG -i WEZTHEME= | awk -F= '{print $2}' | tr -d '"'); if [[ -z $confweztheme ]]; then confweztheme="Wild Cherry (Gogh)"; fi
+  confwezfntsz=$(cat "$CONFFILE" | $GREPPROG -i WEZFNTSZ= | awk -F= '{print $2}'); if [[ -z $confwezfntsz ]]; then confwezfntsz=12; fi
 fi
 
 # Prompt for all parameters
 # ====================================================================
-dialog --backtitle "Niente Configuration File Editor" --title " Configuration Parameters " --form "" 20 90 16 \
+dialog --backtitle "Niente Configuration File Editor" --title " Configuration Parameters " --form "" 21 95 16 \
 "Default music folder " 1 1 "$confmusdir" 1 45 40 0 \
 "Default music database name " 2 1 "$confdbname" 2 45 25 0 \
 "Stop accented characters conversion" 3 1 "$confaccents" 3 45 6 0 \
@@ -50,6 +52,8 @@ dialog --backtitle "Niente Configuration File Editor" --title " Configuration Pa
 "Preferred browser" 11 1 "$confbrowz" 11 45 30 0 \
 "Size of the Program Logo" 12 1  "$conflogosize"     12 45 9 0 \
 "Program Logo position (- or +)" 13 1  "$conflogopos"     13 45 9 0 \
+"Niente colour theme name" 14 1 "$confweztheme" 14 45 40 0 \
+"Niente font size (in points)" 15 1 "$confwezfntsz" 15 45 6 0 \
 2>"$CONFDIR/tmp/confparams"
 
 readarray -t confparams < "$CONFDIR/tmp/confparams" 2>/dev/null
@@ -70,6 +74,17 @@ CONFLOGOSIZE="${confparams[11]}"
   CONFLOGOSIZE=$CONFLOGOSIZE"x"$CONFLOGOSIZE
 CONFLOGOPOS="${confparams[12]}"
   if [[ $((CONFLOGOPOS)) != "$CONFLOGOPOS" ]]; then CONFLOGOPOS=0; fi
+CONFWEZTHEME="${confparams[13]}"; CONFWEZTHEME="${CONFWEZTHEME//\"/}"        # WezTerm colour scheme: no double quotes, as it's written in quotes
+  if [[ -z $CONFWEZTHEME ]]; then CONFWEZTHEME="Wild Cherry (Gogh)"; fi
+CONFWEZFNTSZ="${confparams[14]}"
+  if [[ $CONFWEZFNTSZ =~ ^[0-9]+$ ]] && (( 10#$CONFWEZFNTSZ >= 8 && 10#$CONFWEZFNTSZ <= 32 )); then CONFWEZFNTSZ=$((10#$CONFWEZFNTSZ)); else CONFWEZFNTSZ=12; fi   # 8 to 32 points: default 12
+
+# WezTerm's own settings file for Niente gets the colour scheme and font size, as Giocoso's and Semplice's do
+if [[ -f $HOME/.niente.lua ]]; then
+  WEZSED="${CONFWEZTHEME//\\/\\\\}"; WEZSED="${WEZSED//&/\\&}"; WEZSED="${WEZSED//|/\\|}"
+  $SEDPROG -i "s|^config\.color_scheme = '.*'\$|config.color_scheme = '$WEZSED'|" "$HOME/.niente.lua"
+  $SEDPROG -i "s|^config\.font_size = .*\$|config.font_size = $CONFWEZFNTSZ|" "$HOME/.niente.lua"
+fi
 
 # Check for legal values and replace with defaults if not legal
 # ====================================================================
@@ -109,6 +124,8 @@ PARALLELISM=$CONFPARALLEL
 BROWSER=$CONFBROWZ
 LOGOSIZE=$CONFLOGOSIZE
 LOGOPOS=$CONFLOGOPOS
+WEZTHEME=\"$CONFWEZTHEME\"
+WEZFNTSZ=$CONFWEZFNTSZ
 
 # Database Parameters
 # ====================================================================

@@ -106,6 +106,8 @@ PARALLELISM=0
 BROWSER=
 LOGOSIZE=110
 LOGOPOS=0
+WEZTHEME=\"Wild Cherry (Gogh)\"
+WEZFNTSZ=12
 
 # Database Parameters
 # ====================================================================
