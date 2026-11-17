@@ -46,7 +46,7 @@ fi
 # OK on the second saves both. Cancel or Esc on either page changes nothing at all: the configuration file (and
 # ~/.niente.lua and the logos) stay exactly as they were.
 # ====================================================================
-dialog --backtitle "Niente Configuration File Editor" --title " Program Settings " --form "" 16 95 9 \
+dialog --backtitle "Niente Configuration File Editor" --title " Program Configuration " --form "Program Settings:" 17 95 9 \
 "Default music folder " 1 1 "$confmusdir" 1 45 40 0 \
 "Default music database name " 2 1 "$confdbname" 2 45 25 0 \
 "Stop accented characters conversion" 3 1 "$confaccents" 3 45 6 0 \
@@ -64,7 +64,7 @@ if [[ $exitStatus -eq 1 || $exitStatus -eq 255 ]]; then
 fi
 readarray -t progparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
-dialog --backtitle "Niente Configuration File Editor" --title " Reporting Settings " --form "" 13 95 6 \
+dialog --backtitle "Niente Configuration File Editor" --title " Program Configuration " --form "Reporting Settings:" 14 95 6 \
 "Threshold (pixels) for small art " 1 1 "$confsmart" 1 45 6 0 \
 "Threshold (pixels) for large art " 2 1 "$conflgart" 2 45 6 0 \
 "Should album art be square? " 3 1 "$confsqart" 3 45 6 0 \
