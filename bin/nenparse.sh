@@ -74,6 +74,11 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
     VOLUMETHRESHOLD=2
   fi
 
+  # Dialog colour theme: must be one of the supplied themes (anything else, including blank, gets 'standard'), as in
+  # Giocoso and Semplice. Exported here, so a theme chosen in the configuration editor takes effect as soon as it is saved.
+  if [[ ${DIATHEME,,} =~ ^(standard|red|green|yellow|magenta)$ ]]; then DIATHEME=${DIATHEME,,}; else DIATHEME=standard; fi
+  export DIALOGRC="$CONFDIR/txt/$DIATHEME.conf"
+
   # The logo size must be a whole number of pixels from 100 to 400 (written as NxN): anything else gives the default, 110
   LOGOSIZE="${LOGOSIZE%%x*}"
   if [[ $LOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$LOGOSIZE >= 100 && 10#$LOGOSIZE <= 400 )); then LOGOSIZE="$((10#$LOGOSIZE))x$((10#$LOGOSIZE))"; else LOGOSIZE="110x110"; fi
@@ -108,6 +113,7 @@ LOGOSIZE=110
 LOGOPOS=0
 WEZTHEME=\"Wild Cherry (Gogh)\"
 WEZFNTSZ=12
+DIATHEME=\"standard\"
 
 # Database Parameters
 # ====================================================================

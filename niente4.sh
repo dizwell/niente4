@@ -164,7 +164,6 @@ for i in "$@"; do
   esac
 done
 
-export DIALOGRC="$CONFDIR/txt/abnendialog.conf"		# Sets the colour scheme for dialogs
 tput civis; printf '\e[8;28;103t'			# Setting terminal virtual size to 103x28, regardless of what it's actually set to
 parse_config
 

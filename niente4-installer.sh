@@ -4,7 +4,7 @@
 # Installation Program for Niente Version 4. In broad terms:
 #
 #  1. Get user consent to adjust system
-#  2. Write the Dialog colour scheme
+#  2. Download the Dialog colour schemes
 #  3. Use nenoscheck to install Niente's software dependencies
 #  4. Install new Niente 4 files
 #  5. Verify installation
@@ -477,46 +477,13 @@ if [[ "$response" == [Yy]* ]]; then
   downloads
   chown -R $USERNAME:$USERNAME "$NEWCONF" 2>/dev/null
   
-  # 5. Write Niente's Dialog colour scheme
+  # 5. Download the various Dialog configuration files (the same five themes as Giocoso and Semplice)
   # -----------------------------------------------------
-  echo "screen_color = (WHITE,BLACK,ON)
-shadow_color = (BLACK,BLACK,ON)
-dialog_color = (BLACK,WHITE,OFF)
-title_color = (GREEN,WHITE,OFF)
-border_color = (WHITE,WHITE,ON)
-button_active_color = (WHITE,RED,ON)
-button_inactive_color = dialog_color
-button_key_active_color = button_active_color
-button_key_inactive_color = (RED,WHITE,ON)
-button_label_active_color = (WHITE,RED,ON)
-button_label_inactive_color = (BLACK,WHITE,ON)
-inputbox_color = dialog_color
-inputbox_border_color = dialog_color
-searchbox_color = dialog_color
-searchbox_title_color = title_color
-searchbox_border_color = border_color
-position_indicator_color = title_color
-menubox_color = dialog_color
-menubox_border_color = border_color
-item_color = dialog_color
-item_selected_color = button_active_color
-tag_color = title_color
-tag_selected_color = button_label_active_color
-tag_key_color = button_key_inactive_color
-tag_key_selected_color = (RED,WHITE,ON)
-check_color = dialog_color
-check_selected_color = button_active_color
-uarrow_color = (GREEN,WHITE,ON)
-darrow_color = uarrow_color
-itemhelp_color = (WHITE,BLACK,OFF)
-form_active_text_color = button_active_color
-form_text_color = (WHITE,CYAN,ON)
-form_item_readonly_color = (CYAN,WHITE,ON)
-gauge_color = title_color
-border2_color = dialog_color
-inputbox_border2_color = dialog_color
-searchbox_border2_color = dialog_color
-menubox_border2_color = dialog_color" > "$NEWCONF/txt/abnendialog.conf"
+  fetch_file "$REMOTESOURCE/txt/standard.conf" "$NEWCONF/txt/standard.conf"
+  fetch_file "$REMOTESOURCE/txt/red.conf" "$NEWCONF/txt/red.conf"
+  fetch_file "$REMOTESOURCE/txt/green.conf" "$NEWCONF/txt/green.conf"
+  fetch_file "$REMOTESOURCE/txt/yellow.conf" "$NEWCONF/txt/yellow.conf"
+  fetch_file "$REMOTESOURCE/txt/magenta.conf" "$NEWCONF/txt/magenta.conf"
 
   # 6. Try to install the program fonts (but it may not work on all distros, and ultimately it's up to them)
   # -----------------------------------------------------

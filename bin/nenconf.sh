@@ -34,11 +34,12 @@ if [ -f "$CONFFILE" ]; then
   conflogopos=$(cat "$CONFFILE" | $GREPPROG -i LOGOPOS= | awk -F= '{print $2}'); if [ -z $conflogopos ]; then conflogopos=0; fi  
   confweztheme=$(cat "$CONFFILE" | $GREPPROG -i WEZTHEME= | awk -F= '{print $2}' | tr -d '"'); if [[ -z $confweztheme ]]; then confweztheme="Wild Cherry (Gogh)"; fi
   confwezfntsz=$(cat "$CONFFILE" | $GREPPROG -i WEZFNTSZ= | awk -F= '{print $2}'); if [[ -z $confwezfntsz ]]; then confwezfntsz=12; fi
+  confdiatheme=$(cat "$CONFFILE" | $GREPPROG -i DIATHEME= | awk -F= '{print $2}' | tr -d '"'); if [[ -z $confdiatheme ]]; then confdiatheme="standard"; fi
 fi
 
 # Prompt for all parameters
 # ====================================================================
-dialog --backtitle "Niente Configuration File Editor" --title " Configuration Parameters " --form "" 21 95 16 \
+dialog --backtitle "Niente Configuration File Editor" --title " Configuration Parameters " --form "" 22 95 17 \
 "Default music folder " 1 1 "$confmusdir" 1 45 40 0 \
 "Default music database name " 2 1 "$confdbname" 2 45 25 0 \
 "Stop accented characters conversion" 3 1 "$confaccents" 3 45 6 0 \
@@ -54,6 +55,7 @@ dialog --backtitle "Niente Configuration File Editor" --title " Configuration Pa
 "Program Logo position (- or +)" 13 1  "$conflogopos"     13 45 9 0 \
 "Niente colour theme name" 14 1 "$confweztheme" 14 45 40 0 \
 "Niente font size (in points)" 15 1 "$confwezfntsz" 15 45 6 0 \
+"Dialog colour theme name" 16 1 "$confdiatheme" 16 45 10 0 \
 2>"$CONFDIR/tmp/confparams"
 exitStatus=$?
 
@@ -85,6 +87,10 @@ CONFWEZTHEME="${confparams[13]}"; CONFWEZTHEME="${CONFWEZTHEME//\"/}"        # W
   if [[ -z $CONFWEZTHEME ]]; then CONFWEZTHEME="Wild Cherry (Gogh)"; fi
 CONFWEZFNTSZ="${confparams[14]}"
   if [[ $CONFWEZFNTSZ =~ ^[0-9]+$ ]] && (( 10#$CONFWEZFNTSZ >= 8 && 10#$CONFWEZFNTSZ <= 32 )); then CONFWEZFNTSZ=$((10#$CONFWEZFNTSZ)); else CONFWEZFNTSZ=12; fi   # 8 to 32 points: default 12
+
+CONFDIATHEME="${confparams[15]}"
+# Make sure CONFDIATHEME is one of standard, red, green, yellow or magenta. If not, it's standard
+if [[ ${CONFDIATHEME,,} =~ ^(standard|red|green|yellow|magenta)$ ]]; then CONFDIATHEME=${CONFDIATHEME,,}; else CONFDIATHEME=standard; fi
 
 # WezTerm's own settings file for Niente gets the colour scheme and font size, as Giocoso's and Semplice's do
 if [[ -f $HOME/.niente.lua ]]; then
@@ -133,6 +139,7 @@ LOGOSIZE=$CONFLOGOSIZE
 LOGOPOS=$CONFLOGOPOS
 WEZTHEME=\"$CONFWEZTHEME\"
 WEZFNTSZ=$CONFWEZFNTSZ
+DIATHEME=\"$CONFDIATHEME\"
 
 # Database Parameters
 # ====================================================================
