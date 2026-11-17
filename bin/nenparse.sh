@@ -74,15 +74,19 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
     VOLUMETHRESHOLD=2
   fi
 
-  # The Use Kitty Graphics parameter, if set, should be yes or no, defaulting to no.
-  if [[ -z $USEKITTY ]]; then
-    USEKITTY=0
-  elif  [[ ${USEKITTY^^} == YES ]]; then
-    USEKITTY=1
-  else
-    USEKITTY=0
-  fi
-  
+  # The logo size must be a whole number of pixels, at least 100 (written as NxN): anything else gives the default, 110
+  LOGOSIZE="${LOGOSIZE%%x*}"
+  if [[ $LOGOSIZE =~ ^[0-9]+$ ]] && (( 10#$LOGOSIZE >= 100 )); then LOGOSIZE="$((10#$LOGOSIZE))x$((10#$LOGOSIZE))"; else LOGOSIZE="110x110"; fi
+
+  # The small menu logos (release and beta) are made from the full-size icons with the bundled ImageMagick, if
+  # they don't exist yet; saving the configuration makes them again at the configured size
+  for smalllogo in nienteico nienteicobeta; do
+    if [[ ! -f "$CONFDIR/art/${smalllogo/ico/icosmall}.png" && -x $CONVPROG ]]; then
+      "$CONVPROG" "$CONFDIR/art/$smalllogo.png" -resize "$LOGOSIZE" "$CONFDIR/art/${smalllogo/ico/icosmall}.png" 2>/dev/null
+    fi
+  done
+  unset smalllogo
+
 else
 echo "# New Niente Configuration File, created $(date),
 # Colour Constants (alter at your peril!)
@@ -100,8 +104,7 @@ ALERT=1
 UTFCHARS=yes
 PARALLELISM=0
 BROWSER=
-USEKITTY=no
-LOGOSIZE=220
+LOGOSIZE=110
 LOGOPOS=0
 
 # Database Parameters

@@ -39,7 +39,7 @@
 # ==============================================================================================================
 PROGFILE="${BASH_SOURCE[0]}"                      # This script's own path (a symlink such as /usr/local/bin/niente is fine)
 if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.1"; else PROGVERSION="4.1-beta"; fi
-echo -ne "\033]0;Niente: The Music Integrity Checker\007"
+echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
 mkdir -p "$CONFDIR" "$CONFDIR/txt" "$CONFDIR/bin" "$CONFDIR/tmp" "$CONFDIR/art" "$CONFDIR/db" 2>/dev/null	   # Create a folder structure, if it doesn't already exist (and suppress errors if it does!)
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued

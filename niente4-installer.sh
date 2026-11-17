@@ -165,7 +165,7 @@ tput setaf $DRAWLINES; echo -e "┌───────────────
 │                                                                                                   │
 │                                                                                                   │
 └───────────────────────────────────────────────────────────────────────────────────────────────────┘"
-tput cup  1 4; tput setaf $LOGO; echo "♬♪ Niente: The Digital Music Integrity Checker ♬♪"
+tput cup  1 4; tput setaf $LOGO; echo "♬♪ Niente: The Digital Music Integrity Manager ♬♪"
 tput cup  2 4; tput setaf $LOGO; echo "Copyright © H. Rogers $COPYRIGHT"
 tput cup  3 4; tput setaf $LOGO; echo "Version $PROGVERSION"
 # Once known (from -v, or from the stable/beta prompt), the release being installed shows flush right
@@ -239,7 +239,7 @@ fi
 chmod +x "$NEWCONF/exec/"*
 
 # Art files next
-components=(Luxi_License.txt luximr.ttf LinLibertine_M.otf nienteico.png nienteicobeta.png nienteico.svg)
+components=(LinLibertine_M.otf nienteico.png nienteicobeta.png nienteico.svg)
 total=${#components[@]}
 count=0
 (
@@ -541,7 +541,7 @@ local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 config.initial_cols = 103
 config.initial_rows = 28
-config.color_scheme = 'Galaxy'
+config.color_scheme = 'Wild Cherry (Gogh)'
 config.font = wezterm.font("Linux Libertine Mono O", {weight="Regular", stretch="Normal", style="Normal"})
 config.font_size = 12
 config.audible_bell = "Disabled"
@@ -572,7 +572,7 @@ config.line_height = 1.2
 --config.front_end = "WebGpu"
 local schemes = wezterm.get_builtin_color_schemes()
 if not schemes[config.color_scheme] then
-  config.color_scheme = "Galaxy"
+  config.color_scheme = "Wild Cherry (Gogh)"
 end
 return config
 EOF

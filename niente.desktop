@@ -1,7 +1,7 @@
 [Desktop Entry]
 Categories=AudioVideo;Audio;Player
-Comment[en_GB]=Niente FLAC Checker
-Comment=Niente FLAC Checker
+Comment[en_GB]=Niente Music Integrity Manager
+Comment=Niente Music Integrity Manager
 Exec=/usr/bin/wezterm --config-file /home/xxxxxxxx/.niente.lua -e niente4.sh
 GenericName[en_GB]=Niente
 GenericName=Niente
