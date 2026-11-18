@@ -142,13 +142,20 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd ".mode ascii" -cmd ".import $CONFDIR/txt/f
 rm -f "$CONFDIR/txt/fsalbums-ascii.txt" >/dev/null 2>&1
 }
 
+function thousands {
+# A whole number with thousands separators: 17597 becomes 17,597
+local NUM="$1" OUT=""
+while (( ${#NUM} > 3 )); do OUT=",${NUM: -3}$OUT"; NUM="${NUM:0:${#NUM}-3}"; done
+printf '%s' "$NUM$OUT"
+}
+
 function check_data_loss {
 # Compare the database with the list just loaded by list_music_folder. If more than a fifth of the database's tracks
 # were not found in the music folder (an unmounted or partly available share, say), return 1 and leave the counts in
 # DBTRACKS and LOSTTRACKS, plus a ready-made warning (LOSSWARN) and log line (LOSSLOG). An empty database can never trip it.
 DBTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks" 2>/dev/null); DBTRACKS=$((DBTRACKS))
 LOSTTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks t where not exists (select 1 from loadfiles where filename=t.filename)" 2>/dev/null); LOSTTRACKS=$((LOSTTRACKS))
-LOSSWARN="\\n$LOSTTRACKS of the $DBTRACKS tracks in the database could not be found in your music folder. Continuing would remove them from the database, along with their integrity-check results. Is your music folder fully available?\\n\\nAre you sure you want to continue?"
+LOSSWARN="\\n$(thousands $LOSTTRACKS) of the $(thousands $DBTRACKS) tracks in the database could not be found in your music folder. Continuing would remove them from the database, along with their integrity-check results. Is your music folder fully available?\\n\\nAre you sure you want to continue?"
 LOSSLOG="Unattended scan refused: $LOSTTRACKS of $DBTRACKS tracks in the database were not found in the music folder (more than a fifth), so nothing has been changed. If they really have gone, run a refresh from the menu."
 if (( DBTRACKS > 0 && LOSTTRACKS * 5 > DBTRACKS )); then return 1; fi
 return 0

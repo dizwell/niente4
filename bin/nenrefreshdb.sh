@@ -74,6 +74,9 @@ fi
 # And if there are things in TRACKS which aren't in loadfiles, these are old recordings which are no longer
 # extant on the file system and which should therefore be deleted from the TRACKS table.
 
+# Count what is about to change, for the completion message (check_data_loss has already counted the files gone)
+NEWTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from loadfiles l where not exists (select 1 from tracks where filename=l.filename)" .exit 2>/dev/null); NEWTRACKS=$((NEWTRACKS))
+
 # So, first: load newly discovered files into TRACKS
 SQLSTMT="insert into tracks (filename) select filename from loadfiles l where not exists (select 1 from tracks where filename=l.filename)"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -85,7 +88,18 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 # Finally, count number of records in the TRACKS table
 SQLSTMT="select count(*) from tracks"
 RECCOUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit)
-dialog --stdout --backtitle "Niente Database Refresh" --title " File Scan and Database Refresh Complete! " --msgbox "\\nYour music files have been scanned and added to the database, which now knows of $RECCOUNT separate FLACs.\\n\\nUse the Integrity Checking menu to analyse these files in detail.\\n\\nClick OK to return to the main menu." 12 80
+# Say what the refresh actually did, with thousands separators
+if (( NEWTRACKS == 0 && LOSTTRACKS == 0 )); then
+  REFRESHMSG="Your music folder has been scanned: no FLACs have been added or removed. The database still knows of $(thousands $RECCOUNT) FLACs."
+else
+  if (( NEWTRACKS == 1 )); then ADDTXT="1 new FLAC was added to the database"; else ADDTXT="$(thousands $NEWTRACKS) new FLACs were added to the database"; fi
+  if (( LOSTTRACKS == 1 )); then GONETXT="1 that is no longer on disk was removed"; else GONETXT="$(thousands $LOSTTRACKS) that are no longer on disk were removed"; fi
+  if (( NEWTRACKS == 0 )); then CHANGETXT="${GONETXT/that is/FLAC that is}"; CHANGETXT="${CHANGETXT/that are/FLACs that are}"; CHANGETXT="$CHANGETXT from the database"
+  elif (( LOSTTRACKS == 0 )); then CHANGETXT="$ADDTXT"
+  else CHANGETXT="$ADDTXT and $GONETXT"; fi
+  REFRESHMSG="Your music folder has been scanned: $CHANGETXT. The database now knows of $(thousands $RECCOUNT) FLACs."
+fi
+dialog --stdout --backtitle "Niente Database Refresh" --title " File Scan and Database Refresh Complete! " --msgbox "\\n$REFRESHMSG\\n\\nUse the Integrity Checking menu to analyse these files in detail.\\n\\nClick OK to return to the main menu." 12 80
 
 # Update the activities log...
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
