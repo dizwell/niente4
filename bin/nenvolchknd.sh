@@ -43,8 +43,8 @@ if [ $SCANTYPE == "full" ]; then
   sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes"
 else
   # Note the horror SQL needed to extract only the folder name from a folder/file full path name!
-  VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select filename from maxvolumes)")
-  VOLSCAN_SQL="select id, filename from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select filename from maxvolumes) order by filename"
+  VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes)")
+  VOLSCAN_SQL="select id, filename from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes) order by filename"
 fi
 
 if [ $VOLSCAN_COUNT -eq 0 ]; then
@@ -65,8 +65,8 @@ for f in "${volcheck[@]}"; do
   COUNTER=$((COUNTER+1))
   if [ -z "$filename" ]; then filename='QxQxQx'; fi
   if [ -f "$filename" ]; then
-    dirname=$(dirname "$filename")
-    MAXV=$("$FFMPEG" -nostdin -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | $GREPPROG -m 1 max_volume | $GREPPROG -oP '\-\K.+')
+    LINE=$("$FFMPEG" -nostdin -threads 0 -nostats -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | grep "max_volume")
+    MAXV=$(echo "$LINE" | awk '{print $5}' | tr -d '-')
     if [ -z "$MAXV" ]; then
       MAXV=0.0              # Special case: if max_volume is 0.0, then ffmpeg displays no '+' against it, so the return from the above is null. This sets it back to being 0.0
     else
@@ -75,7 +75,7 @@ for f in "${volcheck[@]}"; do
 
     # Remove dodgy characters. Single quotes are escaped into being two-single quotes.
     # Double quotes are replaced by a meaningless string for now...
-    volfilename=${dirname//\'/\'\'}
+    volfilename=${filename//\'/\'\'}
     volfilename="${volfilename//\"/##@##}"
     SQLSTR="insert into maxvolumes_load (filename, boost) values ('$volfilename','$MAXV')"
     sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTR"
@@ -89,11 +89,7 @@ for f in "${volcheck[@]}"; do
 done
 
 # Since we've only been inserting every tenth row in the loop, the last up-to-nine rows in maxvolumes_load are left hanging
-# A final insert makes sure the last few rows are transferred too.
-sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
-sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
-
-# If dodgy characters were replaced, now put them back
+# A final insert makes sure the last few rows are transferred too, once any double quotes have been put back.
 sqlite3 "$CONFDIR/db/$DBNAME.db" "update maxvolumes_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
