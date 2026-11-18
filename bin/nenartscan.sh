@@ -74,7 +74,7 @@ for f in "${artcheck[@]}"; do
     if [[ $ARTWIDTH -eq 9999 ]]; then 
       ARTSTRING="Embedded artwork not present"
     else 
-      ARTSTRING="Embedded art found at $ARTWIDTH x $ARTWIDTH pixels"
+      ARTSTRING="Embedded art found at $ARTWIDTH x $ARTHEIGHT pixels"
     fi
     
     PERCENTAGE=$(( 100 * COUNTER / ARTSCAN_COUNT ))
@@ -190,7 +190,7 @@ for f in "${artcheck[@]}"; do
     if [[ $ARTWIDTH -eq 9999 ]]; then 
       ARTSTRING="Embedded artwork not present"
     else 
-      ARTSTRING="Embedded art found at $ARTWIDTH x $ARTWIDTH pixels"
+      ARTSTRING="Embedded art found at $ARTWIDTH x $ARTHEIGHT pixels"
     fi
     
     PERCENTAGE=$(( 100 * COUNTER / ARTSCAN_COUNT ))
