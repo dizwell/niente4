@@ -36,7 +36,7 @@ if [ "$1" == "database" ]; then
   case $option in
    "" ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
     1 ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
-    2 ) source "$CONFDIR/bin/nennukedb.sh" quiet; source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;
+    2 ) source "$CONFDIR/bin/nennukedb.sh" quiet && source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;   # No re-load if the wipe is declined
     3 ) source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;
     4 ) source "$CONFDIR/bin/nennukedb.sh" verbose; nmenuoptions database;;
     D|d ) clear; nmenuoptions database;;

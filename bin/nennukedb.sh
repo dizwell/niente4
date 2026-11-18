@@ -8,6 +8,17 @@
 
 function nuke_database {
 check_database
+# A wipe can't be undone, so say what is about to happen and default to No (as Giocoso's restore does).
+# 'verbose' is the plain wipe (Database option 4); 'quiet' is the wipe before a full re-load (option 2)
+WIPEWARN="\nThis will delete everything in the '$DBNAME' database: every track, its stored hashes and check history, the album-art and volume results, and the refresh logs. It can be re-populated by a fresh scan, but all the integrity checks that Niente performs for a populated database can only be re-created by performing a fresh, lengthy integrity check."
+if [ "$callmode" == "quiet" ]; then
+  WIPEASK="Are you sure you want to wipe it and re-load it from scratch with a full scan?"
+else
+  WIPEASK="Are you sure you want to wipe it?"
+fi
+if ! dialog --backtitle "Niente Database Wipe" --title " Confirm Database Wipe " --no-mouse --defaultno --yesno "$WIPEWARN\n\n$WIPEASK" 14 80; then
+  return 1
+fi
 # Place a lock on disk, so no competing sessions can run
 if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
   touch "$CONFDIR/tmp/nientelock"
