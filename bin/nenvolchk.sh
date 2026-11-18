@@ -128,7 +128,7 @@ for f in "${volcheck[@]}"; do
 done
 echo "$POSSIBLE_BOOSTS" > "$CONFDIR/tmp/boost_count.txt"
 ) | dialog --backtitle "Niente $SCANDESC Volume Boost Check" \
-           --title " Analysing Music Files for Physical Volume Levels" \
+           --title " Analysing Music Files for Physical Volume Levels " \
            --no-collapse \
            --gauge "Initialising..." 15 95 0
 
