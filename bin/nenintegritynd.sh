@@ -32,157 +32,9 @@ TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Starting a $CHECKTYPE integrity check');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
-# This SQL gets the filenames of every dodgy FLAC in the database, in one hit. We run it twice so we
-# can determine the *number* of records that need re-scanning.
-
-if [ $CHECKTYPE == "full" ]; then
-  RESCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks")
-  RESCAN_SQL="select distinct id, filename from tracks order by filename"
-elif [ $CHECKTYPE == "diff" ]; then
-  if [ "$NAMEBITS" == "yes" ]; then     # We only count filenames not including bit-depth data as a problem if NAMEBITS is switched on
-    RESCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (
-    select filename from tracks where hash_orig<>hash_new union
-    select filename from tracks where hash_new is null or length(hash_new)=0 union
-    select filename from tracks where length(artistname)=0 or artistname is null union
-    select filename from tracks where length(albumname)=0 or albumname is null union
-    select filename from tracks where length(composername)=0 or composername is null union
-    select filename from tracks where length(performer)=0 or performer is null union
-    select filename from tracks where length(genrename)=0 or genrename is null union
-    select filename from tracks where length(comment)=0 or comment is null union
-    select filename from tracks where length(date_tag)=0 or date_tag is null union
-    select filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select filename from tracks where not instr(comment, performer) union
-    select filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select filename from tracks where artistname<>composername)")
-
-    RESCAN_SQL="select distinct id, filename from (
-    select id, filename from tracks where hash_orig<>hash_new union
-    select id, filename from tracks where hash_new is null or length(hash_new)=0 union
-    select id, filename from tracks where length(artistname)=0 or artistname is null union
-    select id, filename from tracks where length(albumname)=0 or albumname is null union
-    select id, filename from tracks where length(composername)=0 or composername is null union
-    select id, filename from tracks where length(performer)=0 or performer is null union
-    select id, filename from tracks where length(genrename)=0 or genrename is null union
-    select id, filename from tracks where length(comment)=0 or comment is null union
-    select id, filename from tracks where length(date_tag)=0 or date_tag is null union
-    select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select id, filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select id, filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select id, filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select id, filename from tracks where not instr(comment, performer) union
-    select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select id, filename from tracks where artistname<>composername)
-    order by filename"
-  else
-    RESCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (
-    select filename from tracks where ifnull(hash_orig,'X')<>ifnull(hash_new,'Y') union
-    select filename from tracks where length(artistname)=0 or artistname is null union
-    select filename from tracks where length(albumname)=0 or albumname is null union
-    select filename from tracks where length(composername)=0 or composername is null union
-    select filename from tracks where length(performer)=0 or performer is null union
-    select filename from tracks where length(genrename)=0 or genrename is null union
-    select filename from tracks where length(comment)=0 or comment is null union
-    select filename from tracks where length(date_tag)=0 or date_tag is null union
-    select filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select filename from tracks where not instr(comment, performer) union
-    select filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select filename from tracks where artistname<>composername)")
-
-    RESCAN_SQL="select distinct id, filename from (
-    select id, filename from tracks where ifnull(hash_orig,'X')<>ifnull(hash_new,'Y') union
-    select id, filename from tracks where length(artistname)=0 or artistname is null union
-    select id, filename from tracks where length(albumname)=0 or albumname is null union
-    select id, filename from tracks where length(composername)=0 or composername is null union
-    select id, filename from tracks where length(performer)=0 or performer is null union
-    select id, filename from tracks where length(genrename)=0 or genrename is null union
-    select id, filename from tracks where length(comment)=0 or comment is null union
-    select id, filename from tracks where length(date_tag)=0 or date_tag is null union
-    select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select id, filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select id, filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select id, filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select id, filename from tracks where not instr(comment, performer) union
-    select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select id, filename from tracks where artistname<>composername)
-    order by filename"
-  fi
-elif [ $CHECKTYPE == "logic" ]; then
-  if [ "$NAMEBITS" == "yes" ]; then     # We only count filenames not including bit-depth data as a problem if NAMEBITS is switched on
-    RESCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (
-    select filename from tracks where length(artistname)=0 or artistname is null union
-    select filename from tracks where length(albumname)=0 or albumname is null union
-    select filename from tracks where length(composername)=0 or composername is null union
-    select filename from tracks where length(performer)=0 or performer is null union
-    select filename from tracks where length(genrename)=0 or genrename is null union
-    select filename from tracks where length(comment)=0 or comment is null union
-    select filename from tracks where length(date_tag)=0 or date_tag is null union
-    select filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select filename from tracks where not instr(comment, performer) union
-    select filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select filename from tracks where artistname<>composername union
-  select filename from tracks where instr(filename, ifnull(bitdepth, 'xxQxx'))=1)")
-
-    RESCAN_SQL="select distinct id, filename from (
-    select id, filename from tracks where length(artistname)=0 or artistname is null union
-    select id, filename from tracks where length(albumname)=0 or albumname is null union
-    select id, filename from tracks where length(composername)=0 or composername is null union
-    select id, filename from tracks where length(performer)=0 or performer is null union
-    select id, filename from tracks where length(genrename)=0 or genrename is null union
-    select id, filename from tracks where length(comment)=0 or comment is null union
-    select id, filename from tracks where length(date_tag)=0 or date_tag is null union
-    select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select id, filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select id, filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select id, filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select id, filename from tracks where not instr(comment, performer) union
-    select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select id, filename from tracks where artistname<>composername union
-    select id, filename from tracks where instr(filename, ifnull(bitdepth, 'xxQxx'))=1)
-    order by filename"
-  else
-    RESCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (
-    select filename from tracks where length(artistname)=0 or artistname is null union
-    select filename from tracks where length(albumname)=0 or albumname is null union
-    select filename from tracks where length(composername)=0 or composername is null union
-    select filename from tracks where length(performer)=0 or performer is null union
-    select filename from tracks where length(genrename)=0 or genrename is null union
-    select filename from tracks where length(comment)=0 or comment is null union
-    select filename from tracks where length(date_tag)=0 or date_tag is null union
-    select filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select filename from tracks where not instr(comment, performer) union
-    select filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select filename from tracks where artistname<>composername)")
-
-    RESCAN_SQL="select distinct id, filename from (
-    select id, filename from tracks where length(artistname)=0 or artistname is null union
-    select id, filename from tracks where length(albumname)=0 or albumname is null union
-    select id, filename from tracks where length(composername)=0 or composername is null union
-    select id, filename from tracks where length(performer)=0 or performer is null union
-    select id, filename from tracks where length(genrename)=0 or genrename is null union
-    select id, filename from tracks where length(comment)=0 or comment is null union
-    select id, filename from tracks where length(date_tag)=0 or date_tag is null union
-    select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0 union
-    select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0 union
-    select id, filename from tracks where bitdepth=16 and ifnull(sample_rate,999999)>48000 union select id, filename from tracks where bitdepth=24 and ifnull(sample_rate,0)<48000 union
-    select id, filename from tracks where id in (select id from (select  id from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)) union
-    select id, filename from tracks where not instr(comment, performer) union
-    select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) union
-    select id, filename from tracks where artistname<>composername)
-    order by filename"
-  fi
-fi
+# The files to examine come from the same shared list the menu's checks use
+integrity_candidates "$CONFDIR/tmp/nienterecs.txt"
+RESCAN_COUNT=$(wc -l < "$CONFDIR/tmp/nienterecs.txt"); RESCAN_COUNT=${RESCAN_COUNT//[[:space:]]/}
 
 if [ $RESCAN_COUNT -eq 0 ]; then
   release_lock
@@ -192,7 +44,6 @@ if [ $RESCAN_COUNT -eq 0 ]; then
 fi
 
 # If we get this far, we have at least one file to process
-sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"$RESCAN_SQL" > "$CONFDIR/tmp/nienterecs.txt"
 readarray -t recheck < "$CONFDIR/tmp/nienterecs.txt"
 COUNTER=0
 

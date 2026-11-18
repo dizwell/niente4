@@ -154,6 +154,121 @@ function tidy_music_list {
 rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 2>&1
 }
 
+# A function listing the files each kind of integrity check needs to examine ("id|filename", one per line, sorted
+# and de-duplicated), shared by the menu and unattended checks so the two can never pick different files
+# -----------------------------------------------------------------------------
+function integrity_candidates {
+local OUTFILE="$1"
+rm -f "$OUTFILE" "$OUTFILE.tmp" >/dev/null 2>&1; touch "$OUTFILE"
+if [[ $CHECKTYPE == "full" ]]; then
+  SQLSTMT="select id, filename from tracks order by filename"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+elif [[ $CHECKTYPE == "diff" ]]; then
+  # Problems found on General Reports
+  SQLSTMT="select id, filename from tracks where hash_orig<>hash_new or hash_orig is null or hash_new is null"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  SQLSTMT="select id, filename from tracks where (bitdepth IS NULL OR bitdepth='') AND (sample_rate IS NULL OR sample_rate='') AND (hash_orig IS NULL OR hash_orig='') AND (hash_new IS NULL OR hash_new='') AND (album_year IS NULL OR album_year='') AND (date_tag IS NULL OR date_tag='') AND (performer IS NULL OR performer='') AND (comment IS NULL OR comment='') AND (albumname IS NULL OR albumname='') AND (artistname IS NULL OR artistname='') AND (composername IS NULL OR composername='') AND (genrename IS NULL OR genrename='') AND (tracktitle IS NULL OR tracktitle='')"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  SQLSTMT="select id, filename from tracks where ((bitdepth IS NULL OR bitdepth='') OR (sample_rate IS NULL OR sample_rate='') OR (hash_orig IS NULL OR hash_orig='') OR (hash_new IS NULL OR hash_new='') OR (album_year IS NULL OR album_year='') OR (date_tag IS NULL OR date_tag='') OR (performer IS NULL OR performer='') OR (comment IS NULL OR comment='') OR (albumname IS NULL OR albumname='') OR (artistname IS NULL OR artistname='') OR (composername IS NULL OR composername='') OR (genrename IS NULL OR genrename='') OR (tracktitle IS NULL OR tracktitle='')) AND NOT ((bitdepth IS NULL OR bitdepth='') AND (sample_rate IS NULL OR sample_rate='') AND (hash_orig IS NULL OR hash_orig='') AND (hash_new IS NULL OR hash_new='') AND (album_year IS NULL OR album_year='') AND (date_tag IS NULL OR date_tag='') AND (performer IS NULL OR performer='') AND (comment IS NULL OR comment='') AND (albumname IS NULL OR albumname='') AND (artistname IS NULL OR artistname='') AND (composername IS NULL OR composername='') AND (genrename IS NULL OR genrename='') AND (tracktitle IS NULL OR tracktitle=''))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Track numbers that are missing, empty or zero
+  SQLSTMT="select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Problems found on Logical Issues Reports
+  SQLSTMT="select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+ 
+  SQLSTMT="select id, filename from (select * from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where not instr(comment, performer)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '('))))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where artistname<>composername"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where bitdepth=16 and sample_rate>48000 union select id, filename from tracks where bitdepth=24 and sample_rate<48000"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  # Problems found on Other Reports. We don't deal with album art of volume boost issues: they have separate integrity checks
+  # We either care about albumart height=width or we don't
+  SQLSTMT="select id, filename from tracks where replaygain is null or replaygain=''"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Whether file names should have bitdepth and samplerate signifiers is configurable: only do it if it is switched on
+  if [[ $NAMEBITS == "yes" ]]; then  
+    SQLSTMT="select id, filename from (select id, filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from (select id, filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks) where intest=0)"
+    sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  fi
+
+  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from (select id, filename, hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+elif [[ $CHECKTYPE == "logic" ]]; then
+  # This is for fast refreshes: no worrying about physical corruption. Otherwise everything else is in.  
+  # Problems found on General Reports
+  SQLSTMT="select id, filename from tracks where (bitdepth IS NULL OR bitdepth='') AND (sample_rate IS NULL OR sample_rate='') AND (hash_orig IS NULL OR hash_orig='') AND (hash_new IS NULL OR hash_new='') AND (album_year IS NULL OR album_year='') AND (date_tag IS NULL OR date_tag='') AND (performer IS NULL OR performer='') AND (comment IS NULL OR comment='') AND (albumname IS NULL OR albumname='') AND (artistname IS NULL OR artistname='') AND (composername IS NULL OR composername='') AND (genrename IS NULL OR genrename='') AND (tracktitle IS NULL OR tracktitle='')"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  SQLSTMT="select id, filename from tracks where ((bitdepth IS NULL OR bitdepth='') OR (sample_rate IS NULL OR sample_rate='') OR (hash_orig IS NULL OR hash_orig='') OR (hash_new IS NULL OR hash_new='') OR (album_year IS NULL OR album_year='') OR (date_tag IS NULL OR date_tag='') OR (performer IS NULL OR performer='') OR (comment IS NULL OR comment='') OR (albumname IS NULL OR albumname='') OR (artistname IS NULL OR artistname='') OR (composername IS NULL OR composername='') OR (genrename IS NULL OR genrename='') OR (tracktitle IS NULL OR tracktitle='')) AND NOT ((bitdepth IS NULL OR bitdepth='') AND (sample_rate IS NULL OR sample_rate='') AND (hash_orig IS NULL OR hash_orig='') AND (hash_new IS NULL OR hash_new='') AND (album_year IS NULL OR album_year='') AND (date_tag IS NULL OR date_tag='') AND (performer IS NULL OR performer='') AND (comment IS NULL OR comment='') AND (albumname IS NULL OR albumname='') AND (artistname IS NULL OR artistname='') AND (composername IS NULL OR composername='') AND (genrename IS NULL OR genrename='') AND (tracktitle IS NULL OR tracktitle=''))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Track numbers that are missing, empty or zero
+  SQLSTMT="select id, filename from tracks where length(tracknumber)=0 or tracknumber is null or tracknumber=0"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Problems found on Logical Issues Reports
+  SQLSTMT="select id, filename from tracks where album_year<>date_tag and length(DATE_TAG)>0 and length(ALBUM_YEAR)>0"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+ 
+  SQLSTMT="select id, filename from (select * from tracks t, (select albumname from tracks group by albumname having min(cast(tracknumber as int)) <> 1) b where b.albumname=t.albumname)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where not instr(comment, performer)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '('))))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where artistname<>composername"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from tracks where bitdepth=16 and sample_rate>48000 union select id, filename from tracks where bitdepth=24 and sample_rate<48000"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  # Problems found on Other Reports. We don't deal with album art of volume boost issues: they have separate integrity checks
+  SQLSTMT="select id, filename from tracks where replaygain is null or replaygain=''"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+
+  # Whether file names should have bitdepth and samplerate signifiers is configurable: only do it if it is switched on
+  if [[ $NAMEBITS == "yes" ]]; then  
+    SQLSTMT="select id, filename from (select id, filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from (select id, filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0)"
+    sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  fi
+
+  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+  
+  SQLSTMT="select id, filename from (select id, filename, hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1))"
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
+fi  
+  
+# Now sort and de-dupe the output file (as one flawed record might appear in multiple tests)
+sort -t'|' -k2,2 -u -o "$OUTFILE.tmp" "$OUTFILE"
+sort -t'|' -k2,2 -u -o "$OUTFILE" "$OUTFILE.tmp"
+}
+
 # A function to test that a named database exists and is usable
 # -----------------------------------------------------------------------------
 function unattended_stop {
