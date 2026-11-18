@@ -58,10 +58,9 @@ readarray -t volcheck < "$CONFDIR/txt/nienterecs.txt"
 COUNTER=0
 
 for f in "${volcheck[@]}"; do
-  fileid=$(echo "$f" | awk -F'|' '{print $1}')
-  filename=$(echo "$f" | awk -F'|' '{print $2}')
-  COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-  ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+  fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
+  COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
   COUNTER=$((COUNTER+1))
   if [ -z "$filename" ]; then filename='QxQxQx'; fi
   if [ -f "$filename" ]; then

@@ -135,7 +135,11 @@ else
 fi
 sort "$CONFDIR/txt/fsalbums.txt" | uniq > "$CONFDIR/txt/fsalbums-sorted.txt"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "delete from loadfiles" .exit > /dev/null 2>&1
-sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd ".separator '|'" -cmd ".import $CONFDIR/txt/fsalbums-sorted.txt loadfiles" .exit
+# Loaded in sqlite's "ascii" mode, whose separators (two control characters) can't occur in a file name, so a path
+# containing '|' is stored exactly as it is on disk
+tr '\n' '\036' < "$CONFDIR/txt/fsalbums-sorted.txt" > "$CONFDIR/txt/fsalbums-ascii.txt"
+sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd ".mode ascii" -cmd ".import $CONFDIR/txt/fsalbums-ascii.txt loadfiles" .exit
+rm -f "$CONFDIR/txt/fsalbums-ascii.txt" >/dev/null 2>&1
 }
 
 function check_data_loss {
@@ -265,8 +269,8 @@ elif [[ $CHECKTYPE == "logic" ]]; then
 fi  
   
 # Now sort and de-dupe the output file (as one flawed record might appear in multiple tests)
-sort -t'|' -k2,2 -u -o "$OUTFILE.tmp" "$OUTFILE"
-sort -t'|' -k2,2 -u -o "$OUTFILE" "$OUTFILE.tmp"
+sort -t'|' -k2 -u -o "$OUTFILE.tmp" "$OUTFILE"                 # The whole path (field 2 to the end), even one containing '|'
+sort -t'|' -k2 -u -o "$OUTFILE" "$OUTFILE.tmp"
 }
 
 # A function making a database name safe: NTFS-safe and usable by Niente (as Semplice does for file names, every

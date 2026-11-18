@@ -65,8 +65,7 @@ COUNTER=0
 
 (
 for f in "${volcheck[@]}"; do
-  fileid=$(echo "$f" | awk -F'|' '{print $1}')
-  filename=$(echo "$f" | awk -F'|' '{print $2}')
+  fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
   HOURS=$(( SECONDS / 3600 ))
   MINS=$(( (SECONDS % 3600) / 60 ))
@@ -88,8 +87,8 @@ for f in "${volcheck[@]}"; do
   
   if [[ -z "$filename" ]]; then filename='QxQxQx'; fi
   if [[ -f "$filename" ]]; then
-    COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-    ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
+    COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+    ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
     DISP_ALBUMNAME="${ALBUMNAME:0:75}"
     LINE=$("$FFMPEG" -nostdin -threads 0 -nostats -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | grep "max_volume")
     MAXV=$(echo "$LINE" | awk '{print $5}' | tr -d '-')

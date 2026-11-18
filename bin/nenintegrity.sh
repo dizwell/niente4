@@ -106,8 +106,7 @@ COUNTER=0
   
 (
 for f in "${recheck[@]}"; do
-  fileid=$(echo "$f" | awk -F'|' '{print $1}')
-  filename=$(echo "$f" | awk -F'|' '{print $2}')
+  fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
   HOURS=$(( SECONDS / 3600 ))
   MINS=$(( (SECONDS % 3600) / 60 ))
@@ -135,27 +134,27 @@ for f in "${recheck[@]}"; do
     :
   else
       if [[ $BITDEPTH == "16" ]]; then
-        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed s/.*=//g)
+        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
       elif [[ $BITDEPTH == "24" ]]; then
-        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s24le -map 0:a -f md5 - 2>/dev/null | sed s/.*=//g)
+        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s24le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
       else
-        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed s/.*=//g)
+        FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
       fi
   fi
   
   LASTCHECK=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select last_check_date from tracks where id='$fileid'")
-  ALBUM=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
-  DATETAG=$("$METAFLAC" $UTFCHARS --show-tag=DATE "$filename" 2>/dev/null | sed s/.*=//g)
+  ALBUM=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  DATETAG=$("$METAFLAC" $UTFCHARS --show-tag=DATE "$filename" 2>/dev/null | sed 's/^[^=]*=//')
   ALBUMYEAR=${ALBUM: -5:4} # If album contains a year, should be 5th, 4th, 3rd and 2nd characters from the end
-  COMMENT=$("$METAFLAC" $UTFCHARS --show-tag=COMMENT "$filename" 2>/dev/null | sed s/.*=//g)
-  PERFORMER=$("$METAFLAC" $UTFCHARS --show-tag=PERFORMER "$filename" 2>/dev/null | sed s/.*=//g)
-  TRACKNO=$("$METAFLAC" $UTFCHARS --show-tag=TRACKNUMBER "$filename" 2>/dev/null | sed s/.*=//g)
-  ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed s/.*=//g)
-  ARTISTNAME=$("$METAFLAC" $UTFCHARS --show-tag=ARTIST "$filename" 2>/dev/null | sed s/.*=//g)
-  COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed s/.*=//g)
-  GENRENAME=$("$METAFLAC" $UTFCHARS --show-tag=GENRE "$filename" 2>/dev/null | sed s/.*=//g)
-  TRACKTITLE=$("$METAFLAC" $UTFCHARS --show-tag=TITLE "$filename" 2>/dev/null | sed s/.*=//g)
-  REPLAYGAIN=$("$METAFLAC" $UTFCHARS --show-tag=REPLAYGAIN_ALBUM_GAIN "$filename" 2>/dev/null | sed s/.*=//g)
+  COMMENT=$("$METAFLAC" $UTFCHARS --show-tag=COMMENT "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  PERFORMER=$("$METAFLAC" $UTFCHARS --show-tag=PERFORMER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  TRACKNO=$("$METAFLAC" $UTFCHARS --show-tag=TRACKNUMBER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  ARTISTNAME=$("$METAFLAC" $UTFCHARS --show-tag=ARTIST "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  GENRENAME=$("$METAFLAC" $UTFCHARS --show-tag=GENRE "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  TRACKTITLE=$("$METAFLAC" $UTFCHARS --show-tag=TITLE "$filename" 2>/dev/null | sed 's/^[^=]*=//')
+  REPLAYGAIN=$("$METAFLAC" $UTFCHARS --show-tag=REPLAYGAIN_ALBUM_GAIN "$filename" 2>/dev/null | sed 's/^[^=]*=//')
   THISDATE=$(date +"%Y-%m-%d")
   LINELENGTH=75
 
