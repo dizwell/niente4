@@ -32,9 +32,19 @@ while [[ $RETURNTOMENU -ne 1 ]]; do
     0) mv "$SQL_INPUT.tmp" "$SQL_INPUT" ;;
   esac
 
-  SQLTXT=$(tr '\n' ' ' < "$SQL_INPUT" | sed 's/;//g; s/delete//gi; s/update//gi')
-    
-    sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$HTML_OUT"
+  # The query is run exactly as typed, except that semicolons are removed: Niente adds its own to the end, and also
+  # counts the rows with "select count(*) from (<query>)", which a typed semicolon would break
+  SQLTXT=$(tr '\n' ' ' < "$SQL_INPUT" | sed 's/;//g')
+  # sqlite3's own dot commands (.shell, .system and the rest) can run programs on the computer: only SQL is allowed
+  LEADTXT="${SQLTXT#"${SQLTXT%%[![:space:]]*}"}"
+  if [[ $LEADTXT == .* ]]; then
+    dialog --backtitle "Niente Advanced SQL Reporting" --title " Not an SQL Query " --msgbox "\\nOnly SQL queries can be run here: a query cannot begin with a dot (sqlite3's own commands, such as .shell, are not allowed).\\n\\nClick OK to return to your query." 10 80
+    continue
+  fi
+
+    # The database is opened read-only for this query alone, so nothing typed here can change it: sqlite refuses any
+    # write itself, and its error message is shown in place of the report
+    sqlite3 -readonly "$CONFDIR/db/$DBNAME.db" <<EOF > "$HTML_OUT" 2>"$CONFDIR/tmp/advsqlerror.txt"
 .mode html
 .headers on
 .print '<html><head><title>Custom Niente Report</title>'
@@ -82,6 +92,19 @@ FROM ($SQLTXT);
 .print '<hr style="border: 0; border-top: 1px solid #ccc; margin: 10px 0;">'
 .print '</div></body></html>'
 EOF
+
+  if [[ -s "$CONFDIR/tmp/advsqlerror.txt" ]]; then
+    {
+      echo "<html><head><title>Niente Advanced SQL Error</title>"
+      echo "<link rel=\"icon\" type=\"image/svg+xml\" href=\"file://$CONFDIR/art/nienteico.svg\">"
+      echo "<style> body { font-family: serif; margin: 20px; } .error { font-family: monospace; font-size: 14px; white-space: pre-wrap; background: #f5f5f5; border: 1px solid #ccc; padding: 12px; } </style></head><body>"
+      echo "<div style=\"display: flex; align-items: center; margin-bottom: 20px;\"><img src=\"file://$CONFDIR/art/nienteico.png\" style=\"width:80px; height:80px; margin-right:20px;\"><h1 style=\"margin: 0;\">Niente Advanced SQL Reporting: Error!</h1></div>"
+      echo "<pre class=\"error\">"
+      sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' "$CONFDIR/tmp/advsqlerror.txt"
+      echo "</pre></body></html>"
+    } > "$HTML_OUT"
+  fi
+  rm -f "$CONFDIR/tmp/advsqlerror.txt" >/dev/null 2>&1
 
   output_report
 done
