@@ -20,9 +20,7 @@ tput civis;
 FSSCAN=X
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Non-interactive integrity check aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -187,7 +185,7 @@ elif [ $CHECKTYPE == "logic" ]; then
 fi
 
 if [ $RESCAN_COUNT -eq 0 ]; then
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+  release_lock
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Cancelling a $CHECKTYPE integrity check, as no records to process');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
   exit
@@ -257,7 +255,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "update tracks set performer=replace(performer,
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a $CHECKTYPE integrity check');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }

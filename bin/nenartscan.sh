@@ -14,10 +14,8 @@ SQLSTMT="create table if not exists albumart_load (ID integer not null, FILENAME
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
-  dialog --stdout --backtitle "Niente Album Art Check" --title " Application lock present! " --msgbox "\\nOnly one administrative option can run at a time, but you appear to be already running one. This new one cannot therefore proceed. \\n\\nManually remove the program lock (by tapping the 'L' key) if you think this message has appeared in error. Click OK to return to the main menu." 12 80
+if ! take_lock; then
+  dialog --stdout --backtitle "Niente Album Art Check" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return
 fi
 
@@ -31,7 +29,7 @@ ARTSCAN_SQL="select id, filename from tracks order by filename"
 
 if [ $ARTSCAN_COUNT -eq 0 ]; then
   dialog --stdout --backtitle "Niente Album Art Check" --title " No candidate recordings! " --msgbox "\\nThe current working database knows of no recordings to analyse for album artwork issues.\\n\\nClick OK to return to the main menu." 12 80
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+  release_lock
   return
 fi
 
@@ -115,7 +113,7 @@ dialog --stdout --backtitle "Niente Album Art Check" --title " Art Check Complet
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a full Album Art Checkup');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 function diff_art_checkonly {
@@ -126,10 +124,8 @@ SQLSTMT="create table if not exists albumart_load (ID integer not null, FILENAME
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
-  dialog --stdout --backtitle "Niente Album Art Check" --title " Application lock present! " --msgbox "\\nOnly one administrative option can run at a time, but you appear to be already running one. This new one cannot therefore proceed. \\n\\nManually remove the program lock (by tapping the 'L' key) if you think this message has appeared in error. Click OK to return to the main menu." 12 80
+if ! take_lock; then
+  dialog --stdout --backtitle "Niente Album Art Check" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return
 fi
 
@@ -142,14 +138,14 @@ ARTSCAN_SQL="select id, filename from tracks where filename not in (select filen
 
 if [ $ARTSCAN_COUNT -eq 0 ]; then
   dialog --stdout --backtitle "Niente Album Art Check" --title " No candidate recordings! " --msgbox "\\nThe current working database knows of no recordings to analyse for album artwork issues.\\n\\nClick OK to return to the main menu." 12 80
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+  release_lock
   return
 elif [ $ARTSCAN_COUNT -gt 100 ]; then
   dialog --no-label "Cancel" --yes-label "OK" --stdout --backtitle "Niente Album Art Check" --title " Excessive candidate recordings! " --yesno "\\nThe check of 'new' album art needs to analyse the data from over one hundred recordings. This could take a long time to complete.\\n\\nClick OK to proceed or Cancel to return to the main menu." 12 80
   exitstatus=$?
   # 0 means OK was pressed, 1 means Cancel, and 255 means Escape
   if [ $exitstatus -eq 1 ] || [ $exitstatus -eq 255 ]; then
-    rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+    release_lock
     return
   fi
 fi
@@ -231,7 +227,7 @@ dialog --stdout --backtitle "Niente Album Art Check" --title " Art Check Complet
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a differential Album Art Checkup');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi

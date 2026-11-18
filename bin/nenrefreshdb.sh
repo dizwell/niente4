@@ -12,13 +12,11 @@ FSSCAN=X
 
 if [ -z "$DBNAME" ]; then
   dialog --stdout --backtitle "Niente Scan for Music" --title " No database specified " --msgbox "\\nThis Niente session is not configured to use a database, so nothing meaningful can be achieved.\\n\\nClick OK to return to the main menu." 12 80
-  rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
   return
 fi
 
 if [ -z "$MUSICDIR" ]; then
   dialog --stdout --backtitle "Niente Scan for Music" --title " No music folder specified " --msgbox "\\nYou haven't specified a folder containing FLACs to scan, so nothing can be added to the database at this time.\\n\\nClick OK to return to the main menu." 12 80
-  rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
   return
 fi
 
@@ -42,13 +40,11 @@ SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Starting a database refr
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Database refresh aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-  dialog --stdout --backtitle "Niente Scan for Music" --title " Application lock present! " --msgbox "\\nOnly one file-scanning option can run at a time, but you appear to be already running one. This new one cannot therefore proceed. \\n\\nManually remove the program lock (by tapping the 'L' key) if you think this message has appeared in error. Click OK to return to the main menu." 12 80
+  dialog --stdout --backtitle "Niente Scan for Music" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return
 fi
 
@@ -100,7 +96,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 # Tidy Up
 rm -f "$CONFDIR/txt/fsalbums.txt" 2>/dev/null
 rm -f "$CONFDIR/txt/fsalbums-sorted.txt" > /dev/null 2>&1
-rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 rm -f "$CONFDIR/txt/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }

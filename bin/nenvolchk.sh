@@ -11,7 +11,7 @@ SECONDS=0
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
 
 function ctrl_c() {
-  source "$CONFDIR/bin/nenlokdel.sh" quiet
+  release_lock
   exit_program
 }
 
@@ -24,10 +24,8 @@ SQLSTMT="create table if not exists maxvolumes_load (ID integer not null, FILENA
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
-  dialog --stdout --backtitle "Niente Volume Boost Check" --title " Application lock present! " --msgbox "\\nOnly one administrative option can run at a time, but you appear to be already running one. This new one cannot therefore proceed. \\n\\nManually remove the program lock (by tapping the 'L' key) if you think this message has appeared in error. Click OK to return to the main menu." 12 80
+if ! take_lock; then
+  dialog --stdout --backtitle "Niente Volume Boost Check" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return
 fi
 
@@ -142,7 +140,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing the volume boost check');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 
 if [[ -f "$CONFDIR/tmp/boost_count.txt" ]]; then
     POSSIBLE_BOOSTS=$(cat "$CONFDIR/tmp/boost_count.txt")

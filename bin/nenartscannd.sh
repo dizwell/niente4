@@ -16,9 +16,7 @@ SQLSTMT="create table if not exists albumart_load (ID integer not null, FILENAME
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Non-interactive Album Art scan aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -34,7 +32,7 @@ ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks
 ARTSCAN_SQL="select id, filename from tracks order by filename"
 
 if [ $ARTSCAN_COUNT -eq 0 ]; then
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+  release_lock
   return
 fi
 
@@ -76,7 +74,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from albumart_load"
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a full Album Art Checkup');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 function diff_art_checkonly {
@@ -87,9 +85,7 @@ SQLSTMT="create table if not exists albumart_load (ID integer not null, FILENAME
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Non-interactive Album Art scan aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -105,7 +101,7 @@ ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks
 ARTSCAN_SQL="select id, filename from tracks where filename not in (select filename from albumart) order by filename"
 
 if [ $ARTSCAN_COUNT -eq 0 ]; then
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+  release_lock
   return
 fi
 
@@ -145,7 +141,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from albumart_load"
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a differential Album Art Checkup');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi

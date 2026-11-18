@@ -177,7 +177,7 @@ fi
 
 function downloads {
 # Fetch Niente components: BIN files first
-components=(nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh nenintegrity.sh nenintegritynd.sh nenlogdel.sh nenlokdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh nenoscheck.sh nenoutput.sh nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh nmenudraw.sh nmenuoptions.sh nsubmenuoptions.sh)
+components=(nenaggstatnd.sh nenartscan.sh nenartscannd.sh nencolour.sh nenconf.sh nencreatedb.sh nenintegrity.sh nenintegritynd.sh nenlogdel.sh nennodb.sh nennukedb.sh nennukedbnd.sh nenoscheck.sh nenoutput.sh nenparse.sh nenrefreshdb.sh nenrefreshdbnd.sh nenreports.sh nenrptgen.sh nenrptlog.sh nenrptother.sh nentput.sh nenvolchk.sh nenvolchknd.sh nmenudraw.sh nmenuoptions.sh nsubmenuoptions.sh)
 BINCOMPONENTS=("${components[@]}")                                  # Remembered for the final installation check
 total=${#components[@]}
 count=0

@@ -22,9 +22,8 @@ if [ "$1" == "database" ]; then
   tput cup  9 4; echo "2) Wipe & re-load a database from scratch"
   tput cup 10 4; echo "3) Add/Remove music files incrementally"
   tput cup 11 4; echo "4) Wipe a music database"
-  tput cup 13 4; echo -e "L) Remove the program lock"
-  tput cup 14 4; echo -e "C) Change Working Database"
-  tput cup 15 4; echo -e "F) Change Working Music Folder"
+  tput cup 13 4; echo -e "C) Change Working Database"
+  tput cup 14 4; echo -e "F) Change Working Music Folder"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
 
   until [ "$option" == "q" ]; do
@@ -44,7 +43,6 @@ if [ "$1" == "database" ]; then
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions database;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions database;;
     F|f ) source "$CONFDIR/bin/nennodb.sh" folder; nmenuoptions database;;
     X|x ) exit_program ;;
@@ -89,8 +87,7 @@ elif [ "$1" == "integrity" ]; then
   tput cup 12 4; echo "5) Check album art for new files"
   tput cup 13 4; echo "6) Check all files for volume boosts"
   tput cup 14 4; echo "7) Check new files for volume boosts"
-  tput cup 16 4; echo -e "L) Remove the program lock"
-  tput cup 17 4; echo -e "C) Change Working Database"
+  tput cup 16 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
   
   until [ "$option" == "q" ]; do
@@ -113,7 +110,6 @@ elif [ "$1" == "integrity" ]; then
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions integrity;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions integrity;;
     X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
@@ -154,8 +150,7 @@ elif [ "$1" == "reporting" ]; then
   tput cup  9 4; echo "2) Logical Problems Reports"
   tput cup 10 4; echo "3) Other Reports"
   tput cup 11 4; echo "4) Advanced SQL Reporting"
-  tput cup 13 4; echo -e "L) Remove the program lock"
-  tput cup 14 4; echo -e "C) Change Working Database"
+  tput cup 13 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
   
   until [ "$option" == "q" ]; do
@@ -175,7 +170,6 @@ elif [ "$1" == "reporting" ]; then
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions reporting;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions reporting;;
     X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
@@ -214,11 +208,9 @@ elif [ "$1" == "administration" ]; then
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Edit Configuration File"
   tput cup  9 4; echo -e "2) Display software licence"
-  tput cup 10 4; echo -e "3) Remove Program Lock"
-  tput cup 11 4; echo -e "4) Wipe the Niente operations log"
-  tput cup 12 4; echo -e "5) Change the program colour scheme"
-  tput cup 15 4; echo -e "L) Remove the program lock"
-  tput cup 16 4; echo -e "C) Change Working Database"
+  tput cup 10 4; echo -e "3) Wipe the Niente operations log"
+  tput cup 11 4; echo -e "4) Change the program colour scheme"
+  tput cup 14 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program"  
   
   until [ "$option" == "q" ]; do
@@ -250,16 +242,14 @@ elif [ "$1" == "administration" ]; then
           dialog --backtitle "Niente GPL v2 Software Licence" --msgbox "\nThe licence text could not be downloaded. Please check your internet connection and try again." 9 70
         fi
         nmenuoptions administration ;;
-    3 ) clear; source "$CONFDIR/bin/nenlokdel.sh"; nmenuoptions administration ;;
-    4 ) clear; source "$CONFDIR/bin/nenlogdel.sh"; nmenuoptions administration ;;
-    5 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
+    3 ) clear; source "$CONFDIR/bin/nenlogdel.sh"; nmenuoptions administration ;;
+    4 ) clear; source "$CONFDIR/bin/nencolour.sh"; nmenuoptions administration;;
 
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
-    L|l ) source "$CONFDIR/bin/nenlokdel.sh" quiet; nmenuoptions administration;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions administration;;
     X|x ) exit_program ;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then

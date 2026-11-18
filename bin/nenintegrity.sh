@@ -69,10 +69,8 @@ rm -f "$PROCESSFILES" 2>/dev/null
 rm -f "$TMPFILES" 2>/dev/null
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
-  dialog --stdout --backtitle "Niente Integrity Check" --title " Application lock present! " --msgbox "\\nOnly one file-scanning option can run at a time, but you appear to be already running one. This new one cannot therefore proceed. \\n\\nManually remove the program lock (by tapping the 'L' key) if you think this message has appeared in error. Click OK to return to the main menu." 12 80
+if ! take_lock; then
+  dialog --stdout --backtitle "Niente Integrity Check" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return
 fi
 
@@ -191,7 +189,7 @@ TOTALRECORDS=$(wc -l < "$PROCESSFILES")
 TOTALRECORDS=${TOTALRECORDS//[[:space:]]/}
 
 if [[ $TOTALRECORDS -eq 0 ]]; then
-  rm -rf "$CONFDIR/tmp/nientelock"
+  release_lock
   dialog --stdout --backtitle "Niente Integrity Check" --title " No records to process " --msgbox "\\nThere are no recordings mentioned in the database that Niente needs to process for this sort of integrity check.\\n\\nClick OK to return to the main menu." 12 80
   SQLSTM="insert into refresh_logs values ('$TODAYDATE','Cancelling a $CHECKTYPE integrity check, as there are no recordings that need processing.')"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -326,7 +324,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "update tracks set performer=replace(performer,
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing a $CHECKTYPE integrity check');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 rm -f "$PROCESSFILES" 2>/dev/null

@@ -10,9 +10,7 @@ PATH=/usr/local/bin:/usr/bin:/bin:$PATH
 function nuke_database {
 check_database
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Nuke database operation aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -30,7 +28,7 @@ update sqlite_sequence set seq=0;
 commit;
 EOF
 
-rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 nuke_database

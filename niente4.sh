@@ -56,6 +56,31 @@ if [[ -t 1 ]]; then tput cvvis; tput sgr0; clear; fi
 exit 0
 }
 
+function take_lock {
+# One program lock (tmp/nientelock) is shared by every scan and check, menu or unattended, and holds the process
+# number of the Niente session that took it. A lock whose process is still running (and is Niente) is genuine:
+# refuse (return 1). A lock whose process has gone, or is no longer Niente, is a leftover: remove it, note that
+# in the log, and take a new lock for this session.
+local LOCKFILE="$CONFDIR/tmp/nientelock" LOCKPID
+if ( set -o noclobber; echo "$$" > "$LOCKFILE" ) 2>/dev/null; then return 0; fi
+LOCKPID=$(head -n 1 "$LOCKFILE" 2>/dev/null); LOCKPID=${LOCKPID//[^0-9]/}
+if [[ $LOCKPID == "$$" ]]; then return 0; fi                                       # Already this session's own lock
+if [[ -n $LOCKPID ]] && ps -p "$LOCKPID" -o args= 2>/dev/null | grep -qi "niente"; then return 1; fi
+rm -f "$LOCKFILE" >/dev/null 2>&1
+if [[ -n $DBNAME && -f "$CONFDIR/db/$DBNAME.db" ]]; then
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "insert into refresh_logs values ('$(date +"%Y-%m-%d : %H:%M:%S")','Removed a leftover program lock (its Niente session${LOCKPID:+, process $LOCKPID,} is no longer running)');" .exit >/dev/null 2>&1
+fi
+if ( set -o noclobber; echo "$$" > "$LOCKFILE" ) 2>/dev/null; then return 0; fi
+return 1
+}
+
+function release_lock {
+# Only ever remove this session's own lock, never one held by another Niente session
+local LOCKPID
+LOCKPID=$(head -n 1 "$CONFDIR/tmp/nientelock" 2>/dev/null); LOCKPID=${LOCKPID//[^0-9]/}
+if [[ $LOCKPID == "$$" ]]; then rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1; fi
+}
+
 function ctrl_c() {
   exit_program
 }

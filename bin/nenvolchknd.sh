@@ -12,7 +12,7 @@ POSSIBLE_BOOSTS=0
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
 
 function ctrl_c() {
-  source "$CONFDIR/bin/nenlokdel.sh" quiet
+  release_lock
   exit_program
 }
 
@@ -23,9 +23,7 @@ SQLSTMT="create table if not exists maxvolumes_load (ID integer not null, FILENA
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Non-interactive Volume Boost scan aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -103,7 +101,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Completing the volume boost check');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 }
 
 if [ -z "$1" ]; then SCANTYPE="full"; else SCANTYPE=$1; fi

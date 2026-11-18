@@ -32,9 +32,7 @@ SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Starting a database refr
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
-if ! [ -f "$CONFDIR/tmp/nientelock" ]; then
-  touch "$CONFDIR/tmp/nientelock"
-else
+if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Database refresh aborted, due to presence of program lock');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -81,7 +79,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 # Tidy Up
 rm -f "$CONFDIR/txt/fsalbums.txt" 2>/dev/null
 rm -f "$CONFDIR/txt/fsalbums-sorted.txt" > /dev/null 2>&1
-rm -f "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
+release_lock
 rm -f "$CONFDIR/txt/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }

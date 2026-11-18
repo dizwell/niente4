@@ -53,7 +53,6 @@ EOF
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
   sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd "PRAGMA journal_mode=TRUNCATE;" .exit >/dev/null 2>&1
   # sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd "PRAGMA journal_mode=TRUNCATE;" .exit >$CONFDIR/db/$DBNAME.walmode;
-  rm -rf "$CONFDIR/tmp/nientelock" >/dev/null 2>&1
   dialog --stdout --backtitle "Niente Database Creation" --title " Database successfully created! " --msgbox "\\nA database called "$DBNAME" has been successfully created. \\n\\nYou should now perform a scan for your music to populate it.\\n\\nClick OK to continue." 12 80
 else
   return
