@@ -269,6 +269,15 @@ sort -t'|' -k2,2 -u -o "$OUTFILE.tmp" "$OUTFILE"
 sort -t'|' -k2,2 -u -o "$OUTFILE" "$OUTFILE.tmp"
 }
 
+# A function making a database name safe: NTFS-safe and usable by Niente (as Semplice does for file names, every
+# character that isn't a letter, number, underscore or hyphen becomes an underscore; surrounding spaces go first)
+# -----------------------------------------------------------------------------
+function clean_dbname {
+local NAME="$1"
+NAME="${NAME#"${NAME%%[![:space:]]*}"}"; NAME="${NAME%"${NAME##*[![:space:]]}"}"
+printf '%s' "${NAME//[^A-Za-z0-9_-]/_}"                  # One underscore per character, accented letters included
+}
+
 # A function to test that a named database exists and is usable
 # -----------------------------------------------------------------------------
 function unattended_stop {

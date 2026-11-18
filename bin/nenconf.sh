@@ -80,7 +80,7 @@ fi
 readarray -t reptparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
 CONFMUSDIR="${progparams[0]}"
-CONFDBNAME="${progparams[1]}"
+CONFDBNAME=$(clean_dbname "${progparams[1]}")              # NTFS-safe and Niente-usable, as when a database is created
 CONFACCENTS="${progparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no"; fi
 CONFBROWZ="${progparams[3]}"
 CONFLOGOSIZE="${progparams[4]}"

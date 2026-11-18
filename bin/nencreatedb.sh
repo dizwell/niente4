@@ -11,6 +11,7 @@ function create_database {
   while [ $GOODDB -eq 0 ]; do
     DBNAME=$(dialog --stdout --backtitle "Niente Database Creation" --inputbox "Enter the name of a database to be created:" 8 80 )
     exitStatus=$?
+    DBNAME=$(clean_dbname "$DBNAME")                         # NTFS-safe and Niente-usable: "Music Master" becomes "Music_Master"
     # If they cancel or escape, quit out of the loop
     if [ $exitStatus -eq 1 ]  || [ $exitStatus -eq 255 ]; then
       GOODDB=0
