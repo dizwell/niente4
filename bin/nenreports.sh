@@ -62,8 +62,8 @@ while [[ $RETURNTOMENU -ne 1 ]]; do
 .print '</style></head><body>'
 
 /* Branding Header */
-.print '<div style="display: flex; align-items: center; margin-bottom: 20px;">'
-.print '  <img src="file://$CONFDIR/art/nienteico.png" style="width:80px; height:80px; margin-right:20px;">'
+.print '<div style="display: flex; align-items: center; border-bottom: 1px solid #ccc; margin-bottom: 20px;">'
+.print '  <a href="https://bbritten.com"><img src="file://$CONFDIR/art/nienteico.png" style="width:80px; height:80px; margin-right:20px;"></a>'
 .print '  <div>'
 .print '    <h1 style="margin: 0;">Custom Niente Report</h1>'
 .print '  </div>'
@@ -99,7 +99,7 @@ EOF
       echo "<html><head><title>Niente Advanced SQL Error</title>"
       echo "<link rel=\"icon\" type=\"image/svg+xml\" href=\"file://$CONFDIR/art/nienteico.svg\">"
       echo "<style> body { font-family: serif; margin: 20px; } .error { font-family: monospace; font-size: 14px; white-space: pre-wrap; background: #f5f5f5; border: 1px solid #ccc; padding: 12px; } </style></head><body>"
-      echo "<div style=\"display: flex; align-items: center; margin-bottom: 20px;\"><img src=\"file://$CONFDIR/art/nienteico.png\" style=\"width:80px; height:80px; margin-right:20px;\"><h1 style=\"margin: 0;\">Niente Advanced SQL Reporting: Error!</h1></div>"
+      echo "<div style=\"display: flex; align-items: center; border-bottom: 1px solid #ccc; margin-bottom: 20px;\"><a href=\"https://bbritten.com\"><img src=\"file://$CONFDIR/art/nienteico.png\" style=\"width:80px; height:80px; margin-right:20px;\"></a><h1 style=\"margin: 0;\">Niente Advanced SQL Reporting: Error!</h1></div>"
       echo "<pre class=\"error\">"
       sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' "$CONFDIR/tmp/advsqlerror.txt"
       echo "</pre></body></html>"
