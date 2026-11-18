@@ -156,7 +156,17 @@ rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 
 
 # A function to test that a named database exists and is usable
 # -----------------------------------------------------------------------------
+function unattended_stop {
+# Unattended runs (cron) must never show a dialog or a menu: record why the run stopped in txt/unattended.log and quit
+echo "$(date +"%Y-%m-%d %H:%M:%S") $UNATTENDED: $1 Nothing has been done." >> "$CONFDIR/txt/unattended.log"
+exit 1
+}
+
 function check_database {
+if [[ -n $UNATTENDED ]]; then
+  if [ -z "$DBNAME" ]; then unattended_stop "No database is named in the configuration."; fi
+  if [ ! -f "$CONFDIR/db/$DBNAME.db" ]; then unattended_stop "The configuration names a database called '$DBNAME', but no such database exists."; fi
+fi
 if [ -z "$DBNAME" ]; then
   dialog --stdout --backtitle "Niente Database Management" --title " No database specified " --msgbox "\\nThis Niente session is not configured to use a database, so nothing meaningful can be achieved.\\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
@@ -169,6 +179,7 @@ fi
 # -----------------------------------------------------------------------------
 VALIDDB=$(sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd "PRAGMA schema_version;" .exit 2>&1)
 if [[ ${VALIDDB^^} == *"ERROR"* ]] || [[ $VALIDDB -eq 0 ]]; then
+  if [[ -n $UNATTENDED ]]; then unattended_stop "The database called '$DBNAME' exists, but is not a valid Niente database."; fi
   dialog --stdout --backtitle "Niente Database Management" --title " Music Database is invalid! " --msgbox "\\nYour persistent configuration file mentions a database called $DBNAME and whilst a file of that name exists, it isn't a valid database. Use the Administration menu to configure Niente to use a valid database. \\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
   VALIDDATABASE=0
@@ -197,6 +208,7 @@ source "$CONFDIR/bin/nentput.sh"                     # The fast tput wrapper (in
 
 # Check if parameters have been passed. If so, run non-interactively. Otherwise launch program normally
 for i in "$@"; do
+  case $i in --scan-*|--check-*|--aggstats) UNATTENDED="$i" ;; esac    # Unattended options: no dialogs or menus, ever
   case $i in
     --scan-full)
       source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nennukedbnd.sh" quiet && source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
