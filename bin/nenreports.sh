@@ -11,16 +11,17 @@ source "$CONFDIR/bin/nenoutput.sh" "$REPORT_FILE"
 }
 
 function advsql_reports {
-rm "$CONFDIR/tmp/advsqlreport.html"
+rm -f "$CONFDIR/tmp/advsqlreport.html"
 REPORT_DATE=$(date "+%a %d %b %Y %H:%M:%S %Z")
 local RETURNTOMENU=0
 local SQL_INPUT="$CONFDIR/tmp/advsqlreport.txt"
 local HTML_OUT="$CONFDIR/tmp/advsqlreport.html"
+REPORT_FILE="$HTML_OUT"                                    # The file output_report opens in the browser
 
 [[ -f "$SQL_INPUT" ]] || touch "$SQL_INPUT"
 
 while [[ $RETURNTOMENU -ne 1 ]]; do
-  dialog --backtitle "Niente Advanced SQL Reporting - $SQLDEST" \
+  dialog --backtitle "Niente Advanced SQL Reporting" \
          --title " Enter your complete select query below " \
          --extra-button --extra-label "Clear" \
          --editbox "$SQL_INPUT" 12 90 2>"$SQL_INPUT.tmp"
