@@ -20,28 +20,21 @@ if [ $DBCOUNT -gt 0 ]; then
 
   CHOSENDB=$(dialog --no-tags --backtitle "Niente set Working Database" --radiolist "Enter the name of the database to be used:" 15 90 0 $DBLIST  3>&1 1>&2 2>&3 3>&- )
   exitStatus=$?
-  if [ $exitStatus -eq 1 ]; then
-    GOODSOURCE=0
-  else
-    SOURCEDB="$CHOSENDB"
-    GOODSOURCE=1
-  fi
-
-  if [ -z "$SOURCEDB" ]; then           # If Cancel is pressed, we need to make sure the database name is set back to null
-    SOURCEDB=""
-    GOODSOURCE=0
-  fi
-
   unset DBLIST
   unset DBNM
-  unset CHOSENDB
 
-  if [ $GOODSOURCE -eq 1 ]; then
-    /usr/bin/dialog --stdout --backtitle "Niente Working Database Selection" --msgbox "Database '$SOURCEDB' will now be used as this session's working database. \\n\\nPress OK to continue." 8 80
-    DBNAME="$SOURCEDB"
-  else
-    /usr/bin/dialog --stdout --backtitle "Niente Working Database Selection" --msgbox "No database has been selected for this session. You'll need to create or select one before you can meaningfully use Niente further.\\n\\nPress OK to continue." 8 80
+  # Cancel, Esc, or OK with nothing chosen: change nothing, and keep using the current database
+  if [[ $exitStatus -ne 0 || -z $CHOSENDB ]]; then
+    unset CHOSENDB
+    GOODSOURCE=0
+    return
   fi
+
+  SOURCEDB="$CHOSENDB"
+  GOODSOURCE=1
+  unset CHOSENDB
+  dialog --stdout --backtitle "Niente Working Database Selection" --msgbox "Database '$SOURCEDB' will now be used as this session's working database. \\n\\nPress OK to continue." 8 80
+  DBNAME="$SOURCEDB"
 
   # Adds the SAMPLE_RATE column to the selected Niente database if it's not already present
   SRATESQL="select count(*) from pragma_table_info('TRACKS') where name='SAMPLE_RATE'"
