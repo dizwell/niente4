@@ -95,7 +95,7 @@ TOTALRECORDS=${TOTALRECORDS//[[:space:]]/}
 if [[ $TOTALRECORDS -eq 0 ]]; then
   release_lock
   dialog --stdout --backtitle "Niente Integrity Check" --title " No records to process " --msgbox "\\nThere are no recordings mentioned in the database that Niente needs to process for this sort of integrity check.\\n\\nClick OK to return to the main menu." 12 80
-  SQLSTM="insert into refresh_logs values ('$TODAYDATE','Cancelling a $CHECKTYPE integrity check, as there are no recordings that need processing.')"
+  SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Cancelling a $CHECKTYPE integrity check, as there are no recordings that need processing.')"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
   return
 fi
@@ -233,9 +233,10 @@ rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 rm -f "$PROCESSFILES" 2>/dev/null
 rm -f "$TMPFILES"
+# Only a check that has actually run to the end says so (as the album art and volume checks do)
+dialog --stdout --backtitle "Niente Integrity Check Completed" --title " Check Complete! " --msgbox "\\nThe integrity check has completed successfully.\\n\\nReports can now be run to process and display the results. Click OK to return to the main menu." 12 80
 }
 
 rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
 if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
 integrity_check
-dialog --stdout --backtitle "Niente Integrity Check Completed" --title " Check Complete! " --infobox "The integrity check has completed successfully.\\n\\nReports can now be run to process and display the results." 12 95
