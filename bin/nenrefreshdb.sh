@@ -90,7 +90,7 @@ SQLSTMT="select count(*) from tracks"
 RECCOUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit)
 # Say what the refresh actually did, with thousands separators
 if (( NEWTRACKS == 0 && LOSTTRACKS == 0 )); then
-  REFRESHMSG="Your music folder has been scanned: no FLACs have been added or removed. The database still knows of $(thousands $RECCOUNT) FLACs."
+  REFRESHMSG="Your music folder has been scanned: no additional FLACs have been added or removed. The database still knows of the same $(thousands $RECCOUNT) FLACs as it did before."
 else
   if (( NEWTRACKS == 1 )); then ADDTXT="1 new FLAC was added to the database"; else ADDTXT="$(thousands $NEWTRACKS) new FLACs were added to the database"; fi
   if (( LOSTTRACKS == 1 )); then GONETXT="1 that is no longer on disk was removed"; else GONETXT="$(thousands $LOSTTRACKS) that are no longer on disk were removed"; fi
