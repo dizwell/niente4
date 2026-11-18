@@ -123,6 +123,37 @@ done
 tput cvvis
 }
 
+# Functions for the data-loss guard (used by every refresh and by Wipe & re-load, menu and unattended alike)
+# -----------------------------------------------------------------------------
+function list_music_folder {
+# Find every FLAC in the music folder and load the list into the loadfiles table
+rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 2>&1
+if [ "$FDPROG" == "fd" ]; then
+  fd -j $THREADS -t f -e flac . "$MUSICDIR" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
+else
+  find "$MUSICDIR" -name "*.flac" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
+fi
+sort "$CONFDIR/txt/fsalbums.txt" | uniq > "$CONFDIR/txt/fsalbums-sorted.txt"
+sqlite3 "$CONFDIR/db/$DBNAME.db" "delete from loadfiles" .exit > /dev/null 2>&1
+sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd ".separator '|'" -cmd ".import $CONFDIR/txt/fsalbums-sorted.txt loadfiles" .exit
+}
+
+function check_data_loss {
+# Compare the database with the list just loaded by list_music_folder. If more than a fifth of the database's tracks
+# were not found in the music folder (an unmounted or partly available share, say), return 1 and leave the counts in
+# DBTRACKS and LOSTTRACKS, plus a ready-made warning (LOSSWARN) and log line (LOSSLOG). An empty database can never trip it.
+DBTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks" 2>/dev/null); DBTRACKS=$((DBTRACKS))
+LOSTTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks t where not exists (select 1 from loadfiles where filename=t.filename)" 2>/dev/null); LOSTTRACKS=$((LOSTTRACKS))
+LOSSWARN="\\n$LOSTTRACKS of the $DBTRACKS tracks in the database could not be found in your music folder. Continuing would remove them from the database, along with their integrity-check results. Is your music folder fully available?\\n\\nAre you sure you want to continue?"
+LOSSLOG="Unattended scan refused: $LOSTTRACKS of $DBTRACKS tracks in the database were not found in the music folder (more than a fifth), so nothing has been changed. If they really have gone, run a refresh from the menu."
+if (( DBTRACKS > 0 && LOSTTRACKS * 5 > DBTRACKS )); then return 1; fi
+return 0
+}
+
+function tidy_music_list {
+rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 2>&1
+}
+
 # A function to test that a named database exists and is usable
 # -----------------------------------------------------------------------------
 function check_database {
@@ -168,7 +199,7 @@ source "$CONFDIR/bin/nentput.sh"                     # The fast tput wrapper (in
 for i in "$@"; do
   case $i in
     --scan-full)
-      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nennukedbnd.sh" quiet; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
+      source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nennukedbnd.sh" quiet && source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --scan-new)
       source "$CONFDIR/bin/nenoscheck.sh"; source "$CONFDIR/txt/programvariables.txt"; parse_config; check_database; source "$CONFDIR/bin/nenrefreshdbnd.sh"; clear; exit_program;;
     --check-full)

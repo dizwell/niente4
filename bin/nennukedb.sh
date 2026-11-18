@@ -21,6 +21,20 @@ if ! take_lock; then
   dialog --stdout --backtitle "Niente Database Wipe" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return 1
 fi
+# Wipe & re-load only: check the music folder first. If more than a fifth of the database's tracks weren't found,
+# warn before anything is wiped (a plain wipe, option 4, deliberately empties the database, so isn't checked)
+if [ "$callmode" == "quiet" ]; then
+  tput cup 25 4; tput setaf $MAINTEXT
+  MESSAGE="Checking your music folder: please wait..."
+  list_music_folder
+  tidy_music_list
+  if ! check_data_loss; then
+    if ! dialog --backtitle "Niente Database Wipe" --title " Data Loss Warning! " --no-mouse --defaultno --yesno "$LOSSWARN" 14 80; then
+      release_lock
+      return 1
+    fi
+  fi
+fi
 if ! dialog --backtitle "Niente Database Wipe" --title " Confirm Database Wipe " --no-mouse --defaultno --yesno "$WIPEWARN\n\n$WIPEASK" 14 80; then
   release_lock
   return 1

@@ -40,23 +40,19 @@ if ! take_lock; then
 fi
 
 tput civis
-rm -f "$CONFDIR/txt/fsalbums.txt" 2>/dev/null
-rm -f "$CONFDIR/txt/fsalbums-sorted.txt" > /dev/null 2>&1
 INSERTCOUNT=0
 
-# Begin the file system search for FLACs
-if [ "$FDPROG" == "fd" ]; then
-  fd -j $THREADS -t f -e flac . "$MUSICDIR" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
-else
-  find "$MUSICDIR" -name "*.flac" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
+# Begin the file system search for FLACs, loading the list into the loadfiles table
+list_music_folder
+
+# Data-loss guard: if more than a fifth of the database's tracks weren't found, change nothing and say why in the log
+if ! check_data_loss; then
+  TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "insert into refresh_logs values ('$TODAYDATE','$LOSSLOG');" .exit > /dev/null 2>&1
+  tidy_music_list
+  release_lock
+  return 1
 fi
-
-sort "$CONFDIR/txt/fsalbums.txt" | uniq > "$CONFDIR/txt/fsalbums-sorted.txt"
-
-# Load the whole thing into the loadfiles table, having wiped the existing contents first
-SQLSTMT="delete from loadfiles"
-sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-sqlite3 "$CONFDIR/db/$DBNAME.db" ".separator '|'" -cmd ".import $CONFDIR/txt/fsalbums-sorted.txt loadfiles" .exit
 
 # At this point, the loadfiles text file contains a list of every FLAC found to be extant on the file system.
 # With SQL, we can find things in it which aren't in the TRACKS table: these are new recordings.

@@ -49,26 +49,25 @@ if ! take_lock; then
 fi
 
 tput civis
-rm -f "$CONFDIR/txt/fsalbums.txt" 2>/dev/null
-rm -f "$CONFDIR/txt/fsalbums-sorted.txt" > /dev/null 2>&1
 INSERTCOUNT=0
 
-# Begin the file system search for FLACs
+# Begin the file system search for FLACs, loading the list into the loadfiles table
 tput cup 25 4; tput setaf $MAINTEXT; echo -en "Scanning for new/changed files: "
 MESSAGE="Please wait..."
+list_music_folder
 
-if [ "$FDPROG" == "fd" ]; then
-  fd -j $THREADS -t f -e flac . "$MUSICDIR" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
-else
-  find "$MUSICDIR" -name "*.flac" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
+# Data-loss guard: if more than a fifth of the database's tracks weren't found, warn, and change nothing unless told to
+if ! check_data_loss; then
+  if ! dialog --stdout --backtitle "Niente Scan for Music" --title " Data Loss Warning! " --no-mouse --defaultno --yesno "$LOSSWARN" 14 80; then
+    dialog --stdout --backtitle "Niente Scan for Music" --title " Scan Cancelled! " --msgbox "\\nThe proposed scan for new music files has been cancelled.\\n\\nNothing about your existing Niente database has been altered." 12 80
+    TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
+    sqlite3 "$CONFDIR/db/$DBNAME.db" "insert into refresh_logs values ('$TODAYDATE','Database refresh cancelled at the data-loss warning: $LOSTTRACKS of $DBTRACKS tracks were not found in the music folder');" .exit > /dev/null 2>&1
+    tidy_music_list
+    release_lock
+    tput cvvis
+    return
+  fi
 fi
-
-sort "$CONFDIR/txt/fsalbums.txt" | uniq > "$CONFDIR/txt/fsalbums-sorted.txt"
-
-# Load the whole thing into the loadfiles table, having wiped the existing contents first
-SQLSTMT="delete from loadfiles"
-sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd ".separator '|'" -cmd ".import $CONFDIR/txt/fsalbums-sorted.txt loadfiles" .exit
 
 # At this point, the loadfiles text file contains a list of every FLAC found to be extant on the file system.
 # With SQL, we can find things in it which aren't in the TRACKS table: these are new recordings.
@@ -101,26 +100,6 @@ rm -f "$CONFDIR/txt/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }
 
-function check_existing_recordcount {
-dialog --stdout --backtitle "Niente Scan for Music" --title " Scanning for Music " --infobox "\\nChecking your music folder: please hold on..." 8 80
-RECCOUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks"); RECCOUNT=$((RECCOUNT))
-FLACCOUNT=$(find "$MUSICDIR" -type f -iname '*.flac' | wc -l);FLACCOUNT=$((FLACCOUNT))
-# Check if FLACCOUNT is more than 80% smaller than RECCOUNT. That is, FLACCOUNT < 20% of RECCOUNT
-THRESHOLD=$(( RECCOUNT / 5 ))  # 20% of RECCOUNT
-
-if (( FLACCOUNT < THRESHOLD )); then
-  dialog --stdout --backtitle "Niente Scan for Music" --title " Data Loss Warning! " --yesno "\\nThe music folder selected appears to have considerably fewer records than already exist in the database: this will result in substantial data loss.\\n\\nAre you sure you want to continue?" 12 80
-
-  if [[ $? -ne 0 ]]; then  # 0 = Yes, so anything other than a positive selection of 'yes' is taken to mean 'abort'.
-      dialog --stdout --backtitle "Niente Scan for Music" --title " Scan Cancelled! " --msgbox "\\nThe proposed scan for new music files has been cancelled.\\n\\nNothing about your existing Niente database has been altered." 12 80
-  else
-    refresh_database
-  fi
-else
-  refresh_database
-fi
-}
-
 if [ -z "$MUSICDIR" ]; then source "$CONFDIR/bin/nennodb.sh" folder; fi
-check_existing_recordcount
+refresh_database
 

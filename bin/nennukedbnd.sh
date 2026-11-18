@@ -17,6 +17,17 @@ if ! take_lock; then
   exit 1
 fi
 
+# Data-loss guard: check the music folder before wiping anything; if it's suspect, change nothing and say why in the log
+list_music_folder
+if ! check_data_loss; then
+  TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
+  sqlite3 "$CONFDIR/db/$DBNAME.db" "insert into refresh_logs values ('$TODAYDATE','$LOSSLOG');" .exit > /dev/null 2>&1
+  tidy_music_list
+  release_lock
+  return 1
+fi
+tidy_music_list
+
 sqlite3 "$CONFDIR/db/$DBNAME.db" << EOF
 begin transaction;
 delete from tracks;
