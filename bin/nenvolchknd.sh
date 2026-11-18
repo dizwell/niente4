@@ -48,6 +48,7 @@ else
 fi
 
 if [ $VOLSCAN_COUNT -eq 0 ]; then
+  release_lock
   exit
 fi
 

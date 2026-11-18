@@ -43,6 +43,7 @@ if [[ $SCANTYPE == "full" ]]; then
   sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"update sqlite_sequence set seq=0 where name in ('maxvolumes_load','maxvolumes')"
   if [[ $VOLSCAN_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Volume Boost Check" --title " No candidate recordings! " --msgbox "\\nThe current working database knows of no recordings to analyse for volume boosts.\\n\\nClick OK to return to the main menu." 12 80
+  release_lock
   return
   fi
 else
@@ -53,6 +54,7 @@ fi
 
 if [[ $VOLSCAN_COUNT -eq 0 ]]; then
   dialog --stdout --backtitle "Niente Volume Boost Check" --title " No candidate recordings! " --msgbox "\\nYou've asked to perform a Volume Boost check, but there are no recordings known that can be meaningfully analysed.\\n\\nThis can be because your database simply knows of no recordings; or that all the recordings it knows about have already been determined not to be volume boost candidates.\\n\\nClick OK to return to the main menu." 14 80
+  release_lock
   return
 fi
 
