@@ -11,7 +11,7 @@
 #  6. Install new fonts
 #
 ####################################################################
-PROGVERSION="4.1" COPYRIGHT="2021-2026"
+PROGVERSION="4.10" COPYRIGHT="2021-2026"
 PRIORVERSION=0; clear; USERNAME=$(whoami); ERRORCOUNT=0  YPOS=6
 
 # Determine if the user has invoked the installer with a specific release flavour (-v beta)
