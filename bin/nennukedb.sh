@@ -36,9 +36,13 @@ if [ "$callmode" == "quiet" ]; then
     fi
   fi
 fi
-if ! dialog --backtitle "Niente Database Wipe" --title " Confirm Database Wipe " --no-mouse --defaultno --yesno "$WIPEWARN\n\n$WIPEASK" 14 80; then
-  release_lock
-  return 1
+# Only ask when there's something to lose: a database with no tracks (one just created, say) is wiped without asking
+WIPETRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "select count(*) from tracks" 2>/dev/null); WIPETRACKS=$((WIPETRACKS))
+if (( WIPETRACKS > 0 )); then
+  if ! dialog --backtitle "Niente Database Wipe" --title " Confirm Database Wipe " --no-mouse --defaultno --yesno "$WIPEWARN\n\n$WIPEASK" 14 80; then
+    release_lock
+    return 1
+  fi
 fi
 sqlite3 "$CONFDIR/db/$DBNAME.db" << EOF
 begin transaction;
