@@ -317,7 +317,7 @@ if [ -z "$DBNAME" ]; then
   dialog --stdout --backtitle "Niente Database Management" --title " No database specified " --msgbox "\\nThis Niente session is not configured to use a database, so nothing meaningful can be achieved.\\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
 elif [ ! -f "$CONFDIR/db/$DBNAME.db" ]; then
-  dialog --stdout --backtitle "Niente Database Management" --title " Music Database doesn't exist! " --msgbox "\\nYour persistent configuration file mentions a database called $DBNAME but no such database appears to exist. Use the Database menu to create a database of that name before proceeding. \\n\\nQuitting back to the main menu in the meantime." 12 80
+  dialog --stdout --backtitle "Niente Database Management" --title " Music Database doesn't exist! " --msgbox "\\nYour configuration file says to use a database called '$DBNAME' but no such database exists. Use the Database menu to create a database of that or some other name before proceeding. \\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
 fi
 
