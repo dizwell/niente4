@@ -17,6 +17,7 @@ else
   WIPEASK="Are you sure you want to wipe it?"
 fi
 # Take the program lock first, in both modes, so a wipe never runs underneath another scan or check
+if [ "$callmode" == "quiet" ] && ! music_folder_ok; then return 1; fi   # Wipe & re-load needs a real music folder
 if ! take_lock; then
   dialog --stdout --backtitle "Niente Database Wipe" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return 1

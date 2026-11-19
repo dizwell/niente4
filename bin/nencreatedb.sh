@@ -54,6 +54,19 @@ EOF
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
   sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd "PRAGMA journal_mode=TRUNCATE;" .exit >/dev/null 2>&1
   # sqlite3 "$CONFDIR/db/$DBNAME.db" -cmd "PRAGMA journal_mode=TRUNCATE;" .exit >$CONFDIR/db/$DBNAME.walmode;
+  # If this is the only database, make it the configured default (backing the configuration up first, as the
+  # configuration form does). With others already there, which should be the default is the user's choice.
+  DBFILES=("$CONFDIR"/db/*.db)
+  if [[ ${#DBFILES[@]} -eq 1 && -f "$CONFDIR/txt/niente.conf" ]]; then
+    cp "$CONFDIR/txt/niente.conf" "$CONFDIR/txt/niente.conf-$(date +%F-%T).bkp"
+    BKPS=("$CONFDIR/txt"/niente.conf-*.bkp)
+    if [[ ${#BKPS[@]} -gt 10 && -f ${BKPS[0]} ]]; then rm -f "${BKPS[@]:0:${#BKPS[@]}-10}"; fi
+    if grep -q '^DBNAME=' "$CONFDIR/txt/niente.conf"; then
+      $SEDPROG -i "s|^DBNAME=.*|DBNAME=\"$DBNAME\"|" "$CONFDIR/txt/niente.conf"
+    else
+      echo "DBNAME=\"$DBNAME\"" >> "$CONFDIR/txt/niente.conf"
+    fi
+  fi
   dialog --stdout --backtitle "Niente Database Creation" --title " Database successfully created! " --msgbox "\\nA database called "$DBNAME" has been successfully created. \\n\\nYou should now perform a scan for your music to populate it.\\n\\nClick OK to continue." 12 80
 else
   return

@@ -127,6 +127,15 @@ tput cvvis
 
 # Functions for the data-loss guard (used by every refresh and by Wipe & re-load, menu and unattended alike)
 # -----------------------------------------------------------------------------
+function music_folder_ok {
+# Every scan needs the configured music folder to exist. From the menu, say so and return 1; unattended, record why
+# in txt/unattended.log and quit (no dialog, ever)
+if [[ -n $MUSICDIR && -d $MUSICDIR ]]; then return 0; fi
+if [[ -n $UNATTENDED ]]; then unattended_stop "The music folder set in the configuration ($MUSICDIR) doesn't exist."; fi
+dialog --stdout --backtitle "Niente Scan for Music" --title " Music Folder Not Found " --msgbox "\\nThe music folder set in the configuration ($MUSICDIR) doesn't exist.\\n\\nPlease set a correct music folder in Administration > Program Configuration before scanning. Click OK to return to the menu." 12 80
+return 1
+}
+
 function list_music_folder {
 # Find every FLAC in the music folder and load the list into the loadfiles table
 rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 2>&1

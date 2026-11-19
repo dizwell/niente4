@@ -107,7 +107,7 @@ DIATHEME=\"standard\"
 # Database Parameters
 # ====================================================================
 DBNAME=\"niente\"
-MUSICDIR=\"$HOME/Music/classical\"
+MUSICDIR=\"$HOME/Music\"
 
 # Reporting threshold/limit parameters
 # ====================================================================

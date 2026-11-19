@@ -19,6 +19,7 @@ if [ -z "$MUSICDIR" ]; then
   dialog --stdout --backtitle "Niente Scan for Music" --title " No music folder specified " --msgbox "\\nYou haven't specified a folder containing FLACs to scan, so nothing can be added to the database at this time.\\n\\nClick OK to return to the main menu." 12 80
   return
 fi
+if ! music_folder_ok; then return; fi
 
 # Check the database has a loadfiles, logging, maxvolumes, messages and albumart table and an index on filename
 SQLSTMT="create table if not exists refresh_logs (OPERATION_DATE text, OPERATION text);"

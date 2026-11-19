@@ -32,6 +32,7 @@ SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Starting a database refr
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 # Place a lock on disk, so no competing sessions can run
+music_folder_ok                                                       # Unattended: a missing music folder is logged, and nothing is done
 if ! take_lock; then
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Database refresh aborted, due to presence of program lock');"
