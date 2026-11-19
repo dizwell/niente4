@@ -64,7 +64,8 @@ function select_working_musicfolder {
 # If there is no default music folder, check if DBNAME is set. If it is, we can usefully prompt for a music folder. Otherwise, just return
 if ! [ -z "$DBNAME" ]; then
   tput cvvis
-  CHOSENFOLDER="$(pwd)"
+  PICKED=0                                                            # Set to 1 only when a folder is actually chosen
+  if [[ -d $MUSICDIR ]]; then CHOSENFOLDER="${MUSICDIR%/}/"; else CHOSENFOLDER="$HOME/"; fi   # Start at the current music folder
   while true; do
     NEWDIR=$(dialog --backtitle "Niente set Working Music Folder" --title " Please choose a folder containing one or more FLACs " --dselect "$CHOSENFOLDER" 12 80  3>&1 1>&2 2>&3 3>&- )
     exitStatus=$?
@@ -73,6 +74,7 @@ if ! [ -z "$DBNAME" ]; then
     # Check the folder actually chosen, and everything below it, stopping at the first FLAC found (quick, even on a big share)
     if [[ -d $NEWDIR && -n $(find "$NEWDIR" -type f -name "*.flac" -print -quit 2>/dev/null) ]]; then
       MUSICDIR="$NEWDIR"
+      PICKED=1
       break
     fi
     dialog --stdout --backtitle "Niente set Working Music Folder" --title " No FLACs Found " --msgbox "\\nNo FLACs were found in or below $NEWDIR.\\n\\nPlease choose another folder." 10 80

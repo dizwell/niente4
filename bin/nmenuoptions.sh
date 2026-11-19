@@ -35,8 +35,8 @@ if [ "$1" == "database" ]; then
   case $option in
    "" ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
     1 ) source "$CONFDIR/bin/nencreatedb.sh"; nmenuoptions database ;;
-    2 ) source "$CONFDIR/bin/nennukedb.sh" quiet && source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;   # No re-load if the wipe is declined
-    3 ) source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;
+    2 ) pick_scan_folder && source "$CONFDIR/bin/nennukedb.sh" quiet && source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;   # Choose the folder first; no re-load if the wipe is declined
+    3 ) pick_scan_folder && source "$CONFDIR/bin/nenrefreshdb.sh"; nmenuoptions database;;   # Choose the folder first (as Giocoso)
     4 ) source "$CONFDIR/bin/nennukedb.sh" verbose; nmenuoptions database;;
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;

@@ -127,6 +127,29 @@ tput cvvis
 
 # Functions for the data-loss guard (used by every refresh and by Wipe & re-load, menu and unattended alike)
 # -----------------------------------------------------------------------------
+function pick_scan_folder {
+# Database options 2 and 3 (as Giocoso's menu refreshes): choose the folder to scan, starting at the current music
+# folder. Cancel or Esc returns 1: nothing is wiped or scanned. The chosen folder is this session's music folder; it
+# also becomes the configured default, but only if the configured folder is no use (it doesn't exist, or holds no
+# FLACs), as on a first run, so a one-off pick never overwrites a good default.
+if [[ -z $DBNAME ]]; then return 0; fi                              # The scan's own checks will say what's missing
+source "$CONFDIR/bin/nennodb.sh" folder
+if [[ $PICKED -ne 1 ]]; then return 1; fi
+local CONFMUSIC FOUND=0 LINE
+CONFMUSIC=$( . "$CONFDIR/txt/niente.conf" >/dev/null 2>&1; printf '%s' "$MUSICDIR" )
+if [[ -n $CONFMUSIC && -d $CONFMUSIC && -n $(find "$CONFMUSIC" -type f -name "*.flac" -print -quit 2>/dev/null) ]]; then return 0; fi
+if [[ ! -f "$CONFDIR/txt/niente.conf" || $MUSICDIR == *[\"\$\\\`]* ]]; then return 0; fi   # A name the configuration can't hold stays session-only
+cp "$CONFDIR/txt/niente.conf" "$CONFDIR/txt/niente.conf-$(date +%F-%T).bkp"
+BKPS=("$CONFDIR/txt"/niente.conf-*.bkp)
+if [[ ${#BKPS[@]} -gt 10 && -f ${BKPS[0]} ]]; then rm -f "${BKPS[@]:0:${#BKPS[@]}-10}"; fi
+while IFS= read -r LINE || [[ -n $LINE ]]; do
+  if [[ $LINE == MUSICDIR=* ]]; then printf 'MUSICDIR="%s"\n' "$MUSICDIR"; FOUND=1; else printf '%s\n' "$LINE"; fi
+done < "$CONFDIR/txt/niente.conf" > "$CONFDIR/txt/niente.conf.new"
+if [[ $FOUND -eq 0 ]]; then printf 'MUSICDIR="%s"\n' "$MUSICDIR" >> "$CONFDIR/txt/niente.conf.new"; fi
+mv "$CONFDIR/txt/niente.conf.new" "$CONFDIR/txt/niente.conf"
+return 0
+}
+
 function music_folder_ok {
 # Every scan needs the configured music folder to exist. From the menu, say so and return 1; unattended, record why
 # in txt/unattended.log and quit (no dialog, ever)
