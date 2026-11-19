@@ -65,7 +65,9 @@ function select_working_musicfolder {
 if ! [ -z "$DBNAME" ]; then
   tput cvvis
   PICKED=0                                                            # Set to 1 only when a folder is actually chosen
-  if [[ -d $MUSICDIR ]]; then CHOSENFOLDER="${MUSICDIR%/}/"; else CHOSENFOLDER="$HOME/"; fi   # Start at the current music folder
+  # Start at the configured music folder (or the home folder, if that doesn't exist)
+  CHOSENFOLDER=$( . "$CONFDIR/txt/niente.conf" >/dev/null 2>&1; printf '%s' "$MUSICDIR" )
+  if [[ -n $CHOSENFOLDER && -d $CHOSENFOLDER ]]; then CHOSENFOLDER="${CHOSENFOLDER%/}/"; else CHOSENFOLDER="$HOME/"; fi
   while true; do
     NEWDIR=$(dialog --backtitle "Niente set Working Music Folder" --title " Please choose a folder containing one or more FLACs " --dselect "$CHOSENFOLDER" 12 80  3>&1 1>&2 2>&3 3>&- )
     exitStatus=$?
