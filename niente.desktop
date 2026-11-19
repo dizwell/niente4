@@ -2,7 +2,7 @@
 Categories=AudioVideo;Audio;Player
 Comment[en_GB]=Niente Music Integrity Manager
 Comment=Niente Music Integrity Manager
-Exec=/usr/bin/wezterm --config-file /home/xxxxxxxx/.niente.lua -e niente4.sh
+Exec=/usr/bin/wezterm --config-file /home/xxxxxxxx/.niente.lua start --class niente -- niente4.sh
 GenericName[en_GB]=Niente
 GenericName=Niente
 Icon=/home/xxxxxxxx/.local/share/niente4/art/nienteico.png
@@ -11,7 +11,7 @@ Name[en_GB]=niente4
 Name=niente4
 Path=
 StartupNotify=true
-StartupWMClass=Xterm
+StartupWMClass=niente
 Terminal=false
 TerminalOptions=
 Type=Application
