@@ -42,7 +42,7 @@
 # If the folder Niente was started from no longer exists (moved or deleted since the Terminal was in it), start in the home folder instead
 if [[ ! -d $PWD ]]; then cd "$HOME" 2>/dev/null || exit 1; fi
 PROGFILE="${BASH_SOURCE[0]}"                      # This script's own path (a symlink such as /usr/local/bin/niente is fine)
-if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.1"; else PROGVERSION="4.1-beta"; fi
+if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.10"; else PROGVERSION="4.10-beta"; fi
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
 mkdir -p "$CONFDIR" "$CONFDIR/txt" "$CONFDIR/bin" "$CONFDIR/tmp" "$CONFDIR/art" "$CONFDIR/db" 2>/dev/null	   # Create a folder structure, if it doesn't already exist (and suppress errors if it does!)
