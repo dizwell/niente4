@@ -7,7 +7,7 @@
 # https://absolutelybaching.com/niente-version-4-the-user-manual/
 #
 # Copyright © Howard Rogers 2019-2026
-# Version 4.1 - release date not yet set (??)
+# Version 4.10 - November 22nd 2026
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 # 4.04  Significant re-write to run on macOS and improve performance   28.02.26
 # 4.05  Bug fix in Integrity Check regarding ReplayGain, changed
 #       menus and colour-picker capability                             28.03.26
+# 4.10  Significant code changes, bug fixes, feature enhancements and 
+#       a new code source at Git Hub                                   22.11.26
 # ==============================================================================================================
 # If the folder Niente was started from no longer exists (moved or deleted since the Terminal was in it), start in the home folder instead
 if [[ ! -d $PWD ]]; then cd "$HOME" 2>/dev/null || exit 1; fi
