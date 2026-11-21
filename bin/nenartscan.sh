@@ -132,8 +132,7 @@ fi
 TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")
 SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Starting a differential Album Art Checkup');"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
-ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where filename not in (select filename from albumart)")
-ARTSCAN_SQL="select id, filename from tracks where filename not in (select filename from albumart) order by filename"
+recheck_selection art                                                 # Never checked, plus those with art problems (as the report)
 
 if [ $ARTSCAN_COUNT -eq 0 ]; then
   dialog --stdout --backtitle "Niente Album Art Check" --title " No candidate recordings! " --msgbox "\\nThe current working database knows of no recordings to analyse for album artwork issues.\\n\\nClick OK to return to the main menu." 12 80
@@ -217,6 +216,7 @@ done
 
 # If there were dodgy characters that were replaced, now put them back
 sqlite3 "$CONFDIR/db/$DBNAME.db" "update albumart_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
+sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from albumart where filename in (select filename from albumart_load)"   # Re-checked files: the new result replaces the old
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into albumart select * from albumart_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from albumart_load"
 dialog --stdout --backtitle "Niente Album Art Check" --title " Art Check Completed! " --msgbox "\\nThe album art check has completed successfully.\\n\\nClick OK to return to the main menu." 12 80

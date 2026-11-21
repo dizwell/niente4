@@ -202,6 +202,27 @@ rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 
 # A function listing the files each kind of integrity check needs to examine ("id|filename", one per line, sorted
 # and de-duplicated), shared by the menu and unattended checks so the two can never pick different files
 # -----------------------------------------------------------------------------
+function recheck_selection {
+# The files the "new files" album art check (option 5) and volume check (option 7) examine, menu and unattended alike:
+# those never checked, plus those whose recorded result is currently a problem, by the same rules the reports use, so
+# a re-check clears a fixed file from the report. Sets ARTSCAN_COUNT/ARTSCAN_SQL or VOLSCAN_COUNT/VOLSCAN_SQL.
+local PROBLEM
+if [[ $1 == "art" ]]; then
+  PROBLEM="(albumartheight < ${SMALLART:-300} or albumartwidth < ${SMALLART:-300}) or (albumartheight > ${LARGEART:-1600} or albumartwidth > ${LARGEART:-1600}) or albumartheight is null or albumartheight = '' or albumartwidth is null or albumartwidth = ''"
+  if [[ $SQUAREART -eq 1 ]]; then PROBLEM="$PROBLEM or (albumartheight <> albumartwidth)"; fi
+  local WHERE="filename not in (select filename from albumart) or filename in (select filename from albumart where $PROBLEM)"
+  ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where $WHERE")
+  ARTSCAN_SQL="select id, filename from tracks where $WHERE order by filename"
+else
+  # Volume results are judged by folder: a folder is re-checked if it has never been checked, or if any of its files
+  # is recorded as able to take a boost above the threshold (the "Potential Volume Boosts" report's rule)
+  local FOLDER="substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2)"
+  local WHERE="$FOLDER not in (select $FOLDER from maxvolumes) or $FOLDER in (select $FOLDER from maxvolumes where boost > ${VOLUMETHRESHOLD:-2})"
+  VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where $WHERE")
+  VOLSCAN_SQL="select id, filename from tracks where $WHERE order by filename"
+fi
+}
+
 function integrity_candidates {
 local OUTFILE="$1"
 rm -f "$OUTFILE" "$OUTFILE.tmp" >/dev/null 2>&1; touch "$OUTFILE"

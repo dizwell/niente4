@@ -43,8 +43,7 @@ if [ $SCANTYPE == "full" ]; then
   sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes"
 else
   # Note the horror SQL needed to extract only the folder name from a folder/file full path name!
-  VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes)")
-  VOLSCAN_SQL="select id, filename from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes) order by filename"
+  recheck_selection volume                                            # Never checked, plus folders above the boost threshold (as the report)
 fi
 
 if [ $VOLSCAN_COUNT -eq 0 ]; then
@@ -82,6 +81,7 @@ for f in "${volcheck[@]}"; do
 
   if [ $((COUNTER%10)) -eq  0 ]; then
     sqlite3 "$CONFDIR/db/$DBNAME.db" "update maxvolumes_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
+    sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes where filename in (select filename from maxvolumes_load)"   # Re-checked files: the new result replaces the old
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
   fi
@@ -90,6 +90,7 @@ done
 # Since we've only been inserting every tenth row in the loop, the last up-to-nine rows in maxvolumes_load are left hanging
 # A final insert makes sure the last few rows are transferred too, once any double quotes have been put back.
 sqlite3 "$CONFDIR/db/$DBNAME.db" "update maxvolumes_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
+sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes where filename in (select filename from maxvolumes_load)"   # Re-checked files: the new result replaces the old
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 

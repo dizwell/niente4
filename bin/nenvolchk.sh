@@ -48,8 +48,7 @@ if [[ $SCANTYPE == "full" ]]; then
   fi
 else
   # Note the horror SQL needed to extract only the folder name from a folder/file full path name! It's finding the position of the last '/', and using that to substring back from that
-  VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes)")
-  VOLSCAN_SQL="select id, filename from tracks where substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) not in (select substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2) from maxvolumes) order by filename"
+  recheck_selection volume                                            # Never checked, plus folders above the boost threshold (as the report)
 fi
 
 if [[ $VOLSCAN_COUNT -eq 0 ]]; then
@@ -134,6 +133,7 @@ echo "$POSSIBLE_BOOSTS" > "$CONFDIR/tmp/boost_count.txt"
 # If dodgy characters were replaced, now put them back
 tput cvvis;
 sqlite3 "$CONFDIR/db/$DBNAME.db" "update maxvolumes_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
+sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes where filename in (select filename from maxvolumes_load)"   # Re-checked files: the new result replaces the old
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 
