@@ -18,15 +18,14 @@ fi
 
 function print_header {
 clear
-LOGO=6
 tput setaf $DRAWLINES; echo -e "┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                                   │
 │                                                                                                   │
 │                                                                                                   │
 └───────────────────────────────────────────────────────────────────────────────────────────────────┘"
-tput cup  1 4; tput setaf $LOGO; echo -e "♬♪ Niente: The Digital Music Integrity Manager Installer ♬♪"
-tput cup  2 4; echo -e "Copyright © H. Rogers $COPYRIGHT"
-tput cup  3 4; echo -e "Version $PROGVERSION"
+tput cup  1 4; tput setaf ${LOGOZ:-6}; echo -e "♬♪ Niente: The Digital Music Integrity Manager Installer ♬♪"
+tput cup  2 4; tput setaf ${LOGOZ:-6}; echo -e "Copyright © H. Rogers $COPYRIGHT"
+tput cup  3 4; tput setaf ${LOGOZ:-6}; echo -e "Version $PROGVERSION"
 }
 
 function check_updates {
