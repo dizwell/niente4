@@ -6,7 +6,7 @@
 # Full documentation available at:
 # https://absolutelybaching.com/niente-version-4-the-user-manual/
 #
-# Copyright © Howard Rogers 2019-2026
+# Copyright © H. Rogers 2019-2026
 # Version 4.10 - November 22nd 2026 (??)
 #
 # This program is free software: you can redistribute it and/or modify
