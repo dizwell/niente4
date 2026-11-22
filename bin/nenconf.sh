@@ -81,7 +81,6 @@ CONFACCENTS="${progparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no";
 CONFBROWZ="${progparams[3]}"
 CONFLOGOSIZE="${progparams[4]}"
   if [[ $CONFLOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$CONFLOGOSIZE >= 100 && 10#$CONFLOGOSIZE <= 400 )); then CONFLOGOSIZE=$((10#$CONFLOGOSIZE)); else CONFLOGOSIZE=110; fi   # 100 to 400: default 110
-  CONFLOGOSIZE=$CONFLOGOSIZE"x"$CONFLOGOSIZE
 CONFLOGOPOS="${progparams[5]}"
   if [[ $((CONFLOGOPOS)) != "$CONFLOGOPOS" ]]; then CONFLOGOPOS=0; fi
 CONFSMART="${reptparams[0]}"; if [ -z "$CONFSMART" ]; then CONFSMART=300; fi
@@ -191,6 +190,6 @@ REPORTMAXV=$CONFREPMAXV
 CONFEOF
 
 rm -f "$CONFDIR/tmp/confparams" 2>/dev/null
-"$CONVPROG" "$CONFDIR/art/nienteicobeta.png" -resize "$CONFLOGOSIZE" "$CONFDIR/art/nienteicosmallbeta.png" 2>/dev/null     # The small menu logos, at the (perhaps new) size
-"$CONVPROG" "$CONFDIR/art/nienteico.png" -resize "$CONFLOGOSIZE" "$CONFDIR/art/nienteicosmall.png" 2>/dev/null
+"$CONVPROG" "$CONFDIR/art/nienteicobeta.png" -resize "${CONFLOGOSIZE}x${CONFLOGOSIZE}" "$CONFDIR/art/nienteicosmallbeta.png" 2>/dev/null     # The small menu logos, at the (perhaps new) size
+"$CONVPROG" "$CONFDIR/art/nienteico.png" -resize "${CONFLOGOSIZE}x${CONFLOGOSIZE}" "$CONFDIR/art/nienteicosmall.png" 2>/dev/null
 source "$CONFDIR/bin/nenparse.sh"
