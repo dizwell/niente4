@@ -156,8 +156,8 @@ tput() {
 	esac
 }
 
-# Attempt to resize the terminal to 29 rows and 105 columns.
-tput civis; printf '\e[8;29;105t'
+# Attempt to resize the terminal to 28 rows and 103 columns.
+tput civis; printf '\e[8;28;103t'
 
 function print_header {
 tput setaf $DRAWLINES; echo -e "┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
