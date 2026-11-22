@@ -5,7 +5,7 @@
 # prerequisites are present.
 #
 ####################################################################
-COPYRIGHT="2021-2026"                             # Copyright years, used by every screen that displays them (set here, as bin/ is always current)
+COPYRIGHT="2019-2026"                             # Copyright years, used by every screen that displays them (set here, as bin/ is always current)
 if [[ -f "$CONFDIR/bin/nentput.sh" ]]; then
   source "$CONFDIR/bin/nentput.sh"
 fi
