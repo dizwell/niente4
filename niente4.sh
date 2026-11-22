@@ -46,14 +46,18 @@ if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.10"; else PROGV
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
 mkdir -p "$CONFDIR" "$CONFDIR/txt" "$CONFDIR/bin" "$CONFDIR/tmp" "$CONFDIR/art" "$CONFDIR/db" 2>/dev/null	   # Create a folder structure, if it doesn't already exist (and suppress errors if it does!)
-trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
+trap ctrl_c INT      # Ctrl+C
+trap exit_program TERM      # Told to terminate (a logout or shutdown, say): tidy up as Giocoso does
+trap exit_program SIGHUP    # The window was closed: tidy up just the same
 
 function parse_config {
 source "$CONFDIR/bin/nenparse.sh"
 }
 
 function exit_program {
-# As Semplice: restore the cursor and colours and clear the screen (no 'reset', which is slow and wipes the scrollback)
+# However Niente is stopped (X, Ctrl+C, the window closed, a logout): give back this session's program lock, if it
+# holds one, then restore the cursor and colours and clear the screen (no 'reset', which is slow and wipes the scrollback)
+release_lock
 if [[ -t 1 ]]; then tput cvvis; tput sgr0; clear; fi
 exit 0
 }
