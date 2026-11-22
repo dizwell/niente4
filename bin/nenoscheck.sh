@@ -286,8 +286,6 @@ case $OSFAMILY in
     ) | dialog --backtitle "Niente Software Install" --title " Installing Niente's Software Dependencies " --gauge "\\n\\nInstallation may take some time. Please be patient..." 12 70
     tput cup 24 4
 	
-		
-	
     # Confirmation when concluded
     report_failed_pkgs || dialog --backtitle "Niente Software Install" --title " Software Dependencies Installation Completed " --msgbox "\\n\\nAll Niente's software dependencies have been installed.\\n\\nClick OK to proceed." 12 70
   fi
