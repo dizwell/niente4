@@ -72,7 +72,7 @@ elif [ "$1" == "logical" ]; then
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Inconsistent DATE & ALBUM tags"
-  tput cup  9 4; echo "2) Inconsistent TRACK NUMBER tags"
+  tput cup  9 4; echo "2) Inconsistent TRACKNUMBER tags"
   tput cup 10 4; echo "3) Inconsistent PERFORMER & COMMENT tags"
   tput cup 11 4; echo "4) Inconsistent COMMENT & ALBUM tags"
   tput cup 12 4; echo "5) Inconsistent ARTIST & COMPOSER tags"
