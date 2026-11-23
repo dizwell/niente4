@@ -339,13 +339,14 @@ sort -t'|' -k2 -u -o "$OUTFILE.tmp" "$OUTFILE"                 # The whole path 
 sort -t'|' -k2 -u -o "$OUTFILE" "$OUTFILE.tmp"
 }
 
-# A function making a database name safe: NTFS-safe and usable by Niente (as Semplice does for file names, every
-# character that isn't a letter, number, underscore or hyphen becomes an underscore; surrounding spaces go first)
+# A function making a database name safe: NTFS-safe and usable by Niente (as Giocoso does for stored query names, every
+# character that isn't a letter of any language, a number, an underscore or a hyphen becomes an underscore; surrounding
+# spaces go first)
 # -----------------------------------------------------------------------------
 function clean_dbname {
 local NAME="$1"
 NAME="${NAME#"${NAME%%[![:space:]]*}"}"; NAME="${NAME%"${NAME##*[![:space:]]}"}"
-printf '%s' "${NAME//[^A-Za-z0-9_-]/_}"                  # One underscore per character, accented letters included
+printf '%s' "${NAME//[^[:alnum:]_-]/_}"                # Letters of any language (accented included), numbers, _ and - stay
 }
 
 # A function to test that a named database exists and is usable
