@@ -45,6 +45,11 @@ PROGFILE="${BASH_SOURCE[0]}"                      # This script's own path (a sy
 if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.10"; else PROGVERSION="4.10-beta"; fi
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
+
+# Folder and file pickers: dialog versions from late 2019 to May 2021 (RHEL 9's, for one) squash them, so give those
+# a taller box; later versions grow the box themselves, and a taller one there covers the screen's title and messages
+DIALOGDATE=$(dialog --version 2>/dev/null | grep -o '[0-9]\{8\}' | head -1)
+if [[ -n $DIALOGDATE && $DIALOGDATE -lt 20210601 ]]; then PICKHEIGHT=18; else PICKHEIGHT=12; fi
 mkdir -p "$CONFDIR" "$CONFDIR/txt" "$CONFDIR/bin" "$CONFDIR/tmp" "$CONFDIR/art" "$CONFDIR/db" 2>/dev/null	   # Create a folder structure, if it doesn't already exist (and suppress errors if it does!)
 trap ctrl_c INT      # Ctrl+C
 trap exit_program TERM      # Told to terminate (a logout or shutdown, say): tidy up as Giocoso does

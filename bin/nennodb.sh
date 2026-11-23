@@ -69,7 +69,7 @@ if ! [ -z "$DBNAME" ]; then
   CHOSENFOLDER=$( . "$CONFDIR/txt/niente.conf" >/dev/null 2>&1; printf '%s' "$MUSICDIR" )
   if [[ -n $CHOSENFOLDER && -d $CHOSENFOLDER ]]; then CHOSENFOLDER="${CHOSENFOLDER%/}/"; else CHOSENFOLDER="$HOME/"; fi
   while true; do
-    NEWDIR=$(dialog --backtitle "Niente set Working Music Folder" --title " Please choose a folder containing one or more FLACs " --dselect "$CHOSENFOLDER" 18 80  3>&1 1>&2 2>&3 3>&- )
+    NEWDIR=$(dialog --backtitle "Niente set Working Music Folder" --title " Please choose a folder containing one or more FLACs " --dselect "$CHOSENFOLDER" $PICKHEIGHT 80  3>&1 1>&2 2>&3 3>&- )
     exitStatus=$?
     if [ $exitStatus -eq 1 ] || [ $exitStatus -eq 255 ]; then break; fi      # Cancel or Esc: the current music folder stays as it is
     NEWDIR="${NEWDIR%/}"; [[ -z $NEWDIR ]] && NEWDIR="/"
