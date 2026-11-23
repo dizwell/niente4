@@ -21,7 +21,7 @@ if [[ $SQUAREART -eq 1 ]]; then
   select 'L6', 'Inconsistent Bit Depth/Sample Rates: ', count(*) from (select * from tracks where bitdepth=16 and sample_rate>48000 union select * from tracks where bitdepth=24 and sample_rate<48000) union
   select 'O1','Album Art size issues:', count(*) from (select * from albumart where (albumartheight < $SMALLART or albumartwidth < $SMALLART) or (albumartheight > $LARGEART or albumartwidth > $LARGEART) or (albumartheight <> albumartwidth) or albumartheight is null or albumartheight = '' or albumartwidth is null or albumartwidth = '') union"
 
-  if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select filename, min(boost) from maxvolumes group by filename having boost > $VOLUMETHRESHOLD) union"; fi
+  if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD) union"; fi
   if [[ $NAMEBITS == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O4', 'Missing audio data in filenames:', count(*) from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0) union"; fi
 
   AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1) union
@@ -43,7 +43,7 @@ else
   select 'L6', 'Inconsistent Bit Depth/Sample Rates: ', count(*) from (select * from tracks where bitdepth=16 and sample_rate>48000 union select * from tracks where bitdepth=24 and sample_rate<48000) union
   select 'O1','Album Art size issues:', count(*) from (select * from albumart where (albumartheight < $SMALLART or albumartwidth < $SMALLART) or (albumartheight > $LARGEART or albumartwidth > $LARGEART) or albumartheight is null or albumartheight = '' or albumartwidth is null or albumartwidth = '') union"
 
-  if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select id, filename, min(boost) from maxvolumes group by filename having boost > $VOLUMETHRESHOLD) union"; fi
+  if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD) union"; fi
   if [[ $NAMEBITS == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O4', 'Missing audio data in filenames:', count(*) from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0) union"; fi
 
   AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1) union

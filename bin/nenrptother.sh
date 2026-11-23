@@ -92,8 +92,8 @@ rm -f "$REPORT_FILE" 2>/dev/null
 check_database
 
 # Now we can produce the report
-MAXV_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (select filename, min(boost) from maxvolumes group by filename having boost > $VOLUMETHRESHOLD)")
-MAXV_SQL="select filename as 'Folder Name', min(boost) as 'Potential Boost' from maxvolumes group by filename having boost > $VOLUMETHRESHOLD order by filename"
+MAXV_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD)")
+MAXV_SQL="select $FOLDERSQL as 'Folder Name', min(boost) as 'Potential Boost' from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD order by 1"
 
 REPORT_DATE=$(date "+%a %d %b %Y %H:%M:%S %Z")
 REPORT_TITLE="Music folders with potentially useful <i>physical</i> volume boosts"

@@ -46,6 +46,10 @@ if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.10"; else PROGV
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
 
+# SQL giving the folder part of a FILENAME (everything before its last '/'): volume boosts are judged folder by folder,
+# since an album can only be boosted as far as its loudest track allows
+FOLDERSQL="substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2)"
+
 # Folder and file pickers: dialog versions from late 2019 to May 2021 (RHEL 9's, for one) squash them, so give those
 # a taller box; later versions grow the box themselves, and a taller one there covers the screen's title and messages
 DIALOGDATE=$(dialog --version 2>/dev/null | grep -o '[0-9]\{8\}' | head -1)
@@ -223,10 +227,9 @@ if [[ $1 == "art" ]]; then
   ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where $WHERE")
   ARTSCAN_SQL="select id, filename from tracks where $WHERE order by filename"
 else
-  # Volume results are judged by folder: a folder is re-checked if it has never been checked, or if any of its files
-  # is recorded as able to take a boost above the threshold (the "Potential Volume Boosts" report's rule)
-  local FOLDER="substr(filename, 1, instr(filename,replace(filename, rtrim(filename, replace(filename, '/', '')), ''))-2)"
-  local WHERE="$FOLDER not in (select $FOLDER from maxvolumes) or $FOLDER in (select $FOLDER from maxvolumes where boost > ${VOLUMETHRESHOLD:-2})"
+  # Volume results are judged by folder, and whole folders are re-measured: those holding any file never measured (a
+  # new album, or a new track in an old one), and those whose loudest track is still below the threshold (the report's rule)
+  local WHERE="$FOLDERSQL in (select $FOLDERSQL from tracks where filename not in (select filename from maxvolumes)) or $FOLDERSQL in (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > ${VOLUMETHRESHOLD:-2})"
   VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where $WHERE")
   VOLSCAN_SQL="select id, filename from tracks where $WHERE order by filename"
 fi

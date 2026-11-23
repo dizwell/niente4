@@ -5,7 +5,6 @@
 # within a FLAC mentioned in the Niente music database
 #
 ####################################################################
-POSSIBLE_BOOSTS=0
 SECONDS=0
 
 trap ctrl_c INT  # Trap to quit nicely if Ctrl+C issued
@@ -63,7 +62,10 @@ readarray -t volcheck < "$CONFDIR/txt/nienterecs.txt"
 COUNTER=0
 
 (
-declare -A BOOSTDIRS                                     # Folders holding at least one candidate: boosting is done album by album
+# A folder can only be boosted as far as its loudest track allows: it is a candidate while its loudest track so far (the
+# smallest headroom) is still below the threshold. Kept per folder as each file is measured, so the counts stay right
+declare -A DIRMIN DIRFILES
+CANDFOLDERS=0; CANDFILES=0
 for f in "${volcheck[@]}"; do
   fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
@@ -100,11 +102,17 @@ for f in "${volcheck[@]}"; do
     fi
     if [[ $MAXV == "0.0" || $MAXV == "0" ]]; then DISPLAY_MAXV="0.0 dB"; else DISPLAY_MAXV="-$MAXV dB"; fi
     
-    # The logic is inverse here, since we've removed any minus sign. So volume -6 is not 6. If 
-    # threshold is 2, we need to say if 6 > 2 then that's a possible volume boost
-    if (( $(echo "$MAXV > $VOLUMETHRESHOLD" | bc -l) )); then POSSIBLE_BOOSTS=$((POSSIBLE_BOOSTS+1)); BOOSTDIRS["${filename%/*}"]=1; fi
-    if (( POSSIBLE_BOOSTS == 1 )); then BOOSTFILES="1 file"; else BOOSTFILES="$POSSIBLE_BOOSTS files"; fi
-    if (( ${#BOOSTDIRS[@]} == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="${#BOOSTDIRS[@]} folders"; fi
+    # The logic is inverse here, since we've removed any minus sign: MAXV is headroom, so a peak of -6 dB is 6, and with a
+    # threshold of 2, 6 > 2 means room for a boost
+    DIR="${filename%/*}"; WASCAND=0; ISCAND=0
+    if [[ -n ${DIRMIN[$DIR]} ]] && (( $(echo "${DIRMIN[$DIR]} > $VOLUMETHRESHOLD" | bc -l) )); then WASCAND=1; fi
+    if [[ -z ${DIRMIN[$DIR]} ]] || (( $(echo "$MAXV < ${DIRMIN[$DIR]}" | bc -l) )); then DIRMIN[$DIR]=$MAXV; fi
+    DIRFILES[$DIR]=$(( ${DIRFILES[$DIR]:-0} + 1 ))
+    if (( $(echo "${DIRMIN[$DIR]} > $VOLUMETHRESHOLD" | bc -l) )); then ISCAND=1; fi
+    if (( WASCAND )); then CANDFOLDERS=$((CANDFOLDERS-1)); CANDFILES=$((CANDFILES - DIRFILES[$DIR] + 1)); fi
+    if (( ISCAND )); then CANDFOLDERS=$((CANDFOLDERS+1)); CANDFILES=$((CANDFILES + DIRFILES[$DIR])); fi
+    if (( CANDFOLDERS == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="$CANDFOLDERS folders"; fi
+    if (( CANDFILES == 1 )); then BOOSTFILES="1 file"; else BOOSTFILES="$CANDFILES files"; fi
 
     
     PERCENTAGE=$(( 100 * COUNTER / VOLSCAN_COUNT ))
@@ -115,7 +123,7 @@ for f in "${volcheck[@]}"; do
  Elapsed     : $(printf "%02d:%02d:%02d" $HOURS $MINS $SECS)\n\
  ETA         : $ETA\n\n\
  Processing file $COUNTER of $VOLSCAN_COUNT\n\
- Possible Volume Boosts found : $BOOSTFILES in $BOOSTFOLDERS (Threshold = -$VOLUMETHRESHOLD dB)\nXXX"
+ Possible Volume Boosts found : $BOOSTFOLDERS ($BOOSTFILES) (Threshold = -$VOLUMETHRESHOLD dB)\nXXX"
     echo "$PERCENTAGE"  
     
     # Remove dodgy characters. Single quotes are escaped into being two-single quotes.
@@ -127,7 +135,7 @@ for f in "${volcheck[@]}"; do
 	sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTR"  >/dev/null 2>&1
   fi
 done
-echo "$POSSIBLE_BOOSTS ${#BOOSTDIRS[@]}" > "$CONFDIR/tmp/boost_count.txt"
+echo "$CANDFOLDERS $CANDFILES" > "$CONFDIR/tmp/boost_count.txt"
 ) | dialog --backtitle "Niente $SCANDESC Volume Boost Check" \
            --title " Analysing Music Files for Physical Volume Levels " \
            --no-collapse \
@@ -147,14 +155,14 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 release_lock
 
 if [[ -f "$CONFDIR/tmp/boost_count.txt" ]]; then
-    read -r POSSIBLE_BOOSTS BOOSTFOLDERCOUNT < "$CONFDIR/tmp/boost_count.txt"
+    read -r CANDFOLDERS CANDFILES < "$CONFDIR/tmp/boost_count.txt"
     rm "$CONFDIR/tmp/boost_count.txt"
 fi
-POSSIBLE_BOOSTS=${POSSIBLE_BOOSTS:-0}; BOOSTFOLDERCOUNT=${BOOSTFOLDERCOUNT:-0}
-if (( POSSIBLE_BOOSTS == 1 )); then BOOSTFILES="1 potential volume boost"; else BOOSTFILES="$POSSIBLE_BOOSTS potential volume boosts"; fi
-if (( BOOSTFOLDERCOUNT == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="$BOOSTFOLDERCOUNT folders"; fi
+CANDFOLDERS=${CANDFOLDERS:-0}; CANDFILES=${CANDFILES:-0}
+if (( CANDFOLDERS == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="$CANDFOLDERS folders"; fi
+if (( CANDFILES == 1 )); then BOOSTFILES="1 file"; else BOOSTFILES="$CANDFILES files"; fi
 
-dialog --stdout --backtitle "Niente Volume Check" --title " Volume Check Completed! " --msgbox "\\nThe volume boost check has completed successfully in $SECONDS seconds, with $BOOSTFILES, in $BOOSTFOLDERS, detected.\\n\\nClick OK to return to the main menu." 12 80
+dialog --stdout --backtitle "Niente Volume Check" --title " Volume Check Completed! " --msgbox "\\nThe volume boost check has completed successfully in $SECONDS seconds, finding $BOOSTFOLDERS ($BOOSTFILES) that could take a volume boost.\\n\\nClick OK to return to the main menu." 12 80
 }
 
 if [[ -z "$1" ]]; then SCANTYPE="full"; else SCANTYPE=$1; fi

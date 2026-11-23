@@ -52,7 +52,7 @@ select filename from tracks where bitdepth=16 and sample_rate>48000 union select
 OTHER REPORTS
 =============
 select filename from albumart where (albumartheight < $SMALLART or albumartwidth < $SMALLART) or (albumartheight > $LARGEART or albumartwidth > $LARGEART) or (albumartheight <> albumartwidth) or (albumartheight is null or albumartheight = '') or (albumartwidth is null or albumartwidth = '')
-select filename from (select filename, min(boost) from maxvolumes group by filename having boost > $VOLUMETHRESHOLD)
+select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD
 select filename from tracks where replaygain is null or replaygain=''
 select filename from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0)
 select filename from (select filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)
