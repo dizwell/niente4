@@ -2,7 +2,6 @@
 ####################################################################
 # smenudraw: Clear screen drawing routine
 ####################################################################
-source "$CONFDIR/bin/nenparse.sh"
 source "$CONFDIR/bin/nentput.sh"
 if [[ $PROGVERSION == *"beta"* ]]; then LOGO_PATH="$CONFDIR/art/nienteicosmallbeta.png"; else LOGO_PATH="$CONFDIR/art/nienteicosmall.png"; fi
 clear; tput cup 0 0
