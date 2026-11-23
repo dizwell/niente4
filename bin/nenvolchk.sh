@@ -63,6 +63,7 @@ readarray -t volcheck < "$CONFDIR/txt/nienterecs.txt"
 COUNTER=0
 
 (
+declare -A BOOSTDIRS                                     # Folders holding at least one candidate: boosting is done album by album
 for f in "${volcheck[@]}"; do
   fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
@@ -101,7 +102,9 @@ for f in "${volcheck[@]}"; do
     
     # The logic is inverse here, since we've removed any minus sign. So volume -6 is not 6. If 
     # threshold is 2, we need to say if 6 > 2 then that's a possible volume boost
-    if (( $(echo "$MAXV > $VOLUMETHRESHOLD" | bc -l) )); then POSSIBLE_BOOSTS=$((POSSIBLE_BOOSTS+1)); fi
+    if (( $(echo "$MAXV > $VOLUMETHRESHOLD" | bc -l) )); then POSSIBLE_BOOSTS=$((POSSIBLE_BOOSTS+1)); BOOSTDIRS["${filename%/*}"]=1; fi
+    if (( POSSIBLE_BOOSTS == 1 )); then BOOSTFILES="1 file"; else BOOSTFILES="$POSSIBLE_BOOSTS files"; fi
+    if (( ${#BOOSTDIRS[@]} == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="${#BOOSTDIRS[@]} folders"; fi
 
     
     PERCENTAGE=$(( 100 * COUNTER / VOLSCAN_COUNT ))
@@ -112,7 +115,7 @@ for f in "${volcheck[@]}"; do
  Elapsed     : $(printf "%02d:%02d:%02d" $HOURS $MINS $SECS)\n\
  ETA         : $ETA\n\n\
  Processing file $COUNTER of $VOLSCAN_COUNT\n\
- Possible Volume Boosts found : $POSSIBLE_BOOSTS (Threshold = -$VOLUMETHRESHOLD dB)\nXXX"
+ Possible Volume Boosts found : $BOOSTFILES in $BOOSTFOLDERS (Threshold = -$VOLUMETHRESHOLD dB)\nXXX"
     echo "$PERCENTAGE"  
     
     # Remove dodgy characters. Single quotes are escaped into being two-single quotes.
@@ -124,7 +127,7 @@ for f in "${volcheck[@]}"; do
 	sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTR"  >/dev/null 2>&1
   fi
 done
-echo "$POSSIBLE_BOOSTS" > "$CONFDIR/tmp/boost_count.txt"
+echo "$POSSIBLE_BOOSTS ${#BOOSTDIRS[@]}" > "$CONFDIR/tmp/boost_count.txt"
 ) | dialog --backtitle "Niente $SCANDESC Volume Boost Check" \
            --title " Analysing Music Files for Physical Volume Levels " \
            --no-collapse \
@@ -144,13 +147,14 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 release_lock
 
 if [[ -f "$CONFDIR/tmp/boost_count.txt" ]]; then
-    POSSIBLE_BOOSTS=$(cat "$CONFDIR/tmp/boost_count.txt")
+    read -r POSSIBLE_BOOSTS BOOSTFOLDERCOUNT < "$CONFDIR/tmp/boost_count.txt"
     rm "$CONFDIR/tmp/boost_count.txt"
-else
-    POSSIBLE_BOOSTS=0
 fi
+POSSIBLE_BOOSTS=${POSSIBLE_BOOSTS:-0}; BOOSTFOLDERCOUNT=${BOOSTFOLDERCOUNT:-0}
+if (( POSSIBLE_BOOSTS == 1 )); then BOOSTFILES="1 potential volume boost"; else BOOSTFILES="$POSSIBLE_BOOSTS potential volume boosts"; fi
+if (( BOOSTFOLDERCOUNT == 1 )); then BOOSTFOLDERS="1 folder"; else BOOSTFOLDERS="$BOOSTFOLDERCOUNT folders"; fi
 
-dialog --stdout --backtitle "Niente Volume Check" --title " Volume Check Completed! " --msgbox "\\nThe volume boost check has completed successfully in $SECONDS seconds, with $POSSIBLE_BOOSTS potential volume boosts detected.\\n\\nClick OK to return to the main menu." 12 80
+dialog --stdout --backtitle "Niente Volume Check" --title " Volume Check Completed! " --msgbox "\\nThe volume boost check has completed successfully in $SECONDS seconds, with $BOOSTFILES, in $BOOSTFOLDERS, detected.\\n\\nClick OK to return to the main menu." 12 80
 }
 
 if [[ -z "$1" ]]; then SCANTYPE="full"; else SCANTYPE=$1; fi
