@@ -12,13 +12,12 @@ function select_working_database {
 DBCOUNT=$(ls "$CONFDIR/db/"*.db 2>/dev/null | wc -l)
 
 if [ $DBCOUNT -gt 0 ]; then
-  dialog --stdout --backtitle "Niente Change Working Database" --title " Change this session's database " --msgbox "\\nSelect one of the following database(s) to act as this session's working database.\\n\\nClick OK to continue." 12 80
   for i in "$CONFDIR/db/"*.db; do
     DBNM="$(basename $i)"; DBNM="${DBNM%.*}"
     DBLIST=$(echo $DBLIST $DBNM $DBNM off)
   done
 
-  CHOSENDB=$(dialog --no-tags --backtitle "Niente set Working Database" --radiolist "Enter the name of the database to be used:" 15 90 0 $DBLIST  3>&1 1>&2 2>&3 3>&- )
+  CHOSENDB=$(dialog --no-tags --backtitle "Niente set Working Database" --title " Change this session's database " --radiolist "Select one of the following databases to act as this session's working database:" 15 90 0 $DBLIST  3>&1 1>&2 2>&3 3>&- )
   exitStatus=$?
   unset DBLIST
   unset DBNM
