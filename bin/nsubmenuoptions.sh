@@ -36,7 +36,7 @@ if [ "$1" == "general" ]; then
     2) source "$CONFDIR/bin/nenreports.sh" phys ;;
     3) source "$CONFDIR/bin/nenreports.sh" nya ;;
     4) source "$CONFDIR/bin/nenreports.sh" nulltg ;;
-    '[D') nsubmenuoptions other;;
+    '[D') source "$CONFDIR/bin/nenreports.sh" advsql general;;   # Left from General: Advanced SQL, the top bar's last item
     '[C') nsubmenuoptions logical;;
     G|g ) clear; nsubmenuoptions general;;
     L|l ) clear; nsubmenuoptions logical;;
@@ -159,7 +159,7 @@ elif [ "$1" == "other" ]; then
     6) source "$CONFDIR/bin/nenreports.sh" dupes ;;
     7) source "$CONFDIR/bin/nenreports.sh" ops ;;
     '[D') nsubmenuoptions logical;;
-    '[C') nsubmenuoptions general;;
+    '[C') source "$CONFDIR/bin/nenreports.sh" advsql other;;     # Right from Other: Advanced SQL, the top bar's last item
     G|g ) clear; nsubmenuoptions general;;
     L|l ) clear; nsubmenuoptions logical;;
     O|o ) clear; nsubmenuoptions other;;
