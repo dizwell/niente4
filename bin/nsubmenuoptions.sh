@@ -197,6 +197,7 @@ elif [ "$1" == "advsql" ]; then
   tput setaf $DRAWLINES; echo -en "\e[7mAdvanced SQL\e[0m"
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
+  tput cup  8 4; tput setaf $MAINTEXT; echo "1) Report by use of SQL"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
 
   until [ "$option" == "q" ]; do
@@ -207,6 +208,7 @@ elif [ "$1" == "advsql" ]; then
   fi
   case $option in
    "") source "$CONFDIR/bin/nenreports.sh" advsql ;;      # As the Reporting menu's option 4
+    1) source "$CONFDIR/bin/nenreports.sh" advsql ;;
     '[D') nsubmenuoptions other;;
     '[C') nsubmenuoptions general;;
     G|g ) clear; nsubmenuoptions general;;
