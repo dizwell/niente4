@@ -68,6 +68,18 @@ TMPFILES="$CONFDIR/tmp/integritycheckfiles-tmp.txt"
 rm -f "$PROCESSFILES" 2>/dev/null
 rm -f "$TMPFILES" 2>/dev/null
 
+# A full check redoes every track, which can take hours: if any track has been checked before (every check of any type
+# records a LAST_CHECK_DATE, and loading never does), ask first, defaulting to No. A never-checked database goes straight ahead
+if [[ $CHECKTYPE == "full" ]]; then
+  CHECKEDBEFORE=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where last_check_date is not null and last_check_date <> ''")
+  if [[ ${CHECKEDBEFORE:-0} -gt 0 ]]; then
+    ALLTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks")
+    if ! dialog --backtitle "Niente Integrity Check" --title " Confirm Full Integrity Check " --no-mouse --defaultno --yesno "\nThis is a full integrity check: it will re-examine every one of the $(thousands "$ALLTRACKS") FLACs in database '$DBNAME', recalculating their checksums, which can take many hours.\n\nAre you sure you want to proceed?" 12 80; then
+      return
+    fi
+  fi
+fi
+
 # Place a lock on disk, so no competing sessions can run
 if ! take_lock; then
   dialog --stdout --backtitle "Niente Integrity Check" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
