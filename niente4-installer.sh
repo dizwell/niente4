@@ -608,7 +608,7 @@ EOF
     fi
   else
     DIALOGTEXT=$DIALOGTEXT"\n\n  ✘ Your basic Niente installation appears to be wrong."
-    DIALOGTEXT=$DIALOGTEXT"\n\nSince even the basic installation seems faulty, you're advised to check your network connection and try re-installing Niente afresh."
+    DIALOGTEXT=$DIALOGTEXT"\n\nSince even the basic installation seems faulty, you're advised to check your network connection and try reinstalling Niente afresh."
   fi
 
   dialog --stdout --backtitle "Niente Software Install" --title " Software installation status " --msgbox "\n$DIALOGTEXT" 18 80 
