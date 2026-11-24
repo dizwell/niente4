@@ -135,8 +135,8 @@ elif [ "$1" == "other" ]; then
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Recordings with album art issues"
-  tput cup  9 4; echo "2) Recordngs with possible real volume boosts"
-  tput cup 10 4; echo "3) Recordngs with missing ReplayGain"
+  tput cup  9 4; echo "2) Folders with potential real volume boosts"
+  tput cup 10 4; echo "3) Recordings with missing ReplayGain"
   tput cup 11 4; echo "4) Files missing audio data in filenames"
   tput cup 12 4; echo "5) Folders with multiple physical files"
   tput cup 13 4; echo "6) Possible duplicate recordings"
