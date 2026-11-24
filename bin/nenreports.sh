@@ -134,5 +134,5 @@ case $REPORT_TYPE in
   dupes ) source "$CONFDIR/bin/nenrptother.sh" dupes;;
   ops   ) source "$CONFDIR/bin/nenrptother.sh" ops;;
 
-  advsql) advsql_reports; nmenuoptions reporting;;
+  advsql) advsql_reports; nsubmenuoptions advsql;;       # Back to the Advanced SQL menu
 esac

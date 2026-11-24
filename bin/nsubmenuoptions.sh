@@ -155,7 +155,7 @@ elif [ "$1" == "advsql" ]; then
     read -rsn2 option
   fi
   case $option in
-   "") source "$CONFDIR/bin/nenreports.sh" advsql ;;      # As the Reporting menu's option 4
+   "") source "$CONFDIR/bin/nenreports.sh" advsql ;;
     1) source "$CONFDIR/bin/nenreports.sh" advsql ;;
     2) open_dbbrowser; clear; nsubmenuoptions advsql ;;
     3) open_dbeaver; clear; nsubmenuoptions advsql ;;

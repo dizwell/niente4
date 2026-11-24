@@ -128,7 +128,7 @@ elif [ "$1" == "reporting" ]; then
     1 ) source "$CONFDIR/bin/nsubmenuoptions.sh" general;;
     2 ) source "$CONFDIR/bin/nsubmenuoptions.sh" logical;;
     3 ) source "$CONFDIR/bin/nsubmenuoptions.sh" other;;
-    4 ) source "$CONFDIR/bin/nenreports.sh" advsql ;;
+    4 ) source "$CONFDIR/bin/nsubmenuoptions.sh" advsql;;
     D|d ) clear; nmenuoptions database;;
     I|i ) clear; nmenuoptions integrity;;
     R|r ) clear; nmenuoptions reporting;;
