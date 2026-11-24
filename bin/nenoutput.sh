@@ -10,7 +10,7 @@ if [[ -z $1 ]]; then
   dialog --stdout --backtitle "Niente Report Generator" --msgbox "Something has gone wrong with generating this report.\\n\\nPress a key to return to the main menu" 10 80
 else
   if [[ $OSFAMILY == "MACOS" ]]; then
-    if command -v "$BROWSER" 2>/dev/null; then
+    if command -v "$BROWSER" >/dev/null 2>&1; then
       "$BROWSER" "file://$REPORT_FILE" >/dev/null 2>&1
     elif open -Ra "$BROWSER" 2>/dev/null; then
       open -a "$BROWSER" "file://$REPORT_FILE" >/dev/null 2>&1
