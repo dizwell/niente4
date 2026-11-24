@@ -79,6 +79,27 @@ else
 fi
 }
 
+function open_dbeaver {
+# Advanced SQL's option 3: open the working database in DBeaver as a temporary (unsaved) SQLite connection, if installed
+local NOTINSTALLED="\\nDBeaver has not been installed on this system. You can get it from https://dbeaver.io, and it needs installing before this option will do anything."
+local CONN="driver=sqlite|database=$CONFDIR/db/$DBNAME.db|name=Niente: $DBNAME"
+local DBEAVERCMD=""
+if [[ $OSFAMILY == "MACOS" ]]; then
+  if open -Ra "DBeaver" 2>/dev/null; then
+    open -a "DBeaver" --args -con "$CONN" >/dev/null 2>&1 &
+  else
+    dialog --stdout --backtitle "Niente Database Browser" --msgbox "$NOTINSTALLED" 10 80
+  fi
+else
+  if command -v dbeaver >/dev/null 2>&1; then DBEAVERCMD=dbeaver; elif command -v dbeaver-ce >/dev/null 2>&1; then DBEAVERCMD=dbeaver-ce; fi
+  if [[ -n $DBEAVERCMD ]]; then
+    "$DBEAVERCMD" -con "$CONN" >/dev/null 2>&1 &
+  else
+    dialog --stdout --backtitle "Niente Database Browser" --msgbox "$NOTINSTALLED" 10 80
+  fi
+fi
+}
+
 function check_new_version {
 # Administration's "Check for a newer version": the installer records which GitHub commit (and its date and branch) it
 # installed from in txt/installedversion.txt; this asks GitHub for the latest commit on that same branch and compares
