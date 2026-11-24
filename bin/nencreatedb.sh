@@ -46,7 +46,6 @@ if [ $GOODDB -eq 1 ]; then
   create table loadfiles (FILENAME text);
   create unique index idx_tracks_id on tracks(id);
   create index idx_tracks_filename on tracks(filename);
-  create table messages (id number, message text, message_type text);
 EOF
   # Update the activities log...
   TODAYDATE=$(date +"%Y-%m-%d : %H:%M:%S")

@@ -21,7 +21,7 @@ if [ -z "$MUSICDIR" ]; then
 fi
 if ! music_folder_ok; then return; fi
 
-# Check the database has a loadfiles, logging, maxvolumes, messages and albumart table and an index on filename
+# Check the database has a loadfiles, logging, maxvolumes and albumart table and an index on filename
 SQLSTMT="create table if not exists refresh_logs (OPERATION_DATE text, OPERATION text);"
 sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 SQLSTMT="create table if not exists albumart (ID integer not null, FILENAME text, ALBUMARTHEIGHT integer, ALBUMARTWIDTH integer, primary key (id autoincrement));"
