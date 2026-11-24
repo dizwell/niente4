@@ -99,6 +99,11 @@ case $CHECKTYPE in
   diff) DISPLAYCHECK="(Differential)" ;;
   logic) DISPLAYCHECK="(Logical)" ;;
 esac
+case $CHECKTYPE in                                        # The menu's names for the three checks, for the screen heading
+  full) CHECKNAME="Full" ;;
+  diff) CHECKNAME="Differential" ;;
+  logic) CHECKNAME="Fast" ;;
+esac
 integrity_candidates "$PROCESSFILES"
 
 TOTALRECORDS=$(wc -l < "$PROCESSFILES")
@@ -201,7 +206,7 @@ for f in "${recheck[@]}"; do
  ReplayGain : $REPLAYGAIN\\n\
  Elapsed    : $(printf "%02d:%02d:%02d" $HOURS $MINS $SECS)\n\
  ETA        : $ETA\n\n\
-Processing file $COUNTER of $TOTALRECORDS" 13 95  
+ Processing file $COUNTER of $TOTALRECORDS\nXXX"
     SQLSTR="Update tracks set BITDEPTH='$BITDEPTH', SAMPLE_RATE='$SAMPLERATE', HASH_ORIG='$HASHORIG', LAST_CHECK_DATE='$THISDATE',ALBUM_YEAR='$ALBUMYEAR', DATE_TAG='$DATETAG', PERFORMER='$PERFORMER', COMMENT='$COMMENT', TRACKNUMBER='$TRACKNO', ALBUMNAME='$ALBUMNAME', ARTISTNAME='$ARTISTNAME', COMPOSERNAME='$COMPOSERNAME', GENRENAME='$GENRENAME', TRACKTITLE='$TRACKTITLE', REPLAYGAIN='$REPLAYGAIN' where id='$fileid'"
     echo "$PERCENTAGE" 
   else 
@@ -227,7 +232,7 @@ Processing file $COUNTER of $TOTALRECORDS" 13 95
   # And now to do the actual database update
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTR" >/dev/null 2>&1
 done
-) | dialog --backtitle "Niente Integrity Check ${CHECKTYPE^}" \
+) | dialog --backtitle "Niente Integrity Check $CHECKNAME" \
            --title " Analysing Music Files " \
            --no-collapse \
            --gauge "Initialising..." 19 95 0
