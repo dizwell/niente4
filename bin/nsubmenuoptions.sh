@@ -15,6 +15,7 @@ if [ "$1" == "general" ]; then
   tput setaf $DRAWLINES; echo -en "\e[7mGeneral Reports\e[0m"; echo -en "$SPACER"
   tput setaf $HOTKEY; echo -en "L"; tput setaf $DRAWLINES; echo -en "ogical Issues Reports"; echo -en "$SPACER"
   tput setaf $HOTKEY; echo -en "O"; tput setaf $DRAWLINES; echo -en "ther Reports"; echo -en "$SPACER"
+  tput setaf $HOTKEY; echo -en "A"; tput setaf $DRAWLINES; echo -en "dvanced SQL"
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo "1) Aggregate Statistics"
@@ -40,6 +41,7 @@ if [ "$1" == "general" ]; then
     G|g ) clear; nsubmenuoptions general;;
     L|l ) clear; nsubmenuoptions logical;;
     O|o ) clear; nsubmenuoptions other;;
+    A|a ) source "$CONFDIR/bin/nenreports.sh" advsql general;;     # Advanced SQL, then back to this menu
     M|m ) clear; nmenuoptions reporting;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
@@ -69,6 +71,7 @@ elif [ "$1" == "logical" ]; then
   tput setaf $HOTKEY; echo -en "G"; tput setaf $DRAWLINES; echo -en "eneral Reports"; echo -en "$SPACER"
   tput setaf $DRAWLINES; echo -en "\e[7mLogical Issues Reports\e[0m"; echo -en "$SPACER"
   tput setaf $HOTKEY; echo -en "O"; tput setaf $DRAWLINES; echo -en "ther Reports"; echo -en "$SPACER"
+  tput setaf $HOTKEY; echo -en "A"; tput setaf $DRAWLINES; echo -en "dvanced SQL"
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Inconsistent DATE & ALBUM tags"
@@ -98,6 +101,7 @@ elif [ "$1" == "logical" ]; then
     G|g ) clear; nsubmenuoptions general;;
     L|l ) clear; nsubmenuoptions logical;;
     O|o ) clear; nsubmenuoptions other;;
+    A|a ) source "$CONFDIR/bin/nenreports.sh" advsql logical;;     # Advanced SQL, then back to this menu
     M|m ) clear; nmenuoptions reporting;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
@@ -127,6 +131,7 @@ elif [ "$1" == "other" ]; then
   tput setaf $HOTKEY; echo -en "G"; tput setaf $DRAWLINES; echo -en "eneral Reports"; echo -en "$SPACER"
   tput setaf $HOTKEY; echo -en "L"; tput setaf $DRAWLINES; echo -en "ogical Issues Reports"; echo -en "$SPACER"
   tput setaf $DRAWLINES; echo -en "\e[7mOther Reports\e[0m"; echo -en "$SPACER"
+  tput setaf $HOTKEY; echo -en "A"; tput setaf $DRAWLINES; echo -en "dvanced SQL"
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Recordings with album art issues"
@@ -158,6 +163,7 @@ elif [ "$1" == "other" ]; then
     G|g ) clear; nsubmenuoptions general;;
     L|l ) clear; nsubmenuoptions logical;;
     O|o ) clear; nsubmenuoptions other;;
+    A|a ) source "$CONFDIR/bin/nenreports.sh" advsql other;;     # Advanced SQL, then back to this menu
     M|m ) clear; nmenuoptions reporting;;
     B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
             if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then

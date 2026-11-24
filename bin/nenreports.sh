@@ -112,6 +112,7 @@ done
 }
 
 if [ -z "$1" ]; then REPORT_TYPE="aggstats"; else REPORT_TYPE=$1; fi
+RETURNMENU="$2"                                             # Advanced SQL from a report sub-menu returns there
 
 case $REPORT_TYPE in
   aggsts) source "$CONFDIR/bin/nenrptgen.sh" aggsts;;
@@ -134,5 +135,5 @@ case $REPORT_TYPE in
   dupes ) source "$CONFDIR/bin/nenrptother.sh" dupes;;
   ops   ) source "$CONFDIR/bin/nenrptother.sh" ops;;
 
-  advsql) advsql_reports; nmenuoptions reporting;;
+  advsql) advsql_reports; if [[ -n $RETURNMENU ]]; then nsubmenuoptions "$RETURNMENU"; else nmenuoptions reporting; fi;;   # Back to the report menu it came from
 esac
