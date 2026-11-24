@@ -59,6 +59,26 @@ trap ctrl_c INT      # Ctrl+C
 trap exit_program TERM      # Told to terminate (a logout or shutdown, say): tidy up as Giocoso does
 trap exit_program SIGHUP    # The window was closed: tidy up just the same
 
+function open_dbbrowser {
+# Advanced SQL's option 2: open the working database in DB Browser for SQLite (sqlitebrowser), if it's installed
+local NOTINSTALLED="\\nDB Browser for SQLite has not been installed on this system. You can get it from https://sqlitebrowser.org, and it needs installing before this option will do anything."
+if [[ $OSFAMILY == "MACOS" ]]; then
+  if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
+    pkill -i "DB Browser for SQLite" 2>/dev/null
+    open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
+  else
+    dialog --stdout --backtitle "Niente Database Browser" --msgbox "$NOTINSTALLED" 10 80
+  fi
+else
+  if command -v sqlitebrowser >/dev/null 2>&1; then
+    pkill -i sqlitebrowser 2>/dev/null
+    sqlitebrowser "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
+  else
+    dialog --stdout --backtitle "Niente Database Browser" --msgbox "$NOTINSTALLED" 10 80
+  fi
+fi
+}
+
 function check_new_version {
 # Administration's "Check for a newer version": the installer records which GitHub commit (and its date and branch) it
 # installed from in txt/installedversion.txt; this asks GitHub for the latest commit on that same branch and compares

@@ -46,24 +46,6 @@ if [ "$1" == "database" ]; then
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions database;;
     F|f ) source "$CONFDIR/bin/nennodb.sh" folder; nmenuoptions database;;
     X|x ) exit_program ;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions database    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions database
-            fi
-          fi
-          ;;
     '[D') nmenuoptions quit;;
     '[C') nmenuoptions integrity;;
     * ) A=1;;
@@ -112,24 +94,6 @@ elif [ "$1" == "integrity" ]; then
     Q|q ) clear; nmenuoptions quit;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions integrity;;
     X|x ) exit_program ;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions integrity    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions integrity
-            fi
-          fi
-          ;;
     '[D') nmenuoptions database;;
     '[C') nmenuoptions reporting;;
     * ) A=1;;
@@ -172,24 +136,6 @@ elif [ "$1" == "reporting" ]; then
     Q|q ) clear; nmenuoptions quit;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions reporting;;
     X|x ) exit_program ;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions reporting    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions reporting
-            fi
-          fi
-          ;;
     '[D') nmenuoptions integrity;;
     '[C') nmenuoptions administration;;
     * ) A=1;;
@@ -254,24 +200,6 @@ elif [ "$1" == "administration" ]; then
     Q|q ) clear; nmenuoptions quit;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions administration;;
     X|x ) exit_program ;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions administration    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions administration
-            fi
-          fi
-          ;;
     '[D') nmenuoptions reporting;;
     '[C') nmenuoptions quit;;
     * ) A=1;;
@@ -305,24 +233,6 @@ elif [ "$1" == "quit" ]; then
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
     X|x ) exit_program ;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions quit    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nmenuoptions quit
-            fi
-          fi
-          ;;
     '[D') nmenuoptions administration;;
     '[C') nmenuoptions database;;
     * ) A=1;;

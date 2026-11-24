@@ -43,24 +43,6 @@ if [ "$1" == "general" ]; then
     O|o ) clear; nsubmenuoptions other;;
     A|a ) clear; nsubmenuoptions advsql;;
     M|m ) clear; nmenuoptions reporting;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions general    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions general
-            fi
-          fi
-          ;;
     * ) A=1;;
   esac
   done
@@ -103,24 +85,6 @@ elif [ "$1" == "logical" ]; then
     O|o ) clear; nsubmenuoptions other;;
     A|a ) clear; nsubmenuoptions advsql;;
     M|m ) clear; nmenuoptions reporting;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions logical    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions logical
-            fi
-          fi
-          ;;
     * ) A=1;;
   esac
   done
@@ -165,24 +129,6 @@ elif [ "$1" == "other" ]; then
     O|o ) clear; nsubmenuoptions other;;
     A|a ) clear; nsubmenuoptions advsql;;
     M|m ) clear; nmenuoptions reporting;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions other    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions other
-            fi
-          fi
-          ;;
     * ) A=1;;
   esac
   done
@@ -198,6 +144,7 @@ elif [ "$1" == "advsql" ]; then
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo "1) Report by use of SQL"
+  tput cup  9 4; echo "2) Open DB Browser for SQLite"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
 
   until [ "$option" == "q" ]; do
@@ -209,6 +156,7 @@ elif [ "$1" == "advsql" ]; then
   case $option in
    "") source "$CONFDIR/bin/nenreports.sh" advsql ;;      # As the Reporting menu's option 4
     1) source "$CONFDIR/bin/nenreports.sh" advsql ;;
+    2) open_dbbrowser; clear; nsubmenuoptions advsql ;;
     '[D') nsubmenuoptions other;;
     '[C') nsubmenuoptions general;;
     G|g ) clear; nsubmenuoptions general;;
@@ -216,24 +164,6 @@ elif [ "$1" == "advsql" ]; then
     O|o ) clear; nsubmenuoptions other;;
     A|a ) clear; nsubmenuoptions advsql;;
     M|m ) clear; nmenuoptions reporting;;
-    B|b ) if [[ $OSFAMILY == "MACOS" ]]; then
-            if [[ $(mdfind "kMDItemFSName == 'DB Browser for SQLite.app'" | wc -l) -gt 0 ]]; then
-              pkill -i "DB Browser for SQLite" 2>/dev/null
-              open -a "DB Browser for SQLite" "$CONFDIR/db/$DBNAME.db" >/dev/null 2>&1 &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions advsql    
-            fi
-          else
-            if command -v sqlitebrowser >/dev/null 2>&1; then
-              pkill -i sqlitebrowser  2>/dev/null
-              sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
-            else
-              dialog --stdout --backtitle "Niente Database Browser" --msgbox "The Sqlitebrowser tool has not been installed on this system. You need to install that manually before the 'B' key will do anything!" 10 80
-              clear; nsubmenuoptions advsql
-            fi
-          fi
-          ;;
     * ) A=1;;
   esac
   done
