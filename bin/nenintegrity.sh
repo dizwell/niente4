@@ -74,7 +74,7 @@ if [[ $CHECKTYPE == "full" ]]; then
   CHECKEDBEFORE=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where last_check_date is not null and last_check_date <> ''")
   if [[ ${CHECKEDBEFORE:-0} -gt 0 ]]; then
     ALLTRACKS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks")
-    if ! dialog --backtitle "Niente Integrity Check" --title " Confirm Full Integrity Check " --no-mouse --defaultno --yesno "\nThis is a full integrity check: it will re-examine every one of the $(thousands "$ALLTRACKS") FLACs in database '$DBNAME', recalculating their checksums, which can take many hours.\n\nAre you sure you want to proceed?" 12 80; then
+    if ! dialog --backtitle "Niente Integrity Check" --title " Confirm Full Integrity Check " --no-mouse --defaultno --yesno "\nThis is a full integrity check: it will re-examine every one of the $(thousands "$ALLTRACKS") FLACs in database '$DBNAME', recalculating their checksums and re-extracting every piece of metadata they contain, which can take many hours.\n\nAre you sure you want to proceed?" 12 80; then
       return
     fi
   fi
