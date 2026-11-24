@@ -50,7 +50,7 @@ if [ "$1" == "general" ]; then
               clear; nsubmenuoptions general    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -108,7 +108,7 @@ elif [ "$1" == "logical" ]; then
               clear; nsubmenuoptions logical    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -168,7 +168,7 @@ elif [ "$1" == "other" ]; then
               clear; nsubmenuoptions other    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else

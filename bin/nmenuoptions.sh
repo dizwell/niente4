@@ -55,7 +55,7 @@ if [ "$1" == "database" ]; then
               clear; nmenuoptions database    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -121,7 +121,7 @@ elif [ "$1" == "integrity" ]; then
               clear; nmenuoptions integrity    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -147,7 +147,7 @@ elif [ "$1" == "reporting" ]; then
   # ======================================================================================================
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}"
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) General Reports"
-  tput cup  9 4; echo "2) Logical Problems Reports"
+  tput cup  9 4; echo "2) Logical Issues Reports"
   tput cup 10 4; echo "3) Other Reports"
   tput cup 11 4; echo "4) Advanced SQL Reporting"
   tput cup 13 4; echo -e "C) Change Working Database"
@@ -181,7 +181,7 @@ elif [ "$1" == "reporting" ]; then
               clear; nmenuoptions reporting    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -263,7 +263,7 @@ elif [ "$1" == "administration" ]; then
               clear; nmenuoptions administration    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
@@ -314,7 +314,7 @@ elif [ "$1" == "quit" ]; then
               clear; nmenuoptions quit    
             fi
           else
-            if command -v sqlitebrowser 2>/dev/null; then
+            if command -v sqlitebrowser >/dev/null 2>&1; then
               pkill -i sqlitebrowser  2>/dev/null
               sqlitebrowser "$CONFDIR/db/$DBNAME.db" 2>/dev/null &
             else
