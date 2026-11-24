@@ -80,10 +80,18 @@ fi
 }
 
 function open_dbeaver {
-# Advanced SQL's option 3: open the working database in DBeaver as a temporary (unsaved) SQLite connection, if installed
+# Advanced SQL's option 3: open the working database in DBeaver as a saved SQLite connection, if DBeaver is installed
 local NOTINSTALLED="\\nDBeaver has not been installed on this system. You can get it from https://dbeaver.io, and it needs installing before this option will do anything."
-local CONN="driver=sqlite|database=$CONFDIR/db/$DBNAME.db|name=Niente: $DBNAME"
-local DBEAVERCMD=""
+local CONN="driver=sqlite|database=$CONFDIR/db/$DBNAME.db|name=Niente: $DBNAME|save=true"
+local DBEAVERCMD="" DSFILE
+# The connection is saved in DBeaver, so it is created only once per database: if DBeaver's own list of connections
+# (data-sources.json, wherever DBeaver keeps it: normal, Flatpak or Snap installs) already has "Niente: <database>",
+# that one is reused instead of making a duplicate
+for DSFILE in "$HOME/Library/DBeaverData" "$HOME/.local/share/DBeaverData" "$HOME/.var/app/io.dbeaver.DBeaverCommunity/data/DBeaverData" "$HOME/snap/dbeaver-ce/current/.local/share/DBeaverData"; do
+  if [[ -d $DSFILE ]] && grep -rqsF "\"name\": \"Niente: $DBNAME\"" "$DSFILE" --include=data-sources*.json; then
+    CONN="create=false|name=Niente: $DBNAME"; break
+  fi
+done
 if [[ $OSFAMILY == "MACOS" ]]; then
   if open -Ra "DBeaver" 2>/dev/null; then
     open -a "DBeaver" --args -con "$CONN" >/dev/null 2>&1 &
