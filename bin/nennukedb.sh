@@ -9,20 +9,20 @@
 function nuke_database {
 check_database
 # A wipe can't be undone, so say what is about to happen and default to No (as Giocoso's restore does).
-# 'verbose' is the plain wipe (Database option 4); 'quiet' is the wipe before a full re-load (option 2)
+# 'verbose' is the plain wipe (Database option 4); 'quiet' is the wipe before a full reload (option 2)
 WIPEWARN="\nThis will delete everything in the '$DBNAME' database: every track, its stored hashes and check history, the album-art and volume results, and the refresh logs. It can be re-populated by a fresh scan, but all the integrity checks that Niente performs for a populated database can only be re-created by performing a fresh, lengthy integrity check."
 if [ "$callmode" == "quiet" ]; then
-  WIPEASK="Are you sure you want to wipe it and re-load it from scratch with a full scan?"
+  WIPEASK="Are you sure you want to wipe it and reload it from scratch with a full scan?"
 else
   WIPEASK="Are you sure you want to wipe it?"
 fi
 # Take the program lock first, in both modes, so a wipe never runs underneath another scan or check
-if [ "$callmode" == "quiet" ] && ! music_folder_ok; then return 1; fi   # Wipe & re-load needs a real music folder
+if [ "$callmode" == "quiet" ] && ! music_folder_ok; then return 1; fi   # Wipe & reload needs a real music folder
 if ! take_lock; then
   dialog --stdout --backtitle "Niente Database Wipe" --title " Application lock present! " --msgbox "\\nAnother Niente session is currently running a scan or check, so this one cannot proceed.\\n\\nPlease try again when it has finished. Click OK to return to the main menu." 12 80
   return 1
 fi
-# Wipe & re-load only: check the music folder first. If more than a fifth of the database's tracks weren't found,
+# Wipe & reload only: check the music folder first. If more than a fifth of the database's tracks weren't found,
 # warn before anything is wiped (a plain wipe, option 4, deliberately empties the database, so isn't checked)
 if [ "$callmode" == "quiet" ]; then
   tput cup 25 4; tput setaf $MAINTEXT

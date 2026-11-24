@@ -138,7 +138,7 @@ done
 tput cvvis
 }
 
-# Functions for the data-loss guard (used by every refresh and by Wipe & re-load, menu and unattended alike)
+# Functions for the data-loss guard (used by every refresh and by Wipe & reload, menu and unattended alike)
 # -----------------------------------------------------------------------------
 function pick_scan_folder {
 # Database options 2 and 3 (as Giocoso's menu refreshes): choose the folder to scan, starting at the current music
