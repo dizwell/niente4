@@ -104,7 +104,7 @@ elif [ "$1" == "other" ]; then
   tput cup 11 4; echo "4) Files missing audio data in filenames"
   tput cup 12 4; echo "5) Folders with multiple physical files"
   tput cup 13 4; echo "6) Possible duplicate recordings"
-  tput cup 15 4; echo "7) Display the operations log"
+  tput cup 14 4; echo "7) Display the operations log"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
 
   until [ "$option" == "q" ]; do
