@@ -24,7 +24,7 @@ while [[ $RETURNTOMENU -ne 1 ]]; do
   dialog --backtitle "Niente Advanced SQL Reporting" \
          --title " Enter your complete select query below " \
          --extra-button --extra-label "Clear" \
-         --editbox "$SQL_INPUT" 12 90 2>"$SQL_INPUT.tmp"
+         --editbox "$SQL_INPUT" 16 90 2>"$SQL_INPUT.tmp"
     
   exitStatus=$?
   case $exitStatus in
