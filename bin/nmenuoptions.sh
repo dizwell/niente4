@@ -23,7 +23,6 @@ if [ "$1" == "database" ]; then
   tput cup 10 4; echo "3) Add/Remove music files incrementally"
   tput cup 11 4; echo "4) Wipe a music database"
   tput cup 13 4; echo -e "C) Change Working Database"
-  tput cup 14 4; echo -e "F) Change Working Music Folder"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
 
   until [ "$option" == "q" ]; do
@@ -44,7 +43,6 @@ if [ "$1" == "database" ]; then
     A|a ) clear; nmenuoptions administration;;
     Q|q ) clear; nmenuoptions quit;;
     C|c ) source "$CONFDIR/bin/nennodb.sh" database; nmenuoptions database;;
-    F|f ) source "$CONFDIR/bin/nennodb.sh" folder; nmenuoptions database;;
     X|x ) exit_program ;;
     '[D') nmenuoptions quit;;
     '[C') nmenuoptions integrity;;
