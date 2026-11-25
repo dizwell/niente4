@@ -46,8 +46,13 @@ if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGBETA="no"; PROGVERSION="4.
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
 if [[ $PROGBETA == "yes" ]]; then
-  # A beta install adds the date of the GitHub commit it was installed from (YYMMDD), so two beta installs can be told apart
-  BETADATE=$(grep -m1 '^INSTDATE=' "$CONFDIR/txt/installedversion.txt" 2>/dev/null | sed 's/^INSTDATE="..\(..\)-\(..\)-\(..\).*/\1\2\3/')
+  # A beta install adds the date (UTC, as YYMMDD) of the GitHub commit it holds, so two beta installs can be told apart: a git clone
+  # (as on a development machine, updated by git pull) asks git; an ordinary install uses the commit its installer recorded
+  if [[ -d $CONFDIR/.git ]] && command -v git >/dev/null 2>&1; then
+    BETADATE=$(TZ=UTC0 git -C "$CONFDIR" log -1 --format=%cd --date=format-local:%y%m%d 2>/dev/null)
+  else
+    BETADATE=$(grep -m1 '^INSTDATE=' "$CONFDIR/txt/installedversion.txt" 2>/dev/null | sed 's/^INSTDATE="..\(..\)-\(..\)-\(..\).*/\1\2\3/')
+  fi
   if [[ $BETADATE =~ ^[0-9]{6}$ ]]; then PROGVERSION="4.10-$BETADATE"; else PROGVERSION="4.10-beta"; fi
 fi
 
