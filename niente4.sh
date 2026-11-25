@@ -42,9 +42,14 @@
 # If the folder Niente was started from no longer exists (moved or deleted since the Terminal was in it), start in the home folder instead
 if [[ ! -d $PWD ]]; then cd "$HOME" 2>/dev/null || exit 1; fi
 PROGFILE="${BASH_SOURCE[0]}"                      # This script's own path (a symlink such as /usr/local/bin/niente is fine)
-if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGVERSION="4.10"; else PROGVERSION="4.10-beta"; fi
+if ! sed -n '10p' "$PROGFILE" | grep -q '?'; then PROGBETA="no"; PROGVERSION="4.10"; else PROGBETA="yes"; fi
 echo -ne "\033]0;Niente: The Music Integrity Manager\007"
 CONFDIR="$HOME/.local/share/niente4"  OLDIFS=$IFS  NODIALOG=0
+if [[ $PROGBETA == "yes" ]]; then
+  # A beta install adds the date of the GitHub commit it was installed from (YYMMDD), so two beta installs can be told apart
+  BETADATE=$(grep -m1 '^INSTDATE=' "$CONFDIR/txt/installedversion.txt" 2>/dev/null | sed 's/^INSTDATE="..\(..\)-\(..\)-\(..\).*/\1\2\3/')
+  if [[ $BETADATE =~ ^[0-9]{6}$ ]]; then PROGVERSION="4.10-$BETADATE"; else PROGVERSION="4.10-beta"; fi
+fi
 
 # SQL giving the folder part of a FILENAME (everything before its last '/'): volume boosts are judged folder by folder,
 # since an album can only be boosted as far as its loudest track allows
