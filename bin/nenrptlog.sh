@@ -99,7 +99,7 @@ if [[ $BADTRACK_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - TRACKNUMBER not starting at 1" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Report on inconsistent ALBUM & DATE tags</title></head>'
+.print '<head><title>Niente Report on inconsistent TRACKNUMBER tags</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on
@@ -163,7 +163,7 @@ if [[ $BADPERCOM_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - COMMENT tag doesn't mention PERFORMER tag" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Report on inconsistent ALBUM & DATE tags</title></head>'
+.print '<head><title>Niente Report on inconsistent PERFORMER & COMMENT tags</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on
@@ -292,7 +292,7 @@ if [[ $BADPERCOM_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - inconsistent ARTIST and COMPOSER tags" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Report on inconsistent ALBUM & DATE tags</title></head>'
+.print '<head><title>Niente Report on inconsistent ARTIST & COMPOSER tags</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on
@@ -356,7 +356,7 @@ if [[ $BADPERCOM_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - incongrous bit-depth and sample rates" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Report on inconsistent ALBUM & DATE tags</title></head>'
+.print '<head><title>Niente Report on incongruous Bit Depth & Sample Rates</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on
