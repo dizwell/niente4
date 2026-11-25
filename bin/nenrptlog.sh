@@ -216,18 +216,19 @@ rm -f "$REPORT_FILE" 2>/dev/null
 check_database
 
 # Now we can produce the report
-BADPERCOM_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where comment not like '%' || (select substr(bracket_content, 1, instr(bracket_content, ' ') - 1) from (select substr(albumname, instr(albumname, '(') + 1) as bracket_content)) || '%' and albumname like '%(% - %)'")
-BADPERCOM_SQL="select rtrim(filename, replace(filename, '/', '')) as 'Folder Name', replace(filename, rtrim(filename, replace(filename, '/', '')), '') as 'File Name', albumname as 'Album Tag', COMMENT as 'Comment Tag', substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '('))) as 'Expected Name' from tracks where comment not like '%' || (select substr(bracket_content, 1, instr(bracket_content, ' ') - 1) from (select substr(albumname, INSTR(albumname, '(') + 1) as bracket_content)) || '%' and albumname like '%(% - %)' order by 1,2"
+# The same test as the L4 statistic: the distinguishing artist in ALBUM's brackets must appear somewhere in PERFORMER
+BADPERCOM_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '('))))")
+BADPERCOM_SQL="select rtrim(filename, replace(filename, '/', '')) as 'Folder Name', replace(filename, rtrim(filename, replace(filename, '/', '')), '') as 'File Name', albumname as 'Album Tag', performer as 'Performer Tag', substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '('))) as 'Expected Name' from tracks where not instr(performer, substr(albumname,instr(albumname,'(')+1,(length(albumname)-8)-(instr(albumname, '(')))) order by 1,2"
 
 REPORT_DATE=$(date "+%a %d %b %Y %H:%M:%S %Z")
-REPORT_TITLE="FLACs whose COMMENT and ALBUM tag disagree on the distinguishing artist"
-REPORT_ALLCLEAR="\nThere are no known examples of FLACs whose COMMENT and ALBUM tags don't agree on the distinguishing artist name to some extent.\\n\\nPress OK to continue."
+REPORT_TITLE="FLACs whose PERFORMER and ALBUM tags disagree on the distinguishing artist"
+REPORT_ALLCLEAR="\nThere are no known examples of FLACs whose PERFORMER and ALBUM tags don't agree on the distinguishing artist name to some extent.\\n\\nPress OK to continue."
 
 if [[ $BADPERCOM_COUNT -eq 0 ]]; then
-    dialog --stdout --backtitle "Niente Reporting - inconsistent COMMENT and ALBUM tags" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
+    dialog --stdout --backtitle "Niente Reporting - inconsistent PERFORMER and ALBUM tags" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Report on inconsistent ALBUM & DATE tags</title></head>'
+.print '<head><title>Niente Report on inconsistent PERFORMER & ALBUM tags</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on

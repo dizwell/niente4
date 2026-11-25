@@ -59,7 +59,7 @@ elif [ "$1" == "logical" ]; then
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Inconsistent DATE & ALBUM tags"
   tput cup  9 4; echo "2) Inconsistent TRACKNUMBER tags"
   tput cup 10 4; echo "3) Inconsistent PERFORMER & COMMENT tags"
-  tput cup 11 4; echo "4) Inconsistent COMMENT & ALBUM tags"
+  tput cup 11 4; echo "4) Inconsistent PERFORMER & ALBUM tags"
   tput cup 12 4; echo "5) Inconsistent ARTIST & COMPOSER tags"
   tput cup 13 4; echo "6) Incongruous Bit Depth & Sample Rates"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"

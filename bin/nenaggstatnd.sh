@@ -24,7 +24,7 @@ if [[ $SQUAREART -eq 1 ]]; then
   if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD) union"; fi
   if [[ $NAMEBITS == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O4', 'Missing audio data in filenames:', count(*) from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0) union"; fi
 
-  AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1) union
+  AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1) union
   select 'O6', 'Possible duplicate recordings:', count(*) from (select hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1)) union
   select 'O3', 'Missing ReplayGain information:', count(*) from tracks where replaygain is null or replaygain='' union
   select 'T1', 'Last integrity check done on (y-m-d):', substr(max(operation_date),1,10) from refresh_logs where operation like '%integrity check%'
@@ -46,7 +46,7 @@ else
   if [[ $REPORTMAXV == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O2', 'Potential Volume Boosts:', count(*) from (select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD) union"; fi
   if [[ $NAMEBITS == "yes" ]]; then AGGSTATS_SQL="$AGGSTATS_SQL select 'O4', 'Missing audio data in filenames:', count(*) from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0) union"; fi
 
-  AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1) union
+  AGGSTATS_SQL="$AGGSTATS_SQL select 'O5', 'Folders containing multiple physical FLACs:', count(*) from (select rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1) union
   select 'O6', 'Possible duplicate recordings:', count(*) from (select hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1)) union
   select 'O3', 'Missing ReplayGain information:', count(*) from tracks where replaygain is null or replaygain='' union
   select 'T1', 'Last integrity check done on (y-m-d):', substr(max(operation_date),1,10) from refresh_logs where operation like '%integrity check%'

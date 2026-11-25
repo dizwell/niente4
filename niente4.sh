@@ -365,7 +365,7 @@ elif [[ $CHECKTYPE == "diff" ]]; then
     sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
   fi
 
-  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)"
+  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1)"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
   
   SQLSTMT="select id, filename from (select id, filename, hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1))"
@@ -413,7 +413,7 @@ elif [[ $CHECKTYPE == "logic" ]]; then
     sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
   fi
 
-  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)"
+  SQLSTMT="select id, filename from (select id, filename, rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1)"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit >> "$OUTFILE" 2>&1
   
   SQLSTMT="select id, filename from (select id, filename, hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1))"

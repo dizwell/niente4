@@ -279,8 +279,8 @@ rm -f "$REPORT_FILE" 2>/dev/null
 check_database
 
 # Now we can produce the report
-MULTI_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (select rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)")
-MULTI_SQL="select rtrim(filename, replace(filename, '/', '')) as 'Folder Name', composername as 'Composer Tag', albumname as 'Album Tag', count(*) as 'Track Count' from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1 order by 1,3"
+MULTI_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from (select rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1)")
+MULTI_SQL="select rtrim(filename, replace(filename, '/', '')) as 'Folder Name', artistname as 'Artist Tag', albumname as 'Album Tag', count(*) as 'Track Count' from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1 order by 1,3"
 
 REPORT_DATE=$(date "+%a %d %b %Y %H:%M:%S %Z")
 REPORT_TITLE="Music folders containing multiple physical FLACs"

@@ -55,7 +55,7 @@ select filename from albumart where (albumartheight < $SMALLART or albumartwidth
 select $FOLDERSQL from maxvolumes group by $FOLDERSQL having min(boost) > $VOLUMETHRESHOLD
 select filename from tracks where replaygain is null or replaygain=''
 select filename from (select filename, bitdepth, sample_rate, instr(filename, computed_bitdepth||'-'||computed_samplerate) as intest, computed_bitdepth, computed_samplerate from ( select filename, bitdepth, sample_rate, ifnull(bitdepth, 1) as computed_bitdepth, ifnull(sample_rate,1) as computed_samplerate from tracks ) where intest=0)
-select filename from (select filename, rtrim(filename, replace(filename, '/', '')), composername, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), composername, albumname having count(*) > 1)
+select filename from (select filename, rtrim(filename, replace(filename, '/', '')), artistname, albumname, count(*) from tracks group by rtrim(filename, replace(filename, '/', '')), artistname, albumname having count(*) > 1)
 select filename from (select filename, hash_orig from tracks where hash_orig in (select hash_orig from tracks group by hash_orig having count(*)>1))
 END
 
