@@ -18,7 +18,7 @@ tput cup 12 60; echo " |_| \_|_|\___|_| |_|\__\___| "
 function sixel_logo {
 wordlogo
 tput cup 14 59; tput setaf $SPINNER; echo -en "♬♪ "; tput setaf $INFOTEXT; echo -en "The Music Integrity Manager"; tput setaf $SPINNER; echo -en " ♬♪"
-tput cup 16 $LOGO_POSITION; "$SIXEL" -w "${LOGOSIZE%x*}" "$LOGO_PATH" 2>/dev/null; printf "%s\n"
+tput cup 16 $LOGO_POSITION; "$SIXEL" -w "${LOGOSIZE%x*}" "$LOGO_PATH" 2>/dev/null; printf "\n"
 }
 
 if [[ "$1" == "short" ]]; then

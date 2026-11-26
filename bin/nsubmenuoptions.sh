@@ -27,7 +27,7 @@ if [[ "$1" == "general" ]]; then
   until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
-  if [[ $option == $escape_char ]]; then
+  if [[ $option == "$escape_char" ]]; then
     read -rsn2 option
   fi
   case $option in
@@ -67,7 +67,7 @@ elif [[ "$1" == "logical" ]]; then
   until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
-  if [[ $option == $escape_char ]]; then
+  if [[ $option == "$escape_char" ]]; then
     read -rsn2 option
   fi
   case $option in
@@ -110,7 +110,7 @@ elif [[ "$1" == "other" ]]; then
   until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
-  if [[ $option == $escape_char ]]; then
+  if [[ $option == "$escape_char" ]]; then
     read -rsn2 option
   fi
   case $option in
@@ -151,7 +151,7 @@ elif [[ "$1" == "advsql" ]]; then
   until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
-  if [[ $option == $escape_char ]]; then
+  if [[ $option == "$escape_char" ]]; then
     read -rsn2 option
   fi
   case $option in
