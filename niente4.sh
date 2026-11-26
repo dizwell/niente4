@@ -4,7 +4,7 @@
 # the COMMENT, PERFORMER, ALBUM and YEAR tags have been entered.
 #
 # Full documentation available at:
-# https://absolutelybaching.com/niente-version-4-the-user-manual/
+# https://bbritten.com/softwares/niente/niente
 #
 # Copyright © H. Rogers 2019-2026
 # Version 4.10 - November 28th 2026 (??)
