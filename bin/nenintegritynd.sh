@@ -15,7 +15,7 @@
 PATH=/usr/local/bin:/usr/bin:/bin:$PATH
 
 function integrity_check {
-if [ -z "$DBNAME" ]; then return; fi
+if [[ -z "$DBNAME" ]]; then return; fi
 tput civis;
 FSSCAN=X
 
@@ -36,7 +36,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 integrity_candidates "$CONFDIR/tmp/nienterecs.txt"
 RESCAN_COUNT=$(wc -l < "$CONFDIR/tmp/nienterecs.txt"); RESCAN_COUNT=${RESCAN_COUNT//[[:space:]]/}
 
-if [ $RESCAN_COUNT -eq 0 ]; then
+if [[ $RESCAN_COUNT -eq 0 ]]; then
   release_lock
   SQLSTMT="insert into refresh_logs values ('$TODAYDATE','Cancelling a $CHECKTYPE integrity check, as no records to process');"
   sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
@@ -80,14 +80,14 @@ for f in "${recheck[@]}"; do
   GENRENAME=${GENRENAME//\'/\'\'}; GENRENAME="${GENRENAME//\"/##@##}"
   TRACKTITLE="${TRACKTITLE//\'/\'\'}"; TRACKTITLE="${TRACKTITLE//\"/##@##}"
 
-  if [ $CHECKTYPE == "logic" ]; then    # If we're only doing logical tests, we skip the hash calculation
+  if [[ $CHECKTYPE == "logic" ]]; then    # If we're only doing logical tests, we skip the hash calculation
     SQLSTR="Update tracks set BITDEPTH='$BITDEPTH', SAMPLE_RATE='$SAMPLERATE', HASH_ORIG='$HASHORIG', LAST_CHECK_DATE='$THISDATE',ALBUM_YEAR='$ALBUMYEAR', DATE_TAG='$DATETAG', PERFORMER='$PERFORMER', COMMENT='$COMMENT', TRACKNUMBER='$TRACKNO', ALBUMNAME='$ALBUMNAME', ARTISTNAME='$ARTISTNAME', COMPOSERNAME='$COMPOSERNAME', GENRENAME='$GENRENAME', TRACKTITLE='$TRACKTITLE', REPLAYGAIN='$REPLAYGAIN' where id='$fileid';"
   else                                  # Differential and Full checks require hashes to be re-calculated
-    if ! [ -z $BITDEPTH ] && [ $BITDEPTH == "16" ]; then
+    if ! [[ -z $BITDEPTH ]] && [[ $BITDEPTH == "16" ]]; then
       FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
-    elif ! [ -z $BITDEPTH ] && [ $BITDEPTH == "24" ]; then
+    elif ! [[ -z $BITDEPTH ]] && [[ $BITDEPTH == "24" ]]; then
       FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s24le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
-    elif ! [ -z $BITDEPTH ]; then FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
+    elif ! [[ -z $BITDEPTH ]]; then FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
 	else
 	  FRESHHASH=$("$FFMPEG" -nostdin -i "$filename" -c:a pcm_s16le -map 0:a -f md5 - 2>/dev/null | sed 's/^[^=]*=//')
     fi
@@ -110,6 +110,6 @@ rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }
 
-if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
+if [[ -z "$1" ]]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
 integrity_check
 echo -ne " - Finished"; sleep 10

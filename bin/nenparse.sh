@@ -7,12 +7,12 @@
 ####################################################################
 NUM='^[0-9]+$'
 
-if [ -f "$CONFDIR/txt/niente.conf" ]; then
+if [[ -f "$CONFDIR/txt/niente.conf" ]]; then
   source "$CONFDIR/txt/niente.conf"                       # Read the configuration file and pick up all its values
 
   # If UTFCHARS is set, check yes or no, interpreted as 1 or 0, and set to 0 by default if not
   # -----------------------------------------------------------------------------
-  if [ ! -z $UTFCHARS ]; then
+  if [[ ! -z $UTFCHARS ]]; then
     if [[ ${UTFCHARS,,} == "yes" ]] ; then
       UTFCHARS="--no-utf8-convert"
     else
@@ -25,7 +25,7 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
   # If SMALLART or LARGEART dimensions have been supplied, make sure they
   # are valid numbers and change them to defaults (300 and 1600) if not.
   # -----------------------------------------------------------------------------
-  if [ ! -z $SMALLART ]; then
+  if [[ ! -z $SMALLART ]]; then
     if ! [[ $SMALLART =~ $NUM ]] ; then
       SMALLART=300
     fi
@@ -33,7 +33,7 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
     SMALLART=300
   fi
 
-  if [ ! -z $LARGEART ]; then
+  if [[ ! -z $LARGEART ]]; then
     if ! [[ $LARGEART =~ $NUM ]] ; then
       LARGEART=1600
     fi
@@ -42,10 +42,10 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
   fi
 
   # If large and small art thresholds are the wrong way round, reverse them
-  if [ $SMALLART -gt $LARGEART ]; then TMPART=$SMALLART; SMALLART=$LARGEART; LARGEART=$TMPART; fi
+  if [[ $SMALLART -gt $LARGEART ]]; then TMPART=$SMALLART; SMALLART=$LARGEART; LARGEART=$TMPART; fi
 
   # If SQUAREART is set, check yes or no, interpreted as 1 or 0, and set to 1 by default if not
-  if [ ! -z $SQUAREART ]; then
+  if [[ ! -z $SQUAREART ]]; then
     if [[ ${SQUAREART,,} == "no" ]] ; then
       SQUAREART=0
     else
@@ -56,7 +56,7 @@ if [ -f "$CONFDIR/txt/niente.conf" ]; then
   fi
 
   # If VOLUMETHRESHOLD is set, check it's numeric and set to 2 by default if not.
-  if [ ! -z $VOLUMETHRESHOLD ]; then
+  if [[ ! -z $VOLUMETHRESHOLD ]]; then
     if ! [[ $VOLUMETHRESHOLD =~ $NUM ]] ; then
       VOLUMETHRESHOLD=2
     fi

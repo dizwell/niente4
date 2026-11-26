@@ -25,7 +25,7 @@ rm -f "$REPORT_FILE" 2>/dev/null
 check_database
 
 # Now we can produce the report
-if [ $SQUAREART -eq 1 ]; then
+if [[ $SQUAREART -eq 1 ]]; then
   ART_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from albumart where (albumartheight < $SMALLART or albumartwidth < $SMALLART) or (albumartheight > $LARGEART or albumartwidth > $LARGEART) or (albumartheight <> albumartwidth) or albumartheight is null or albumartheight = '' or albumartwidth is null or albumartwidth = '';")
   ART_SQL="select rtrim(filename, replace(filename, '/', '')) as 'Folder Name', replace(filename, rtrim(filename, replace(filename, '/', '')), '') as 'File Name', coalesce(nullif(albumartheight, ''), 'Empty') as 'Art Height', coalesce(nullif(albumartwidth, ''), 'Empty') as 'Art Width' from albumart where (albumartheight < $SMALLART or albumartwidth < $SMALLART) or (albumartheight > $LARGEART or albumartwidth > $LARGEART) or (albumartheight <> albumartwidth) or albumartheight is null or albumartheight = '' or albumartwidth is null or albumartwidth = '' order by filename"
 else
@@ -37,7 +37,7 @@ REPORT_DATE=$(date "+%a %d %b %Y %H:%M:%S %Z")
 REPORT_TITLE="Files with embedded album art issues"
 REPORT_ALLCLEAR="\\nAll known music files appear to have good embedded album artwork.\\n\\nPress OK to continue."
 
-if [ $ART_COUNT -eq 0 ]; then
+if [[ $ART_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - Album Art" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 9 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"

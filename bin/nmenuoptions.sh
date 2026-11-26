@@ -8,7 +8,7 @@ source "$CONFDIR/bin/nentput.sh"
 SPACER="      "
 escape_char=$(printf "\u1b")
 
-if [ "$1" == "database" ]; then
+if [[ "$1" == "database" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $DRAWLINES; echo -en "\e[7mDatabase\e[0m"; echo -en "$SPACER"
@@ -25,7 +25,7 @@ if [ "$1" == "database" ]; then
   tput cup 13 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
 
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -50,7 +50,7 @@ if [ "$1" == "database" ]; then
   esac
   done
 
-elif [ "$1" == "integrity" ]; then
+elif [[ "$1" == "integrity" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "D"; tput setaf $DRAWLINES; echo -en "atabase"; echo -en "$SPACER"
@@ -70,7 +70,7 @@ elif [ "$1" == "integrity" ]; then
   tput cup 16 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
   
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -98,7 +98,7 @@ elif [ "$1" == "integrity" ]; then
   esac
   done
 
-elif [ "$1" == "reporting" ]; then
+elif [[ "$1" == "reporting" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "D"; tput setaf $DRAWLINES; echo -en "atabase"; echo -en "$SPACER"
@@ -115,7 +115,7 @@ elif [ "$1" == "reporting" ]; then
   tput cup 13 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program" 
   
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -140,7 +140,7 @@ elif [ "$1" == "reporting" ]; then
   esac
   done
 
-elif [ "$1" == "administration" ]; then
+elif [[ "$1" == "administration" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "D"; tput setaf $DRAWLINES; echo -en "atabase"; echo -en "$SPACER"
@@ -158,7 +158,7 @@ elif [ "$1" == "administration" ]; then
   tput cup 14 4; echo -e "C) Change Working Database"
   tput cup 22 4; tput setaf $ALERT; echo -e "X) Exit the program"  
   
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -204,7 +204,7 @@ elif [ "$1" == "administration" ]; then
   esac
   done
 
-elif [ "$1" == "quit" ]; then
+elif [[ "$1" == "quit" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "D"; tput setaf $DRAWLINES; echo -en "atabase"; echo -en "$SPACER"
@@ -216,7 +216,7 @@ elif [ "$1" == "quit" ]; then
   tput cup  3 4; tput setaf $LOGO; echo -en "Using database: "; tput setaf $INFOTEXT; echo -en "${DBNAME^}";
   tput cup  8 4; tput setaf $MAINTEXT; echo -e "1) Quit the Program"
   
-  until [ "$option" == "Z" ]; do
+  until [[ "$option" == "Z" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then

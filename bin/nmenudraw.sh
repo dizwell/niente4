@@ -21,13 +21,13 @@ tput cup 14 59; tput setaf $SPINNER; echo -en "♬♪ "; tput setaf $INFOTEXT; e
 tput cup 16 $LOGO_POSITION; "$SIXEL" -w "${LOGOSIZE%x*}" "$LOGO_PATH" 2>/dev/null; printf "%s\n"
 }
 
-if [ "$1" == "short" ]; then
+if [[ "$1" == "short" ]]; then
   tput setaf $DRAWLINES; echo -e "┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                                   │
 │                                                                                                   │
 │                                                                                                   │
 └───────────────────────────────────────────────────────────────────────────────────────────────────┘"
-elif  [ "$1" == "playing" ]; then
+elif  [[ "$1" == "playing" ]]; then
   tput setaf $DRAWLINES; echo -e "┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                                   │
 │                                                                                                   │

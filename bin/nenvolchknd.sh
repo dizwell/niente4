@@ -37,7 +37,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes_load"
 sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"update sqlite_sequence set seq=0 where name in ('maxvolumes_load','maxvolumes')"
-if [ $SCANTYPE == "full" ]; then
+if [[ $SCANTYPE == "full" ]]; then
   VOLSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks")
   VOLSCAN_SQL="select id, filename from tracks order by filename"
   sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes"
@@ -46,7 +46,7 @@ else
   recheck_selection volume                                            # Never checked, plus folders above the boost threshold (as the report)
 fi
 
-if [ $VOLSCAN_COUNT -eq 0 ]; then
+if [[ $VOLSCAN_COUNT -eq 0 ]]; then
   release_lock
   exit
 fi
@@ -61,11 +61,11 @@ for f in "${volcheck[@]}"; do
   COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
   ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
   COUNTER=$((COUNTER+1))
-  if [ -z "$filename" ]; then filename='QxQxQx'; fi
-  if [ -f "$filename" ]; then
+  if [[ -z "$filename" ]]; then filename='QxQxQx'; fi
+  if [[ -f "$filename" ]]; then
     LINE=$("$FFMPEG" -nostdin -threads 0 -nostats -i "$filename" -af "volumedetect" -vn -sn -dn -f null - 2>&1 | grep "max_volume")
     MAXV=$(echo "$LINE" | awk '{print $5}' | tr -d '-')
-    if [ -z "$MAXV" ]; then
+    if [[ -z "$MAXV" ]]; then
       MAXV=0.0              # Special case: if max_volume is 0.0, then ffmpeg displays no '+' against it, so the return from the above is null. This sets it back to being 0.0
     else
       MAXV=${MAXV%" dB"}	# Strip the 'dB' suffix from the return: we want only numbers, otherwise we can't do maths with them later
@@ -79,7 +79,7 @@ for f in "${volcheck[@]}"; do
     sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTR"
   fi
 
-  if [ $((COUNTER%10)) -eq  0 ]; then
+  if [[ $((COUNTER%10)) -eq 0 ]]; then
     sqlite3 "$CONFDIR/db/$DBNAME.db" "update maxvolumes_load set filename=replace(filename,'##@##','\"');" >/dev/null 2>&1
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"delete from maxvolumes where filename in (select filename from maxvolumes_load)"   # Re-checked files: the new result replaces the old
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"insert into maxvolumes select * from maxvolumes_load"
@@ -101,5 +101,5 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 release_lock
 }
 
-if [ -z "$1" ]; then SCANTYPE="full"; else SCANTYPE=$1; fi
+if [[ -z "$1" ]]; then SCANTYPE="full"; else SCANTYPE=$1; fi
 volumeboost_scan

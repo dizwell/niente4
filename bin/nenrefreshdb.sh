@@ -10,12 +10,12 @@ function refresh_database {
 tput civis;
 FSSCAN=X
 
-if [ -z "$DBNAME" ]; then
+if [[ -z "$DBNAME" ]]; then
   dialog --stdout --backtitle "Niente Scan for Music" --title " No database specified " --msgbox "\\nThis Niente session is not configured to use a database, so nothing meaningful can be achieved.\\n\\nClick OK to return to the main menu." 12 80
   return
 fi
 
-if [ -z "$MUSICDIR" ]; then
+if [[ -z "$MUSICDIR" ]]; then
   dialog --stdout --backtitle "Niente Scan for Music" --title " No music folder specified " --msgbox "\\nYou haven't specified a folder containing FLACs to scan, so nothing can be added to the database at this time.\\n\\nClick OK to return to the main menu." 12 80
   return
 fi
@@ -115,6 +115,6 @@ rm -f "$CONFDIR/txt/nienterecs.txt" >/dev/null 2>&1
 tput cvvis
 }
 
-if [ -z "$MUSICDIR" ]; then source "$CONFDIR/bin/nennodb.sh" folder; fi
+if [[ -z "$MUSICDIR" ]]; then source "$CONFDIR/bin/nennodb.sh" folder; fi
 refresh_database
 

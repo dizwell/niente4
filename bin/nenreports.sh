@@ -111,7 +111,7 @@ EOF
 done
 }
 
-if [ -z "$1" ]; then REPORT_TYPE="aggstats"; else REPORT_TYPE=$1; fi
+if [[ -z "$1" ]]; then REPORT_TYPE="aggstats"; else REPORT_TYPE=$1; fi
 
 case $REPORT_TYPE in
   aggsts) source "$CONFDIR/bin/nenrptgen.sh" aggsts;;

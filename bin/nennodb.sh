@@ -11,7 +11,7 @@ function select_working_database {
 # Check if any databases exist we might use for this session
 DBCOUNT=$(ls "$CONFDIR/db/"*.db 2>/dev/null | wc -l)
 
-if [ $DBCOUNT -gt 0 ]; then
+if [[ $DBCOUNT -gt 0 ]]; then
   for i in "$CONFDIR/db/"*.db; do
     DBNM="$(basename $i)"; DBNM="${DBNM%.*}"
     DBLIST=$(echo $DBLIST $DBNM $DBNM off)
@@ -38,7 +38,7 @@ if [ $DBCOUNT -gt 0 ]; then
   # Adds the SAMPLE_RATE column to the selected Niente database if it's not already present
   SRATESQL="select count(*) from pragma_table_info('TRACKS') where name='SAMPLE_RATE'"
   SRATE_EXISTS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "$SRATESQL" .exit)
-  if [ $SRATE_EXISTS -eq 0 ]; then
+  if [[ $SRATE_EXISTS -eq 0 ]]; then
     SQLSTMT="alter table TRACKS add column SAMPLE_RATE integer"
     sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
   fi
@@ -61,7 +61,7 @@ fi
 
 function select_working_musicfolder {
 # If there is no default music folder, check if DBNAME is set. If it is, we can usefully prompt for a music folder. Otherwise, just return
-if ! [ -z "$DBNAME" ]; then
+if ! [[ -z "$DBNAME" ]]; then
   tput cvvis
   PICKED=0                                                            # Set to 1 only when a folder is actually chosen
   # Start at the configured music folder (or the home folder, if that doesn't exist)
@@ -70,7 +70,7 @@ if ! [ -z "$DBNAME" ]; then
   while true; do
     NEWDIR=$(dialog --backtitle "Niente set Working Music Folder" --title " Please choose a folder containing one or more FLACs " --dselect "$CHOSENFOLDER" $PICKHEIGHT 80  3>&1 1>&2 2>&3 3>&- )
     exitStatus=$?
-    if [ $exitStatus -eq 1 ] || [ $exitStatus -eq 255 ]; then break; fi      # Cancel or Esc: the current music folder stays as it is
+    if [[ $exitStatus -eq 1 ]] || [[ $exitStatus -eq 255 ]]; then break; fi      # Cancel or Esc: the current music folder stays as it is
     NEWDIR="${NEWDIR%/}"; [[ -z $NEWDIR ]] && NEWDIR="/"
     # Check the folder actually chosen, and everything below it, stopping at the first FLAC found (quick, even on a big share)
     if [[ -d $NEWDIR && -n $(find "$NEWDIR" -type f -name "*.flac" -print -quit 2>/dev/null) ]]; then

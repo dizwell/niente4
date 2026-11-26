@@ -31,7 +31,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 ARTSCAN_COUNT=$(sqlite3 "$CONFDIR/db/$DBNAME.db" <<<"select count(*) from tracks")
 ARTSCAN_SQL="select id, filename from tracks order by filename"
 
-if [ $ARTSCAN_COUNT -eq 0 ]; then
+if [[ $ARTSCAN_COUNT -eq 0 ]]; then
   release_lock
   return
 fi
@@ -46,12 +46,12 @@ COUNTER=0
 for f in "${artcheck[@]}"; do
   fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
-  if [ -z "$filename" ]; then filename='QxQxQx'; fi
-  if [ -f "$filename" ]; then
+  if [[ -z "$filename" ]]; then filename='QxQxQx'; fi
+  if [[ -f "$filename" ]]; then
     COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
     ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
-    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
-    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
+    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [[ -z "$ARTWIDTH" ]]; then ARTWIDTH=9999; fi
+    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [[ -z "$ARTHEIGHT" ]]; then ARTHEIGHT=9999; fi
 
 	# Remove dodgy characters. Single quotes are escaped into being two-single quotes.
     # Double quotes are replaced by a meaningless string for now...
@@ -98,7 +98,7 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 
 recheck_selection art                                                 # Never checked, plus those with art problems (as the report)
 
-if [ $ARTSCAN_COUNT -eq 0 ]; then
+if [[ $ARTSCAN_COUNT -eq 0 ]]; then
   release_lock
   return
 fi
@@ -113,12 +113,12 @@ COUNTER=0
 for f in "${artcheck[@]}"; do
   fileid="${f%%|*}"; filename="${f#*|}"                 # Split at the first pipe only: a filename may contain one
   COUNTER=$((COUNTER+1))
-  if [ -z "$filename" ]; then filename='QxQxQx'; fi
-  if [ -f "$filename" ]; then
+  if [[ -z "$filename" ]]; then filename='QxQxQx'; fi
+  if [[ -f "$filename" ]]; then
     COMPOSERNAME=$("$METAFLAC" $UTFCHARS --show-tag=COMPOSER "$filename" 2>/dev/null | sed 's/^[^=]*=//')
     ALBUMNAME=$("$METAFLAC" $UTFCHARS --show-tag=ALBUM "$filename" 2>/dev/null | sed 's/^[^=]*=//')
-    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [ -z "$ARTWIDTH" ]; then ARTWIDTH=9999; fi
-    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [ -z "$ARTHEIGHT" ]; then ARTHEIGHT=9999; fi
+    ARTWIDTH=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 width | awk '{print $2}'); if [[ -z "$ARTWIDTH" ]]; then ARTWIDTH=9999; fi
+    ARTHEIGHT=$("$METAFLAC" --list --block-type=PICTURE "$filename" 2>/dev/null | $GREPPROG -m 1 height | awk '{print $2}'); if [[ -z "$ARTHEIGHT" ]]; then ARTHEIGHT=9999; fi
 
 	# Remove dodgy characters. Single quotes are escaped into being two-single quotes.
     # Double quotes are replaced by a meaningless string for now...
@@ -142,8 +142,8 @@ sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
 release_lock
 }
 
-if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
-if [ $CHECKTYPE == "full" ]; then
+if [[ -z "$1" ]]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
+if [[ $CHECKTYPE == "full" ]]; then
   full_art_checkonly
 else
   diff_art_checkonly

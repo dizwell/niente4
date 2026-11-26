@@ -263,7 +263,7 @@ return 1
 function list_music_folder {
 # Find every FLAC in the music folder and load the list into the loadfiles table
 rm -f "$CONFDIR/txt/fsalbums.txt" "$CONFDIR/txt/fsalbums-sorted.txt" >/dev/null 2>&1
-if [ "$FDPROG" == "fd" ]; then
+if [[ "$FDPROG" == "fd" ]]; then
   fd -j $THREADS -t f -e flac . "$MUSICDIR" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
 else
   find "$MUSICDIR" -name "*.flac" >> "$CONFDIR/txt/fsalbums.txt" & spinner $!
@@ -455,13 +455,13 @@ exit 1
 
 function check_database {
 if [[ -n $UNATTENDED ]]; then
-  if [ -z "$DBNAME" ]; then unattended_stop "No database is named in the configuration."; fi
-  if [ ! -f "$CONFDIR/db/$DBNAME.db" ]; then unattended_stop "The configuration names a database called '$DBNAME', but no such database exists."; fi
+  if [[ -z "$DBNAME" ]]; then unattended_stop "No database is named in the configuration."; fi
+  if [[ ! -f "$CONFDIR/db/$DBNAME.db" ]]; then unattended_stop "The configuration names a database called '$DBNAME', but no such database exists."; fi
 fi
-if [ -z "$DBNAME" ]; then
+if [[ -z "$DBNAME" ]]; then
   dialog --stdout --backtitle "Niente Database Management" --title " No database specified " --msgbox "\\nThis Niente session is not configured to use a database, so nothing meaningful can be achieved.\\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
-elif [ ! -f "$CONFDIR/db/$DBNAME.db" ]; then
+elif [[ ! -f "$CONFDIR/db/$DBNAME.db" ]]; then
   dialog --stdout --backtitle "Niente Database Management" --title " Music Database doesn't exist! " --msgbox "\\nYour configuration file says to use a database called '$DBNAME' but no such database exists. Use the Database menu to create a database of that or some other name before proceeding. \\n\\nQuitting back to the main menu in the meantime." 12 80
   menu_display
 fi
@@ -485,7 +485,7 @@ if [[ -f $CONFDIR/db/$DBNAME.db ]]; then
   COLUMN_EXISTS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "SELECT count(*) FROM pragma_table_info('TRACKS') WHERE name='REPLAYGAIN';")
 
   # Add the column only if the count is 0
-  if [ "$COLUMN_EXISTS" -eq 0 ]; then
+  if [[ "$COLUMN_EXISTS" -eq 0 ]]; then
     sqlite3 "$CONFDIR/db/$DBNAME.db" "ALTER TABLE TRACKS ADD COLUMN REPLAYGAIN TEXT;"
   fi
 fi
@@ -527,7 +527,7 @@ parse_config                                                          # As Sempl
 
 # If at this point we discover database name is null, we need to prompt for one to
 # use as 'the session database'.
-if [ -z "$DBNAME" ]; then source "$CONFDIR/bin/nennodb.sh" database; fi
+if [[ -z "$DBNAME" ]]; then source "$CONFDIR/bin/nennodb.sh" database; fi
 
 # If a database name is specified, check it's valid
 if [[ ! -z $DBNAME ]]; then
@@ -544,7 +544,7 @@ if [[ ! -z $DBNAME ]]; then
     # Adds the SAMPLE_RATE column to the selected Niente database if it's not already present
     SRATESQL="select count(*) from pragma_table_info('TRACKS') where name='SAMPLE_RATE'"
     SRATE_EXISTS=$(sqlite3 "$CONFDIR/db/$DBNAME.db" "$SRATESQL" .exit)
-    if [ $SRATE_EXISTS -eq 0 ]; then
+    if [[ $SRATE_EXISTS -eq 0 ]]; then
       SQLSTMT="alter table TRACKS add column SAMPLE_RATE integer"
       sqlite3 "$CONFDIR/db/$DBNAME.db" "$SQLSTMT" .exit > /dev/null 2>&1
     fi

@@ -9,7 +9,7 @@ SPACER="      "
 escape_char=$(printf "\u1b")
 
 source "$CONFDIR/bin/nmenudraw.sh"
-if [ "$1" == "general" ]; then
+if [[ "$1" == "general" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $DRAWLINES; echo -en "\e[7mGeneral Reports\e[0m"; echo -en "$SPACER"
@@ -24,7 +24,7 @@ if [ "$1" == "general" ]; then
   tput cup 11 4; echo "4) Files with one or more missing tags"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
   
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -47,7 +47,7 @@ if [ "$1" == "general" ]; then
   esac
   done
 
-elif [ "$1" == "logical" ]; then
+elif [[ "$1" == "logical" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "G"; tput setaf $DRAWLINES; echo -en "eneral Reports"; echo -en "$SPACER"
@@ -64,7 +64,7 @@ elif [ "$1" == "logical" ]; then
   tput cup 13 4; echo "6) Incongruous Bit Depth & Sample Rates"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
   
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -89,7 +89,7 @@ elif [ "$1" == "logical" ]; then
   esac
   done
 
-elif [ "$1" == "other" ]; then
+elif [[ "$1" == "other" ]]; then
   # ======================================================================================================
   tput cup  5 4
   tput setaf $HOTKEY; echo -en "G"; tput setaf $DRAWLINES; echo -en "eneral Reports"; echo -en "$SPACER"
@@ -107,7 +107,7 @@ elif [ "$1" == "other" ]; then
   tput cup 14 4; echo "7) Display the operations log"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
 
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then
@@ -132,7 +132,7 @@ elif [ "$1" == "other" ]; then
     * ) A=1;;
   esac
   done
-elif [ "$1" == "advsql" ]; then
+elif [[ "$1" == "advsql" ]]; then
   # ======================================================================================================
   # Advanced SQL is the top bar's fourth item: arriving here only highlights it; Enter then does what the
   # Reporting menu's option 4 does
@@ -148,7 +148,7 @@ elif [ "$1" == "advsql" ]; then
   tput cup 10 4; echo "3) Open DBeaver"
   tput cup 22 4; tput setaf $ALERT; echo -e "M) Return to Main Menu"
 
-  until [ "$option" == "q" ]; do
+  until [[ "$option" == "q" ]]; do
   tput cup 25 4; tput setaf $MAINTEXT; echo -n "Type a menu item: "; tput setaf $SPINNER;
   tput cup 25 24; tput cvvis; read -n 1 -s -r option
   if [[ $option == $escape_char ]]; then

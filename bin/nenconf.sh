@@ -9,7 +9,7 @@
 # are values read-in from the existing configuration file
 #
 ####################################################################
-if ! [ -d "$CONFDIR/tmp" ]; then mkdir -p "$CONFDIR/tmp" 2>/dev/null; fi
+if ! [[ -d "$CONFDIR/tmp" ]]; then mkdir -p "$CONFDIR/tmp" 2>/dev/null; fi
 CONFFILE="$CONFDIR/txt/niente.conf"
 
 function conf_text {
@@ -20,19 +20,19 @@ $GREPPROG -i -m1 "^$1=" "$CONFFILE" | $SEDPROG -e 's/^[^=]*=//' -e 's/^"//' -e '
 
 # Read parameters from an existing config file, if present
 # ====================================================================
-if [ -f "$CONFFILE" ]; then
-  confaccents=$(conf_text UTFCHARS); if [ -z $confaccents ]; then confaccents='no'; fi
+if [[ -f "$CONFFILE" ]]; then
+  confaccents=$(conf_text UTFCHARS); if [[ -z $confaccents ]]; then confaccents='no'; fi
   confdbname=$(conf_text DBNAME)
   confmusdir=$(conf_text MUSICDIR)
-  confsmart=$(conf_text SMALLART); if [ -z $confsmart ]; then confsmart=300; fi
-  conflgart=$(conf_text LARGEART); if [ -z $conflgart ]; then conflgart=1600; fi
-  confsqart=$(conf_text SQUAREART); if [ -z $confsqart ]; then confsqart='yes'; fi
-  confmaxv=$(conf_text VOLUMETHRESHOLD); if [ -z $confmaxv ]; then confmaxv=2; fi
-  confrepmaxv=$(conf_text REPORTMAXV); if [ -z $confrepmaxv ]; then confrepmaxv='yes'; fi
-  confnbits=$(conf_text NAMEBITS); if [ -z $confnbits ]; then confnbits='yes'; fi
+  confsmart=$(conf_text SMALLART); if [[ -z $confsmart ]]; then confsmart=300; fi
+  conflgart=$(conf_text LARGEART); if [[ -z $conflgart ]]; then conflgart=1600; fi
+  confsqart=$(conf_text SQUAREART); if [[ -z $confsqart ]]; then confsqart='yes'; fi
+  confmaxv=$(conf_text VOLUMETHRESHOLD); if [[ -z $confmaxv ]]; then confmaxv=2; fi
+  confrepmaxv=$(conf_text REPORTMAXV); if [[ -z $confrepmaxv ]]; then confrepmaxv='yes'; fi
+  confnbits=$(conf_text NAMEBITS); if [[ -z $confnbits ]]; then confnbits='yes'; fi
   confbrowz=$(conf_text BROWSER)
-  conflogosize=$(conf_text LOGOSIZE); if [ -z $conflogosize ]; then conflogosize=110; elif [[ $conflogosize == *"x"* ]]; then conflogosize=$(echo "$conflogosize" | awk -Fx '{print $1}'); fi
-  conflogopos=$(conf_text LOGOPOS); if [ -z $conflogopos ]; then conflogopos=0; fi  
+  conflogosize=$(conf_text LOGOSIZE); if [[ -z $conflogosize ]]; then conflogosize=110; elif [[ $conflogosize == *"x"* ]]; then conflogosize=$(echo "$conflogosize" | awk -Fx '{print $1}'); fi
+  conflogopos=$(conf_text LOGOPOS); if [[ -z $conflogopos ]]; then conflogopos=0; fi  
   confweztheme=$(conf_text WEZTHEME); if [[ -z $confweztheme ]]; then confweztheme="Wild Cherry (Gogh)"; fi
   confwezfntsz=$(conf_text WEZFNTSZ); if [[ -z $confwezfntsz ]]; then confwezfntsz=12; fi
   confdiatheme=$(conf_text DIATHEME); if [[ -z $confdiatheme ]]; then confdiatheme="standard"; fi
@@ -77,18 +77,18 @@ readarray -t reptparams < "$CONFDIR/tmp/confparams" 2>/dev/null
 
 CONFMUSDIR="${progparams[0]}"
 CONFDBNAME=$(clean_dbname "${progparams[1]}")              # NTFS-safe and Niente-usable, as when a database is created
-CONFACCENTS="${progparams[2]}"; if [ -z "$CONFACCENTS" ]; then CONFACCENTS="no"; fi
+CONFACCENTS="${progparams[2]}"; if [[ -z "$CONFACCENTS" ]]; then CONFACCENTS="no"; fi
 CONFBROWZ="${progparams[3]}"
 CONFLOGOSIZE="${progparams[4]}"
   if [[ $CONFLOGOSIZE =~ ^[0-9]{1,4}$ ]] && (( 10#$CONFLOGOSIZE >= 100 && 10#$CONFLOGOSIZE <= 400 )); then CONFLOGOSIZE=$((10#$CONFLOGOSIZE)); else CONFLOGOSIZE=110; fi   # 100 to 400: default 110
 CONFLOGOPOS="${progparams[5]}"
   if [[ $((CONFLOGOPOS)) != "$CONFLOGOPOS" ]]; then CONFLOGOPOS=0; fi
-CONFSMART="${reptparams[0]}"; if [ -z "$CONFSMART" ]; then CONFSMART=300; fi
-CONFLGART="${reptparams[1]}"; if [ -z "$CONFLGART" ]; then CONFLGART=1600; fi
-CONFSQART="${reptparams[2]}"; if [ -z "$CONFSQART" ]; then CONFSQART="yes"; fi
-CONFMAXV="${reptparams[3]}"; if [ -z "$CONFMAXV" ]; then CONFMAXV=2; fi
-CONFREPMAXV="${reptparams[4]}"; if [ -z "$CONFREPMAXV" ]; then CONFREPMAXV=yes; fi
-CONFNBITS="${reptparams[5]}"; if [ -z "$CONFNBITS" ]; then CONFNBITS=yes; fi
+CONFSMART="${reptparams[0]}"; if [[ -z "$CONFSMART" ]]; then CONFSMART=300; fi
+CONFLGART="${reptparams[1]}"; if [[ -z "$CONFLGART" ]]; then CONFLGART=1600; fi
+CONFSQART="${reptparams[2]}"; if [[ -z "$CONFSQART" ]]; then CONFSQART="yes"; fi
+CONFMAXV="${reptparams[3]}"; if [[ -z "$CONFMAXV" ]]; then CONFMAXV=2; fi
+CONFREPMAXV="${reptparams[4]}"; if [[ -z "$CONFREPMAXV" ]]; then CONFREPMAXV=yes; fi
+CONFNBITS="${reptparams[5]}"; if [[ -z "$CONFNBITS" ]]; then CONFNBITS=yes; fi
 CONFWEZTHEME="${progparams[6]}"; CONFWEZTHEME="${CONFWEZTHEME//\"/}"        # WezTerm colour scheme: no double quotes, as it's written in quotes
   if [[ -z $CONFWEZTHEME ]]; then CONFWEZTHEME="Wild Cherry (Gogh)"; fi
 CONFWEZFNTSZ="${progparams[7]}"
@@ -120,7 +120,7 @@ if [[ ${CONFNBITS,,} == "yes" ]] || [[ ${CONFNBITS,,} == "no" ]]; then CONFNBITS
 if [[ ${CONFREPMAXV,,} == "yes" ]] || [[ ${CONFREPMAXV,,} == "no" ]]; then CONFREPMAXV=${CONFREPMAXV,,}; else CONFREPMAXV="yes"; fi
 
 # If large and small art thresholds are the wrong way round, reverse them
-if [ $CONFSMART -gt $CONFLGART ]; then TMPART=$CONFSMART; CONFSMART=$CONFLGART; CONFLGART=$TMPART; fi
+if [[ $CONFSMART -gt $CONFLGART ]]; then TMPART=$CONFSMART; CONFSMART=$CONFLGART; CONFLGART=$TMPART; fi
 
 # Text values are written inside double quotes and the file is later sourced, so strip anything that would break
 # out of (or be expanded inside) those quotes: " $ ` and backslash (as Giocoso and Semplice do)

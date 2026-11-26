@@ -60,7 +60,7 @@ select filename from (select filename, hash_orig from tracks where hash_orig in 
 END
 
 function integrity_check {
-if [ -z "$DBNAME" ]; then return; fi
+if [[ -z "$DBNAME" ]]; then return; fi
 tput civis;
 FSSCAN=X
 PROCESSFILES="$CONFDIR/tmp/integritycheckfiles.txt"
@@ -254,5 +254,5 @@ dialog --stdout --backtitle "Niente Integrity Check Completed" --title " Check C
 }
 
 rm -rf "$CONFDIR/tmp/nienterecs.txt" >/dev/null 2>&1
-if [ -z "$1" ]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
+if [[ -z "$1" ]]; then CHECKTYPE="full"; else CHECKTYPE=$1; fi
 integrity_check
