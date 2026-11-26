@@ -87,11 +87,12 @@ function check_shellcheck {
       out+=("$line")
     done < <(shellcheck -s bash -S warning -e "$skip" -f gcc "$f" 2>/dev/null | short)
   done
-  # Accepted: guarded cds
+  # Accepted: 'local' at the top of nenoutput.sh (always sourced from inside a function) and guarded cds
   local kept=() parse=() l
   for l in "${out[@]}"; do
     case "$l" in
       *SC1036*|*SC1072*|*SC1073*) parse+=("$l"); continue;;    # shellcheck cannot parse the line: nearly always a quote or bracket out of step
+      *nenoutput.sh:*SC2168*) continue;;                       # accepted: nenoutput.sh is always sourced from inside a function
       *SC2168*) parse+=("$l"); continue;;                      # 'local' outside a function anywhere else: works only by accident of how the file is sourced
       *SC2164*) continue;;
       *SC2027*|*SC1078*|*SC1079*) continue;;                  # quote juggling inside multi-line SQL strings
