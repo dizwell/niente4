@@ -264,7 +264,7 @@ if [[ $MISSING_COUNT -eq 0 ]]; then
     dialog --stdout --backtitle "Niente Reporting - Physically Corrupt Music Files" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
-.print '<head><title>Niente Not Yet Analysed Report</title></head>'
+.print '<head><title>Niente Missing Tags Report</title></head>'
 .print '  <link rel="icon" type="image/svg+xml" href="file://$CONFDIR/art/nienteico.svg">'
 .mode html
 .headers on
