@@ -7,7 +7,7 @@
 # https://bbritten.com/softwares/niente/niente
 #
 # Copyright © H. Rogers 2019-2026
-# Version 4.10 - November 28th 2026
+# Version 4.10 - November 28th 2026 (??)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
