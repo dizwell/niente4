@@ -261,7 +261,7 @@ REPORT_TITLE="Music files that appear to be missing one or more important tags"
 REPORT_ALLCLEAR="\nAll known music files appear to have a complete complement of metadata tags.\\n\\nPress OK to continue."
 
 if [[ $MISSING_COUNT -eq 0 ]]; then
-    dialog --stdout --backtitle "Niente Reporting - Physically Corrupt Music Files" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
+    dialog --stdout --backtitle "Niente Reporting - Missing Tags" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
 .print '<head><title>Niente Missing Tags Report</title></head>'
