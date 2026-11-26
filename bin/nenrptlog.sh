@@ -353,7 +353,7 @@ REPORT_TITLE="FLACs whose bit-depth and sample rate seem incongruous"
 REPORT_ALLCLEAR="\nThere are no known examples of FLACs with apparently inappropriate bit depth & sample rate combinations.\\n\\nPress OK to continue."
 
 if [[ $BADPERCOM_COUNT -eq 0 ]]; then
-    dialog --stdout --backtitle "Niente Reporting - incongrous bit-depth and sample rates" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
+    dialog --stdout --backtitle "Niente Reporting - incongruous bit-depth and sample rates" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
 .print '<head><title>Niente Report on incongruous Bit Depth & Sample Rates</title></head>'

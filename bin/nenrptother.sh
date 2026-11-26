@@ -349,7 +349,7 @@ REPORT_TITLE="Recordings which appear to be duplicates of each other"
 REPORT_ALLCLEAR="\nThere are no known examples of FLACs which appear to be exact duplicates of each other.\\n\\nPress OK to continue."
 
 if [[ $DUPE_COUNT -eq 0 ]]; then
-    dialog --stdout --backtitle "Niente Reporting - Detection of possible duplcate recordings" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
+    dialog --stdout --backtitle "Niente Reporting - Detection of possible duplicate recordings" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
 .print '<head><title>Niente Duplicates Report</title></head>'

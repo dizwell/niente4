@@ -197,7 +197,7 @@ REPORT_TITLE="Music files that appear not to have been subject to Integrity Chec
 REPORT_ALLCLEAR="\nAll known music files appear to have been fully checked and are not missing any metadata.\\n\\nPress OK to continue."
 
 if [[ $NYA_COUNT -eq 0 ]]; then
-    dialog --stdout --backtitle "Niente Reporting - Physically Corrupt Music Files" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
+    dialog --stdout --backtitle "Niente Reporting - Files Not Yet Analysed" --title " Good News! " --msgbox "$REPORT_ALLCLEAR" 12 80
 else
     sqlite3 "$CONFDIR/db/$DBNAME.db" <<EOF > "$REPORT_FILE"
 .print '<head><title>Niente Not Yet Analysed Report</title></head>'
