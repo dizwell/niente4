@@ -3,7 +3,7 @@
 # Niente – The Digital Music Integrity Manager
 
 Niente is a FLAC integrity checker, for macOS, Linux, Windows (via WSL2)
-and Raspberry PiOS. It is licensed under the GPLv2.
+and Raspberry Pi OS. It is licensed under the GPLv2.
 
 You point it at a tree structure of folders full of FLACs and let it
 construct a database of what FLAC files exist. You then run a battery of
@@ -62,11 +62,7 @@ On first running the program, you should expect to:
 3.  Perform a full integrity check
 
 Items 1 and 2 take hardly any time; item 3 can take a couple of hours
-for a music collection of tens of thousands of FLACs
-
-## Licensing
-
-Niente is licensed under the GPLv2.
+for a music collection of tens of thousands of FLACs.
 
 ## Full Documentation
 
