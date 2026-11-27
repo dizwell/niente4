@@ -23,7 +23,7 @@ can produce seventeen different reports showing violations of the
 logical rules of music tagging.
 
 There’s also a built-in advanced SQL querying ability, together with
-integration with external tools like DB Browser for SQLite and dBeaver.
+integration with external tools like DB Browser for SQLite and DBeaver.
 
 Crucially, Niente never *writes* to your FLACs. It only ever reads from
 them. Its integrity checks are thus completely safe to perform as often
@@ -39,16 +39,18 @@ managers first. On Linux (and Linux running under Windows), your
 distro’s package manager is already available for use. On all platforms,
 installation is achieved by opening a terminal and typing:
 
-cd\
-wget software.bbritten.com/neninst\
+```
+cd
+wget software.bbritten.com/neninst
 bash neninst
+```
 
 The installer will check your system for suitability, install any
 necessary prerequisite software, copy down its own scripts and compiled
 executables and create a program launcher for you. Running it is then a
 matter of simply clicking on the program launcher (on the Linux Desktop;
 from your distro’s standard Start menu, under the Multimedia or Sound &
-Vision sub-menus; or, on macOS, in the Finder’s Applications folder.
+Vision sub-menus; or, on macOS, in the Finder’s Applications folder).
 
 ## Quick Start
 
