@@ -238,7 +238,7 @@ case $OSFAMILY in
     sudo xbps-install -Sfy dialog > /dev/null 2>&1
 
     # Define what's required    
-    packages=(bc coreutils curl dialog fd ncurses sqlite wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -283,7 +283,7 @@ case $OSFAMILY in
     sudo pacman -S --noconfirm dialog > /dev/null 2>&1
 
     # Define what's required
-    packages=(bc coreutils curl dialog fd ncurses sqlite wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -331,7 +331,7 @@ case $OSFAMILY in
     sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
         
     # Define what's required 
-    packages=(bc coreutils curl dialog fd-find libncurses* sqlite3 wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd-find sqlite3 wezterm xdg-utils)
     total=${#packages[@]}
     count=0
     
@@ -378,7 +378,7 @@ case $OSFAMILY in
     sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
 
     # Define what's required
-    packages=(bc coreutils curl dialog fd-find libncurses* sqlite3 wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd-find sqlite3 wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -425,7 +425,7 @@ case $OSFAMILY in
     sudo apt -o DPkg::Lock::Timeout=300 -y install dialog > /dev/null 2>&1
         
      # Define what's required 
-    packages=(bc coreutils curl dialog fd-find libncurses6 sqlite3 wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd-find sqlite3 wezterm xdg-utils)
     total=${#packages[@]}
     count=0
     
@@ -469,7 +469,7 @@ case $OSFAMILY in
     dnf_retry -y install dialog
     
      # Define what's required 
-    packages=(bc coreutils curl dialog fd-find ncurses sqlite wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd-find sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
     
@@ -519,7 +519,7 @@ case $OSFAMILY in
     fi
 
     # Define what's required 
-    packages=(bc coreutils curl dialog fd-find ncurses sqlite wezterm xdg-utils)
+    packages=(bc coreutils curl dialog fd-find sqlite wezterm xdg-utils)
     total=${#packages[@]}
     count=0
 
@@ -611,7 +611,7 @@ case $OSFAMILY in
     done
 
     # Define what's required
-    packages=(bc coreutils curl dialog fd gawk grep gsed md5sha1sum ncurses sqlite sqlite3 wezterm)
+    packages=(bc coreutils curl dialog fd gawk grep gsed md5sha1sum sqlite sqlite3 wezterm)
     total=${#packages[@]}
     count=0
 

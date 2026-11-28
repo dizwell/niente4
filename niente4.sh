@@ -493,8 +493,8 @@ fi
 # ===========================================================================================================
 # The actual program control code
 # ===========================================================================================================
-clear
 source "$CONFDIR/bin/nentput.sh"                     # The fast tput wrapper (installed with Niente, like every other script)
+clear
 
 # Check if parameters have been passed. If so, run non-interactively. Otherwise launch program normally
 for i in "$@"; do
